@@ -106,13 +106,9 @@ supabase --version
 
 ---
 
-# Clone Repository
+# Fork or Clone the Repository
 
-```bash
-git clone <repository-url>
-
-cd sbims
-```
+*Repository*: [https://github.com/imperionite/sbims](https://github.com/imperionite/sbims)
 
 ---
 
