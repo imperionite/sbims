@@ -1,0 +1,83 @@
+{
+  "scriptId": "286",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/@supabase/functions-js/2.111.0/dist/main/types.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 3169,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "FunctionsError",
+      "ranges": [
+        {
+          "startOffset": 538,
+          "endOffset": 682,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "toJSON",
+      "ranges": [
+        {
+          "startOffset": 687,
+          "endOffset": 830,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "FunctionsFetchError",
+      "ranges": [
+        {
+          "startOffset": 1161,
+          "endOffset": 1285,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "FunctionsRelayError",
+      "ranges": [
+        {
+          "startOffset": 1630,
+          "endOffset": 1747,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "FunctionsHttpError",
+      "ranges": [
+        {
+          "startOffset": 2079,
+          "endOffset": 2201,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 2319,
+          "endOffset": 3067,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

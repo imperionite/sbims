@@ -1,0 +1,17 @@
+{
+  "scriptId": "113",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/hono/4.12.32/dist/router/reg-exp-router/index.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 274,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

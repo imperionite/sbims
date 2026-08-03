@@ -1,0 +1,58 @@
+{
+  "scriptId": "123",
+  "url": "file:///Users/arnel/CODES/MMDC/CAPSTONE1/sbims/src/modules/auth/auth.middleware.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 689,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "requireAuth",
+      "ranges": [
+        {
+          "startOffset": 117,
+          "endOffset": 688,
+          "count": 5
+        },
+        {
+          "startOffset": 232,
+          "endOffset": 298,
+          "count": 1
+        },
+        {
+          "startOffset": 298,
+          "endOffset": 367,
+          "count": 4
+        },
+        {
+          "startOffset": 367,
+          "endOffset": 434,
+          "count": 0
+        },
+        {
+          "startOffset": 434,
+          "endOffset": 528,
+          "count": 4
+        },
+        {
+          "startOffset": 530,
+          "endOffset": 597,
+          "count": 0
+        },
+        {
+          "startOffset": 597,
+          "endOffset": 687,
+          "count": 4
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

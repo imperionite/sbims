@@ -1,0 +1,106 @@
+{
+  "scriptId": "129",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/hono/4.12.32/dist/compose.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 1161,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "compose",
+      "ranges": [
+        {
+          "startOffset": 32,
+          "endOffset": 1137,
+          "count": 12
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 80,
+          "endOffset": 1134,
+          "count": 12
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "dispatch",
+      "ranges": [
+        {
+          "startOffset": 149,
+          "endOffset": 1130,
+          "count": 48
+        },
+        {
+          "startOffset": 200,
+          "endOffset": 266,
+          "count": 0
+        },
+        {
+          "startOffset": 454,
+          "endOffset": 530,
+          "count": 0
+        },
+        {
+          "startOffset": 628,
+          "endOffset": 639,
+          "count": 46
+        },
+        {
+          "startOffset": 639,
+          "endOffset": 873,
+          "count": 2
+        },
+        {
+          "startOffset": 821,
+          "endOffset": 863,
+          "count": 0
+        },
+        {
+          "startOffset": 881,
+          "endOffset": 1006,
+          "count": 0
+        },
+        {
+          "startOffset": 1021,
+          "endOffset": 1064,
+          "count": 20
+        },
+        {
+          "startOffset": 1053,
+          "endOffset": 1063,
+          "count": 8
+        },
+        {
+          "startOffset": 1066,
+          "endOffset": 1102,
+          "count": 12
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 605,
+          "endOffset": 626,
+          "count": 36
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

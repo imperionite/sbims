@@ -1,0 +1,17 @@
+{
+  "scriptId": "63",
+  "url": "file:///Users/arnel/CODES/MMDC/CAPSTONE1/sbims/tests/fixtures/test-users.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 587,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "scriptId": "292",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/@supabase/realtime-js/2.111.0/dist/main/lib/serializer.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 7708,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "Serializer",
+      "ranges": [
+        {
+          "startOffset": 100,
+          "endOffset": 562,
+          "count": 2
+        },
+        {
+          "startOffset": 529,
+          "endOffset": 550,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "encode",
+      "ranges": [
+        {
+          "startOffset": 567,
+          "endOffset": 965,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "_binaryEncodeUserBroadcastPush",
+      "ranges": [
+        {
+          "startOffset": 970,
+          "endOffset": 1303,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "_encodeBinaryUserBroadcastPush",
+      "ranges": [
+        {
+          "startOffset": 1308,
+          "endOffset": 1624,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "_encodeJsonUserBroadcastPush",
+      "ranges": [
+        {
+          "startOffset": 1629,
+          "endOffset": 2062,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "_encodeUserBroadcastPush",
+      "ranges": [
+        {
+          "startOffset": 2067,
+          "endOffset": 5174,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "decode",
+      "ranges": [
+        {
+          "startOffset": 5179,
+          "endOffset": 5650,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "_binaryDecode",
+      "ranges": [
+        {
+          "startOffset": 5655,
+          "endOffset": 5959,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "_decodeUserBroadcast",
+      "ranges": [
+        {
+          "startOffset": 5964,
+          "endOffset": 7195,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "_isArrayBuffer",
+      "ranges": [
+        {
+          "startOffset": 7200,
+          "endOffset": 7434,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "_pick",
+      "ranges": [
+        {
+          "startOffset": 7439,
+          "endOffset": 7637,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

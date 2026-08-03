@@ -1,0 +1,17 @@
+{
+  "scriptId": "121",
+  "url": "file:///Users/arnel/CODES/MMDC/CAPSTONE1/sbims/src/modules/auth/auth.schema.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 233,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

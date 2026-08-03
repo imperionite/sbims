@@ -1,0 +1,61 @@
+{
+  "scriptId": "91",
+  "url": "file:///Users/arnel/CODES/MMDC/CAPSTONE1/sbims/src/shared/logger.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 552,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "timestamp",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 59,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "info",
+      "ranges": [
+        {
+          "startOffset": 86,
+          "endOffset": 237,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "warn",
+      "ranges": [
+        {
+          "startOffset": 241,
+          "endOffset": 393,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "error",
+      "ranges": [
+        {
+          "startOffset": 397,
+          "endOffset": 548,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

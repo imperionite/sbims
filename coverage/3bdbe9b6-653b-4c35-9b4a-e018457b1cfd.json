@@ -1,0 +1,83 @@
+{
+  "scriptId": "153",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/hono/4.12.32/dist/utils/buffer.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 2199,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "equal",
+      "ranges": [
+        {
+          "startOffset": 73,
+          "endOffset": 376,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "constantTimeEqualString",
+      "ranges": [
+        {
+          "startOffset": 408,
+          "endOffset": 722,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "timingSafeEqualString",
+      "ranges": [
+        {
+          "startOffset": 752,
+          "endOffset": 1166,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "timingSafeEqual",
+      "ranges": [
+        {
+          "startOffset": 1190,
+          "endOffset": 1599,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "bufferToString",
+      "ranges": [
+        {
+          "startOffset": 1622,
+          "endOffset": 1770,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "bufferToFormData",
+      "ranges": [
+        {
+          "startOffset": 1795,
+          "endOffset": 2120,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

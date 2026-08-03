@@ -1,0 +1,281 @@
+{
+  "scriptId": "300",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/@supabase/realtime-js/2.111.0/dist/main/RealtimePostgresFilterBuilder.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 7121,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "needsQuoting",
+      "ranges": [
+        {
+          "startOffset": 389,
+          "endOffset": 466,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "quote",
+      "ranges": [
+        {
+          "startOffset": 482,
+          "endOffset": 549,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "serializeScalar",
+      "ranges": [
+        {
+          "startOffset": 575,
+          "endOffset": 723,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "serializeIsValue",
+      "ranges": [
+        {
+          "startOffset": 750,
+          "endOffset": 800,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "serialize",
+      "ranges": [
+        {
+          "startOffset": 901,
+          "endOffset": 1435,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "RealtimePostgresFilterBuilder",
+      "ranges": [
+        {
+          "startOffset": 2736,
+          "endOffset": 2784,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "add",
+      "ranges": [
+        {
+          "startOffset": 2789,
+          "endOffset": 2986,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "eq",
+      "ranges": [
+        {
+          "startOffset": 3064,
+          "endOffset": 3135,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "neq",
+      "ranges": [
+        {
+          "startOffset": 3222,
+          "endOffset": 3295,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "gt",
+      "ranges": [
+        {
+          "startOffset": 3382,
+          "endOffset": 3453,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "gte",
+      "ranges": [
+        {
+          "startOffset": 3553,
+          "endOffset": 3626,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "lt",
+      "ranges": [
+        {
+          "startOffset": 3710,
+          "endOffset": 3781,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "lte",
+      "ranges": [
+        {
+          "startOffset": 3878,
+          "endOffset": 3951,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "in",
+      "ranges": [
+        {
+          "startOffset": 4372,
+          "endOffset": 4445,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "like",
+      "ranges": [
+        {
+          "startOffset": 4549,
+          "endOffset": 4628,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "ilike",
+      "ranges": [
+        {
+          "startOffset": 4735,
+          "endOffset": 4816,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "match",
+      "ranges": [
+        {
+          "startOffset": 4918,
+          "endOffset": 4999,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "imatch",
+      "ranges": [
+        {
+          "startOffset": 5119,
+          "endOffset": 5202,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "is",
+      "ranges": [
+        {
+          "startOffset": 5388,
+          "endOffset": 5459,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isDistinct",
+      "ranges": [
+        {
+          "startOffset": 5577,
+          "endOffset": 5664,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "not",
+      "ranges": [
+        {
+          "startOffset": 5669,
+          "endOffset": 5761,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "build",
+      "ranges": [
+        {
+          "startOffset": 6233,
+          "endOffset": 6287,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "toString",
+      "ranges": [
+        {
+          "startOffset": 6384,
+          "endOffset": 6431,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "postgresChangesFilter",
+      "ranges": [
+        {
+          "startOffset": 6966,
+          "endOffset": 7007,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

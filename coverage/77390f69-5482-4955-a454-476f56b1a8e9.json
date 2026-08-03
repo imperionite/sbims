@@ -1,0 +1,55 @@
+{
+  "scriptId": "59",
+  "url": "file:///Users/arnel/CODES/MMDC/CAPSTONE1/sbims/tests/unit/auth/auth.service.test.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 1066,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 463,
+          "endOffset": 816,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 874,
+          "endOffset": 1063,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 945,
+          "endOffset": 1049,
+          "count": 1
+        },
+        {
+          "startOffset": 1045,
+          "endOffset": 1048,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

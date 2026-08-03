@@ -1,0 +1,39 @@
+{
+  "scriptId": "97",
+  "url": "file:///Users/arnel/CODES/MMDC/CAPSTONE1/sbims/src/errors/app-error.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 156,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "<instance_members_initializer>",
+      "ranges": [
+        {
+          "startOffset": 40,
+          "endOffset": 46,
+          "count": 2
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "AppError",
+      "ranges": [
+        {
+          "startOffset": 50,
+          "endOffset": 153,
+          "count": 2
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

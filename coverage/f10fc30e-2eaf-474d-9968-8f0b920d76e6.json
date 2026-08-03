@@ -1,0 +1,83 @@
+{
+  "scriptId": "139",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/hono/4.12.32/dist/utils/body.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 2813,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "isRawRequest",
+      "ranges": [
+        {
+          "startOffset": 88,
+          "endOffset": 121,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "parseBody",
+      "ranges": [
+        {
+          "startOffset": 139,
+          "endOffset": 621,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "parseFormData",
+      "ranges": [
+        {
+          "startOffset": 623,
+          "endOffset": 1282,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "convertFormDataToBodyData",
+      "ranges": [
+        {
+          "startOffset": 1283,
+          "endOffset": 1904,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "handleParsingAllValues",
+      "ranges": [
+        {
+          "startOffset": 1934,
+          "endOffset": 2236,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "handleParsingNestedValues",
+      "ranges": [
+        {
+          "startOffset": 2270,
+          "endOffset": 2787,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

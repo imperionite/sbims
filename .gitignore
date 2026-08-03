@@ -1,0 +1,11 @@
+.env
+.env.test
+.env.dev
+.vscode/
+logs/
+DS_Store
+digest.txt
+.gitingestignore
+supabase/.temp/
+supabase/archive/
+NOTES.md

@@ -1,0 +1,303 @@
+{
+  "scriptId": "352",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/@supabase/auth-js/2.111.0/dist/main/lib/errors.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 10697,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "AuthError",
+      "ranges": [
+        {
+          "startOffset": 1277,
+          "endOffset": 1467,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "toJSON",
+      "ranges": [
+        {
+          "startOffset": 1472,
+          "endOffset": 1642,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isAuthError",
+      "ranges": [
+        {
+          "startOffset": 1676,
+          "endOffset": 1791,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "AuthApiError",
+      "ranges": [
+        {
+          "startOffset": 2059,
+          "endOffset": 2231,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "isAuthApiError",
+      "ranges": [
+        {
+          "startOffset": 2271,
+          "endOffset": 2369,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "AuthUnknownError",
+      "ranges": [
+        {
+          "startOffset": 2694,
+          "endOffset": 2845,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "CustomAuthError",
+      "ranges": [
+        {
+          "startOffset": 3193,
+          "endOffset": 3335,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "AuthSessionMissingError",
+      "ranges": [
+        {
+          "startOffset": 3659,
+          "endOffset": 3763,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isAuthSessionMissingError",
+      "ranges": [
+        {
+          "startOffset": 3825,
+          "endOffset": 3945,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "AuthInvalidTokenResponseError",
+      "ranges": [
+        {
+          "startOffset": 4222,
+          "endOffset": 4339,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "AuthInvalidCredentialsError",
+      "ranges": [
+        {
+          "startOffset": 4722,
+          "endOffset": 4821,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "AuthImplicitGrantRedirectError",
+      "ranges": [
+        {
+          "startOffset": 5266,
+          "endOffset": 5445,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "toJSON",
+      "ranges": [
+        {
+          "startOffset": 5450,
+          "endOffset": 5558,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isAuthImplicitGrantRedirectError",
+      "ranges": [
+        {
+          "startOffset": 5634,
+          "endOffset": 5768,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "AuthPKCEGrantCodeExchangeError",
+      "ranges": [
+        {
+          "startOffset": 6060,
+          "endOffset": 6239,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "toJSON",
+      "ranges": [
+        {
+          "startOffset": 6244,
+          "endOffset": 6352,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "AuthPKCECodeVerifierMissingError",
+      "ranges": [
+        {
+          "startOffset": 6850,
+          "endOffset": 7300,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isAuthPKCECodeVerifierMissingError",
+      "ranges": [
+        {
+          "startOffset": 7380,
+          "endOffset": 7518,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "AuthRetryableFetchError",
+      "ranges": [
+        {
+          "startOffset": 7814,
+          "endOffset": 7920,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isAuthRetryableFetchError",
+      "ranges": [
+        {
+          "startOffset": 7982,
+          "endOffset": 8102,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "AuthRefreshDiscardedError",
+      "ranges": [
+        {
+          "startOffset": 8947,
+          "endOffset": 9134,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isAuthRefreshDiscardedError",
+      "ranges": [
+        {
+          "startOffset": 9200,
+          "endOffset": 9324,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "AuthWeakPasswordError",
+      "ranges": [
+        {
+          "startOffset": 9798,
+          "endOffset": 9949,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "toJSON",
+      "ranges": [
+        {
+          "startOffset": 9954,
+          "endOffset": 10062,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isAuthWeakPasswordError",
+      "ranges": [
+        {
+          "startOffset": 10120,
+          "endOffset": 10236,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "AuthInvalidJwtError",
+      "ranges": [
+        {
+          "startOffset": 10514,
+          "endOffset": 10609,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

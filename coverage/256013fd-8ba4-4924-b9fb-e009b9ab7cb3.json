@@ -1,0 +1,60 @@
+{
+  "scriptId": "107",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/hono/4.12.32/dist/utils/color.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 765,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getColorEnabled",
+      "ranges": [
+        {
+          "startOffset": 22,
+          "endOffset": 312,
+          "count": 12
+        },
+        {
+          "startOffset": 161,
+          "endOffset": 288,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getColorEnabledAsync",
+      "ranges": [
+        {
+          "startOffset": 313,
+          "endOffset": 710,
+          "count": 12
+        },
+        {
+          "startOffset": 520,
+          "endOffset": 666,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 529,
+          "endOffset": 662,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

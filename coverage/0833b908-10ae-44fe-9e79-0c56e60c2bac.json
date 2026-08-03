@@ -1,0 +1,60 @@
+{
+  "scriptId": "313",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/@supabase/auth-js/2.111.0/dist/main/lib/locks.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 16533,
+          "count": 1
+        },
+        {
+          "startOffset": 1052,
+          "endOffset": 1086,
+          "count": 0
+        },
+        {
+          "startOffset": 1087,
+          "endOffset": 1174,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "LockAcquireTimeoutError",
+      "ranges": [
+        {
+          "startOffset": 1549,
+          "endOffset": 1639,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "navigatorLock",
+      "ranges": [
+        {
+          "startOffset": 3929,
+          "endOffset": 12286,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "processLock",
+      "ranges": [
+        {
+          "startOffset": 13371,
+          "endOffset": 16499,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

@@ -1,0 +1,512 @@
+{
+  "scriptId": "351",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/@supabase/auth-js/2.111.0/dist/main/lib/helpers.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 24473,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "expiresAt",
+      "ranges": [
+        {
+          "startOffset": 1589,
+          "endOffset": 1705,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "generateCallbackId",
+      "ranges": [
+        {
+          "startOffset": 2345,
+          "endOffset": 2414,
+          "count": 3
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "isBrowser",
+      "ranges": [
+        {
+          "startOffset": 2433,
+          "endOffset": 2503,
+          "count": 15
+        },
+        {
+          "startOffset": 2469,
+          "endOffset": 2503,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "supportsLocalStorage",
+      "ranges": [
+        {
+          "startOffset": 2710,
+          "endOffset": 3769,
+          "count": 1
+        },
+        {
+          "startOffset": 2782,
+          "endOffset": 2887,
+          "count": 0
+        },
+        {
+          "startOffset": 2898,
+          "endOffset": 3768,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "parseParametersFromURL",
+      "ranges": [
+        {
+          "startOffset": 3906,
+          "endOffset": 4501,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "resolveFetch",
+      "ranges": [
+        {
+          "startOffset": 4523,
+          "endOffset": 4662,
+          "count": 6
+        },
+        {
+          "startOffset": 4563,
+          "endOffset": 4620,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 4580,
+          "endOffset": 4613,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 4632,
+          "endOffset": 4659,
+          "count": 36
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "looksLikeFetchResponse",
+      "ranges": [
+        {
+          "startOffset": 4732,
+          "endOffset": 4993,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "setItemAsync",
+      "ranges": [
+        {
+          "startOffset": 5092,
+          "endOffset": 5179,
+          "count": 6
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getItemAsync",
+      "ranges": [
+        {
+          "startOffset": 5239,
+          "endOffset": 5821,
+          "count": 42
+        },
+        {
+          "startOffset": 5355,
+          "endOffset": 5819,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "removeItemAsync",
+      "ranges": [
+        {
+          "startOffset": 5884,
+          "endOffset": 5946,
+          "count": 4
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "Deferred",
+      "ranges": [
+        {
+          "startOffset": 6216,
+          "endOffset": 6549,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "decodeJWT",
+      "ranges": [
+        {
+          "startOffset": 6620,
+          "endOffset": 7421,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "sleep",
+      "ranges": [
+        {
+          "startOffset": 7490,
+          "endOffset": 7617,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "retryable",
+      "ranges": [
+        {
+          "startOffset": 7822,
+          "endOffset": 8578,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "dec2hex",
+      "ranges": [
+        {
+          "startOffset": 8579,
+          "endOffset": 8652,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "generatePKCEVerifier",
+      "ranges": [
+        {
+          "startOffset": 8808,
+          "endOffset": 9385,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "sha256",
+      "ranges": [
+        {
+          "startOffset": 9386,
+          "endOffset": 9719,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "generatePKCEChallenge",
+      "ranges": [
+        {
+          "startOffset": 9720,
+          "endOffset": 10235,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "validatePKCEFlowId",
+      "ranges": [
+        {
+          "startOffset": 10509,
+          "endOffset": 10640,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "generatePKCEFlowId",
+      "ranges": [
+        {
+          "startOffset": 10641,
+          "endOffset": 11046,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "pkceVerifierSlotKey",
+      "ranges": [
+        {
+          "startOffset": 11510,
+          "endOffset": 11578,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "pkceFlowIndexKey",
+      "ranges": [
+        {
+          "startOffset": 11656,
+          "endOffset": 11707,
+          "count": 2
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getPKCEFlowIndex",
+      "ranges": [
+        {
+          "startOffset": 12015,
+          "endOffset": 12271,
+          "count": 1
+        },
+        {
+          "startOffset": 12200,
+          "endOffset": 12255,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 12215,
+          "endOffset": 12254,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "storePKCEVerifier",
+      "ranges": [
+        {
+          "startOffset": 12820,
+          "endOffset": 13837,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "retrievePKCEVerifier",
+      "ranges": [
+        {
+          "startOffset": 14211,
+          "endOffset": 14690,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "removePKCEVerifier",
+      "ranges": [
+        {
+          "startOffset": 14929,
+          "endOffset": 16133,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "removeAllPKCEVerifiers",
+      "ranges": [
+        {
+          "startOffset": 16444,
+          "endOffset": 16875,
+          "count": 1
+        },
+        {
+          "startOffset": 16600,
+          "endOffset": 16714,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "appendFlowIdToRedirectTo",
+      "ranges": [
+        {
+          "startOffset": 17184,
+          "endOffset": 18042,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getCodeChallengeAndMethod",
+      "ranges": [
+        {
+          "startOffset": 18043,
+          "endOffset": 18661,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "parseResponseAPIVersion",
+      "ranges": [
+        {
+          "startOffset": 18801,
+          "endOffset": 19195,
+          "count": 1
+        },
+        {
+          "startOffset": 18949,
+          "endOffset": 18977,
+          "count": 0
+        },
+        {
+          "startOffset": 19024,
+          "endOffset": 19052,
+          "count": 0
+        },
+        {
+          "startOffset": 19154,
+          "endOffset": 19193,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "validateExp",
+      "ranges": [
+        {
+          "startOffset": 19196,
+          "endOffset": 19420,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getAlgorithm",
+      "ranges": [
+        {
+          "startOffset": 19421,
+          "endOffset": 19856,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "validateUUID",
+      "ranges": [
+        {
+          "startOffset": 19942,
+          "endOffset": 20099,
+          "count": 7
+        },
+        {
+          "startOffset": 20002,
+          "endOffset": 20097,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "assertPasskeyExperimentalEnabled",
+      "ranges": [
+        {
+          "startOffset": 20100,
+          "endOffset": 20421,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "userNotAvailableProxy",
+      "ranges": [
+        {
+          "startOffset": 20422,
+          "endOffset": 22159,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "insecureUserWarningProxy",
+      "ranges": [
+        {
+          "startOffset": 22575,
+          "endOffset": 24236,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "deepClone",
+      "ranges": [
+        {
+          "startOffset": 24366,
+          "endOffset": 24437,
+          "count": 6
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

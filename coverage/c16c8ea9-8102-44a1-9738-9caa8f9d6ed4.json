@@ -1,0 +1,44 @@
+{
+  "scriptId": "61",
+  "url": "file:///Users/arnel/CODES/MMDC/CAPSTONE1/sbims/src/app.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 867,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 522,
+          "endOffset": 625,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 640,
+          "endOffset": 864,
+          "count": 2
+        },
+        {
+          "startOffset": 749,
+          "endOffset": 863,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

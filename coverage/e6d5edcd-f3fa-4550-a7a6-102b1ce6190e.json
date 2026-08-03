@@ -1,0 +1,201 @@
+{
+  "scriptId": "113",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/zod/3.25.76/v3/helpers/parseUtil.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 3601,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "makeIssue",
+      "ranges": [
+        {
+          "startOffset": 117,
+          "endOffset": 833,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "addIssueToContext",
+      "ranges": [
+        {
+          "startOffset": 872,
+          "endOffset": 1469,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "ParseStatus",
+      "ranges": [
+        {
+          "startOffset": 1501,
+          "endOffset": 1552,
+          "count": 9
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "dirty",
+      "ranges": [
+        {
+          "startOffset": 1557,
+          "endOffset": 1642,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "abort",
+      "ranges": [
+        {
+          "startOffset": 1647,
+          "endOffset": 1736,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "mergeArray",
+      "ranges": [
+        {
+          "startOffset": 1748,
+          "endOffset": 2099,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "mergeObjectAsync",
+      "ranges": [
+        {
+          "startOffset": 2111,
+          "endOffset": 2468,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "mergeObjectSync",
+      "ranges": [
+        {
+          "startOffset": 2480,
+          "endOffset": 3165,
+          "count": 1
+        },
+        {
+          "startOffset": 2579,
+          "endOffset": 3098,
+          "count": 6
+        },
+        {
+          "startOffset": 2680,
+          "endOffset": 2695,
+          "count": 0
+        },
+        {
+          "startOffset": 2756,
+          "endOffset": 2771,
+          "count": 0
+        },
+        {
+          "startOffset": 2828,
+          "endOffset": 2843,
+          "count": 0
+        },
+        {
+          "startOffset": 2902,
+          "endOffset": 2917,
+          "count": 0
+        },
+        {
+          "startOffset": 2999,
+          "endOffset": 3016,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "DIRTY",
+      "ranges": [
+        {
+          "startOffset": 3255,
+          "endOffset": 3294,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "OK",
+      "ranges": [
+        {
+          "startOffset": 3314,
+          "endOffset": 3353,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "isAborted",
+      "ranges": [
+        {
+          "startOffset": 3380,
+          "endOffset": 3409,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isDirty",
+      "ranges": [
+        {
+          "startOffset": 3434,
+          "endOffset": 3461,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isValid",
+      "ranges": [
+        {
+          "startOffset": 3486,
+          "endOffset": 3513,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "isAsync",
+      "ranges": [
+        {
+          "startOffset": 3538,
+          "endOffset": 3599,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

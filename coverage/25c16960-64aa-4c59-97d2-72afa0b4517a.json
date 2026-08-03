@@ -1,0 +1,50 @@
+{
+  "scriptId": "283",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/@supabase/functions-js/2.111.0/dist/main/FunctionsClient.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 14175,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "FunctionsClient",
+      "ranges": [
+        {
+          "startOffset": 1132,
+          "endOffset": 1378,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "setAuth",
+      "ranges": [
+        {
+          "startOffset": 1678,
+          "endOffset": 1756,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "invoke",
+      "ranges": [
+        {
+          "startOffset": 6963,
+          "endOffset": 14086,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

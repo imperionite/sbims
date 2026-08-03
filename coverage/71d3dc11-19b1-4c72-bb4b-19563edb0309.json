@@ -1,0 +1,281 @@
+{
+  "scriptId": "343",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/@supabase/realtime-js/2.111.0/dist/main/phoenix/channelAdapter.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 3156,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "ChannelAdapter",
+      "ranges": [
+        {
+          "startOffset": 153,
+          "endOffset": 358,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "get state",
+      "ranges": [
+        {
+          "startOffset": 363,
+          "endOffset": 417,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "set state",
+      "ranges": [
+        {
+          "startOffset": 422,
+          "endOffset": 482,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "get joinedOnce",
+      "ranges": [
+        {
+          "startOffset": 487,
+          "endOffset": 551,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "get joinPush",
+      "ranges": [
+        {
+          "startOffset": 556,
+          "endOffset": 616,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "get rejoinTimer",
+      "ranges": [
+        {
+          "startOffset": 621,
+          "endOffset": 687,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "on",
+      "ranges": [
+        {
+          "startOffset": 692,
+          "endOffset": 768,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "off",
+      "ranges": [
+        {
+          "startOffset": 773,
+          "endOffset": 846,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "subscribe",
+      "ranges": [
+        {
+          "startOffset": 851,
+          "endOffset": 920,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "unsubscribe",
+      "ranges": [
+        {
+          "startOffset": 925,
+          "endOffset": 997,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "teardown",
+      "ranges": [
+        {
+          "startOffset": 1002,
+          "endOffset": 1053,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "onClose",
+      "ranges": [
+        {
+          "startOffset": 1058,
+          "endOffset": 1123,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "onError",
+      "ranges": [
+        {
+          "startOffset": 1128,
+          "endOffset": 1200,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "push",
+      "ranges": [
+        {
+          "startOffset": 1205,
+          "endOffset": 1871,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "updateJoinPayload",
+      "ranges": [
+        {
+          "startOffset": 1876,
+          "endOffset": 2073,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "canPush",
+      "ranges": [
+        {
+          "startOffset": 2078,
+          "endOffset": 2189,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isJoined",
+      "ranges": [
+        {
+          "startOffset": 2194,
+          "endOffset": 2277,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isJoining",
+      "ranges": [
+        {
+          "startOffset": 2282,
+          "endOffset": 2367,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isClosed",
+      "ranges": [
+        {
+          "startOffset": 2372,
+          "endOffset": 2455,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isLeaving",
+      "ranges": [
+        {
+          "startOffset": 2460,
+          "endOffset": 2545,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "updateFilterBindings",
+      "ranges": [
+        {
+          "startOffset": 2550,
+          "endOffset": 2648,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "updatePayloadTransform",
+      "ranges": [
+        {
+          "startOffset": 2653,
+          "endOffset": 2736,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getChannel",
+      "ranges": [
+        {
+          "startOffset": 2774,
+          "endOffset": 2823,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "phoenixChannelParams",
+      "ranges": [
+        {
+          "startOffset": 2860,
+          "endOffset": 3113,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

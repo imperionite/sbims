@@ -1,0 +1,93 @@
+{
+  "scriptId": "152",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/hono/4.12.32/dist/router/trie-router/node.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 6456,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "hasChildren",
+      "ranges": [
+        {
+          "startOffset": 236,
+          "endOffset": 320,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "<instance_members_initializer>",
+      "ranges": [
+        {
+          "startOffset": 349,
+          "endOffset": 422,
+          "count": 4
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "_Node",
+      "ranges": [
+        {
+          "startOffset": 426,
+          "endOffset": 763,
+          "count": 4
+        },
+        {
+          "startOffset": 576,
+          "endOffset": 586,
+          "count": 0
+        },
+        {
+          "startOffset": 588,
+          "endOffset": 734,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "insert",
+      "ranges": [
+        {
+          "startOffset": 766,
+          "endOffset": 1729,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "#pushHandlerSets",
+      "ranges": [
+        {
+          "startOffset": 1732,
+          "endOffset": 2606,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "search",
+      "ranges": [
+        {
+          "startOffset": 2609,
+          "endOffset": 6433,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

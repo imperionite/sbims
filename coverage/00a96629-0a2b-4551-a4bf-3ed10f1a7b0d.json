@@ -1,0 +1,28 @@
+{
+  "scriptId": "154",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/zod/3.25.76/v3/locales/en.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 5602,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "errorMap",
+      "ranges": [
+        {
+          "startOffset": 122,
+          "endOffset": 5575,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

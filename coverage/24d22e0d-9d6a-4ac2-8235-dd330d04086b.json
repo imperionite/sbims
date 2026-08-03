@@ -1,0 +1,28 @@
+{
+  "scriptId": "99",
+  "url": "file:///Users/arnel/CODES/MMDC/CAPSTONE1/sbims/src/lib/supabase.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 1388,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createAuthenticatedClient",
+      "ranges": [
+        {
+          "startOffset": 689,
+          "endOffset": 981,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

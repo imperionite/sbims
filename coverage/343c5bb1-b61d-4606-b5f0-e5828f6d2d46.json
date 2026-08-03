@@ -1,0 +1,92 @@
+{
+  "scriptId": "151",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/hono/4.12.32/dist/router/reg-exp-router/trie.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 1689,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "<instance_members_initializer>",
+      "ranges": [
+        {
+          "startOffset": 92,
+          "endOffset": 140,
+          "count": 3
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "insert",
+      "ranges": [
+        {
+          "startOffset": 144,
+          "endOffset": 983,
+          "count": 8
+        },
+        {
+          "startOffset": 581,
+          "endOffset": 586,
+          "count": 0
+        },
+        {
+          "startOffset": 637,
+          "endOffset": 871,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 330,
+          "endOffset": 468,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "buildRegExp",
+      "ranges": [
+        {
+          "startOffset": 986,
+          "endOffset": 1666,
+          "count": 3
+        },
+        {
+          "startOffset": 1071,
+          "endOffset": 1107,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 1259,
+          "endOffset": 1579,
+          "count": 3
+        },
+        {
+          "startOffset": 1428,
+          "endOffset": 1578,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "scriptId": "340",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/@supabase/realtime-js/2.111.0/dist/main/phoenix/presenceAdapter.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 3608,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "PresenceAdapter",
+      "ranges": [
+        {
+          "startOffset": 153,
+          "endOffset": 964,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "get state",
+      "ranges": [
+        {
+          "startOffset": 969,
+          "endOffset": 1056,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "transformState",
+      "ranges": [
+        {
+          "startOffset": 1614,
+          "endOffset": 1897,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "onJoinPayload",
+      "ranges": [
+        {
+          "startOffset": 1909,
+          "endOffset": 2224,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "onLeavePayload",
+      "ranges": [
+        {
+          "startOffset": 2236,
+          "endOffset": 2557,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "transformState",
+      "ranges": [
+        {
+          "startOffset": 2595,
+          "endOffset": 3150,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "cloneState",
+      "ranges": [
+        {
+          "startOffset": 3151,
+          "endOffset": 3227,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "phoenixPresenceOptions",
+      "ranges": [
+        {
+          "startOffset": 3228,
+          "endOffset": 3366,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "parseCurrentPresences",
+      "ranges": [
+        {
+          "startOffset": 3367,
+          "endOffset": 3564,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

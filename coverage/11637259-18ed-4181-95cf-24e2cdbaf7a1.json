@@ -1,0 +1,270 @@
+{
+  "scriptId": "316",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/@supabase/auth-js/2.111.0/dist/main/lib/webauthn.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 35801,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "get",
+      "ranges": [
+        {
+          "startOffset": 1319,
+          "endOffset": 1388,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "get",
+      "ranges": [
+        {
+          "startOffset": 1478,
+          "endOffset": 1545,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "get",
+      "ranges": [
+        {
+          "startOffset": 1625,
+          "endOffset": 1682,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "get",
+      "ranges": [
+        {
+          "startOffset": 1760,
+          "endOffset": 1815,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "createNewAbortSignal",
+      "ranges": [
+        {
+          "startOffset": 2559,
+          "endOffset": 3048,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "cancelCeremony",
+      "ranges": [
+        {
+          "startOffset": 3317,
+          "endOffset": 3606,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "deserializeCredentialCreationOptions",
+      "ranges": [
+        {
+          "startOffset": 4567,
+          "endOffset": 6711,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "deserializeCredentialRequestOptions",
+      "ranges": [
+        {
+          "startOffset": 7286,
+          "endOffset": 9072,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "serializeCredentialCreationResponse",
+      "ranges": [
+        {
+          "startOffset": 9572,
+          "endOffset": 10581,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "serializeCredentialRequestResponse",
+      "ranges": [
+        {
+          "startOffset": 11087,
+          "endOffset": 12774,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "isValidDomain",
+      "ranges": [
+        {
+          "startOffset": 13335,
+          "endOffset": 13551,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "browserSupportsWebAuthn",
+      "ranges": [
+        {
+          "startOffset": 13907,
+          "endOffset": 14450,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "createCredential",
+      "ranges": [
+        {
+          "startOffset": 15009,
+          "endOffset": 15946,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getCredential",
+      "ranges": [
+        {
+          "startOffset": 16488,
+          "endOffset": 17421,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "deepMerge",
+      "ranges": [
+        {
+          "startOffset": 18002,
+          "endOffset": 19167,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "mergeCredentialCreationOptions",
+      "ranges": [
+        {
+          "startOffset": 19809,
+          "endOffset": 19962,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "mergeCredentialRequestOptions",
+      "ranges": [
+        {
+          "startOffset": 20518,
+          "endOffset": 20669,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "WebAuthnApi",
+      "ranges": [
+        {
+          "startOffset": 21129,
+          "endOffset": 21499,
+          "count": 2
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "_enroll",
+      "ranges": [
+        {
+          "startOffset": 22073,
+          "endOffset": 22211,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "_challenge",
+      "ranges": [
+        {
+          "startOffset": 23337,
+          "endOffset": 27866,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "_verify",
+      "ranges": [
+        {
+          "startOffset": 28659,
+          "endOffset": 28849,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "_authenticate",
+      "ranges": [
+        {
+          "startOffset": 30065,
+          "endOffset": 31889,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "_register",
+      "ranges": [
+        {
+          "startOffset": 33029,
+          "endOffset": 35727,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}

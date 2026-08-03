@@ -1,0 +1,54 @@
+### VARS (Common
+@apiUrl=http://localhost:8000/api/v1
+@accessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjMzc2ZGE4Ni0zMTA4LTRkNzktYmU1Ny01NDQxOTVjNDg4Y2EiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg1NzM5MzYwLCJpYXQiOjE3ODU3MzU3NjAsImVtYWlsIjoiYWRtaW5zYmltczFAbWFpbGRyb3AuY2MiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiSXNhYWMiLCJsYXN0X25hbWUiOiJDbGFya2UiLCJtaWRkbGVfbmFtZSI6Ik1hcmFkb25hIiwicm9sZSI6ImFkbWluaXN0cmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg1NzM1NzYwfV0sInNlc3Npb25faWQiOiIxOWQ2ZmNiNS1iY2M1LTRjN2MtYTZlMC1lNDY3ZjBmYjQyMGMiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.awM2gYjEV3hkbXRuVEG2K8cg8egxpRdqDErf7q8QKxqvgqMky34-cw7JptobuPpalXSZmH5vhFfbPSMKUrAVew
+#### VARS (Email & Password)
+@admin=adminsbims1@maildrop.cc
+@icoordinator=coordinatorsbims1@maildrop.cc
+@password=Dev2026!
+@newPassword=deV2026!
+
+
+### Health check
+GET {{apiUrl}}/health
+
+### Login - First time login
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{admin}}",
+  "password": "{{password}}"
+}
+
+
+### Login - Subsequent login
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{admin}}",
+  "password": "{{newPassword}}"
+}
+
+
+############################################
+#### Change Password (first time login) ####
+############################################
+POST {{apiUrl}}/auth/change-password
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "newPassword": "{{newPassword}}"
+}
+
+
+### Current User
+GET {{apiUrl}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Logout
+POST {{apiUrl}}/auth/logout
+Authorization: Bearer {{accessToken}}

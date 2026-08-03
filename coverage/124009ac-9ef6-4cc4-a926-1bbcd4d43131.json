@@ -1,0 +1,116 @@
+{
+  "scriptId": "289",
+  "url": "file:///Users/arnel/Library/Caches/deno/npm/registry.npmjs.org/@supabase/realtime-js/2.111.0/dist/main/lib/websocket-factory.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [
+        {
+          "startOffset": 0,
+          "endOffset": 4551,
+          "count": 1
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "WebSocketFactory",
+      "ranges": [
+        {
+          "startOffset": 280,
+          "endOffset": 297,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "detectEnvironment",
+      "ranges": [
+        {
+          "startOffset": 309,
+          "endOffset": 2986,
+          "count": 2
+        },
+        {
+          "startOffset": 469,
+          "endOffset": 585,
+          "count": 0
+        },
+        {
+          "startOffset": 587,
+          "endOffset": 724,
+          "count": 0
+        },
+        {
+          "startOffset": 725,
+          "endOffset": 736,
+          "count": 0
+        },
+        {
+          "startOffset": 753,
+          "endOffset": 791,
+          "count": 0
+        },
+        {
+          "startOffset": 793,
+          "endOffset": 973,
+          "count": 0
+        },
+        {
+          "startOffset": 974,
+          "endOffset": 1032,
+          "count": 0
+        },
+        {
+          "startOffset": 1034,
+          "endOffset": 1434,
+          "count": 0
+        },
+        {
+          "startOffset": 1436,
+          "endOffset": 1581,
+          "count": 0
+        },
+        {
+          "startOffset": 1583,
+          "endOffset": 2985,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getWebSocketConstructor",
+      "ranges": [
+        {
+          "startOffset": 3450,
+          "endOffset": 3850,
+          "count": 2
+        },
+        {
+          "startOffset": 3604,
+          "endOffset": 3691,
+          "count": 0
+        },
+        {
+          "startOffset": 3721,
+          "endOffset": 3849,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "isWebSocketSupported",
+      "ranges": [
+        {
+          "startOffset": 4219,
+          "endOffset": 4422,
+          "count": 0
+        }
+      ],
+      "isBlockCoverage": false
+    }
+  ]
+}
