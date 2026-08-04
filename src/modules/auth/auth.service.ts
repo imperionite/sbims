@@ -1,10 +1,18 @@
 import { supabaseAdmin, supabaseClient } from "../../lib/supabase.ts";
-
 import { AppError } from "../../errors/app-error.ts";
 
-import type { ChangePasswordRequest, LoginRequest } from "./auth.schema.ts";
+import type {
+  ChangePasswordRequest,
+  LoginRequest,
+  RefreshTokenRequest,
+} from "./auth.schema.ts";
 
-import type { AuthUser, LoginResponse, Profile } from "./auth.types.ts";
+import type {
+  AuthUser,
+  LoginResponse,
+  Profile,
+  TokenResponse,
+} from "./auth.types.ts";
 
 import { logger } from "../../shared/logger.ts";
 
@@ -42,11 +50,15 @@ export class AuthService {
     }
 
     return {
-      accessToken: data.session.access_token,
-      refreshToken: data.session.refresh_token,
-      requiresPasswordChange: profile.must_change_password,
+      ...this.mapTokens(data.session),
       user: this.mapProfile(profile),
     };
+  }
+
+  async refresh(request: RefreshTokenRequest): Promise<TokenResponse> {
+    const session = await this.refreshSession(request.refreshToken);
+
+    return this.mapTokens(session);
   }
 
   async changePassword(userId: string, request: ChangePasswordRequest) {
@@ -74,6 +86,29 @@ export class AuthService {
 
     return {
       message: "Password changed successfully.",
+    };
+  }
+
+  private async refreshSession(refreshToken: string) {
+    const { data, error } = await supabaseClient.auth.refreshSession({
+      refresh_token: refreshToken,
+    });
+
+    if (error || !data.session) {
+      throw new AppError(401, "Invalid refresh token.");
+    }
+
+    return data.session;
+  }
+
+  private mapTokens(session: {
+    access_token: string;
+    refresh_token: string;
+  }): TokenResponse {
+    return {
+      accessToken: session.access_token,
+
+      refreshToken: session.refresh_token,
     };
   }
 

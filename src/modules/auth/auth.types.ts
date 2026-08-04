@@ -23,16 +23,15 @@ export interface AuthUser {
   mustChangePassword: boolean;
 }
 
-export interface LoginResponse {
+export interface TokenResponse {
   accessToken: string;
 
   refreshToken: string;
-
-  requiresPasswordChange: boolean;
-
-  user: AuthUser;
 }
 
+export interface LoginResponse extends TokenResponse {
+  user: AuthUser;
+}
 export interface Profile {
   id: string;
 

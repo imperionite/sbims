@@ -1,6 +1,6 @@
 ### VARS (Common
 @apiUrl=http://localhost:8000/api/v1
-@accessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjMzc2ZGE4Ni0zMTA4LTRkNzktYmU1Ny01NDQxOTVjNDg4Y2EiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg1NzM5MzYwLCJpYXQiOjE3ODU3MzU3NjAsImVtYWlsIjoiYWRtaW5zYmltczFAbWFpbGRyb3AuY2MiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiSXNhYWMiLCJsYXN0X25hbWUiOiJDbGFya2UiLCJtaWRkbGVfbmFtZSI6Ik1hcmFkb25hIiwicm9sZSI6ImFkbWluaXN0cmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg1NzM1NzYwfV0sInNlc3Npb25faWQiOiIxOWQ2ZmNiNS1iY2M1LTRjN2MtYTZlMC1lNDY3ZjBmYjQyMGMiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.awM2gYjEV3hkbXRuVEG2K8cg8egxpRdqDErf7q8QKxqvgqMky34-cw7JptobuPpalXSZmH5vhFfbPSMKUrAVew
+@accessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjMzc2ZGE4Ni0zMTA4LTRkNzktYmU1Ny01NDQxOTVjNDg4Y2EiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg1ODI0OTQ4LCJpYXQiOjE3ODU4MjEzNDgsImVtYWlsIjoiYWRtaW5zYmltczFAbWFpbGRyb3AuY2MiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiSXNhYWMiLCJsYXN0X25hbWUiOiJDbGFya2UiLCJtaWRkbGVfbmFtZSI6Ik1hcmFkb25hIiwicm9sZSI6ImFkbWluaXN0cmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg1ODIxMzI3fV0sInNlc3Npb25faWQiOiI0MDNhYjJhZi1lNjM5LTRkNGMtYTY4Ni05NzdmMjBkM2ZmMDUiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ._eTT0o8BcugfaM4FI5JyZR01y1C0GNE3ZGOwZd8kmdh4Quxli72Jb2Jq1e6ZyRHA4MYQMiO7KaE3dFOgA0vqRw
 #### VARS (Email & Password)
 @admin=adminsbims1@maildrop.cc
 @icoordinator=coordinatorsbims1@maildrop.cc
@@ -52,3 +52,13 @@ Authorization: Bearer {{accessToken}}
 ### Logout
 POST {{apiUrl}}/auth/logout
 Authorization: Bearer {{accessToken}}
+
+############################################
+####  Refresh token (Public).           ####
+############################################
+POST {{apiUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "v74nisbcscqe"
+}
