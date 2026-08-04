@@ -1,7 +1,11 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 
-import { changePasswordSchema, loginSchema } from "./auth.schema.ts";
+import {
+  changePasswordSchema,
+  loginSchema,
+  refreshTokenSchema,
+} from "./auth.schema.ts";
 
 import { authService } from "./auth.service.ts";
 
@@ -60,7 +64,8 @@ auth.get("/me", requireAuth, async (c) => {
   });
 });
 
-// It does not invalidate the access token on the client side bu revokes refresh token associated with the access token on the server side that expires typicall in one 1 hour
+// Logout revokes the refresh token session on Supabase.
+// The current access token remains valid until it expires (typically 1 hour)
 auth.post("/logout", requireAuth, async (c) => {
   const authHeader = c.req.header("Authorization");
   const token = authHeader?.split(" ")[1];
@@ -81,6 +86,17 @@ auth.post("/logout", requireAuth, async (c) => {
     data: {
       message: "Logged out successfully.",
     },
+  });
+});
+
+auth.post("/refresh", zValidator("json", refreshTokenSchema), async (c) => {
+  const body = c.req.valid("json");
+
+  const result = await authService.refresh(body);
+
+  return c.json({
+    success: true,
+    data: result,
   });
 });
 
