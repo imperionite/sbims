@@ -1,11 +1,7 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 
-import {
-  changePasswordSchema,
-  loginSchema,
-  refreshTokenSchema,
-} from "./auth.schema.ts";
+import { changePasswordSchema, loginSchema, refreshTokenSchema } from "./auth.schema.ts";
 
 import { authService } from "./auth.service.ts";
 
@@ -36,9 +32,7 @@ auth.post("/login", zValidator("json", loginSchema), async (c) => {
 auth.post(
   "/change-password",
   requireAuth,
-
   zValidator("json", changePasswordSchema),
-
   async (c) => {
     const body = c.req.valid("json");
 

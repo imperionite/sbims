@@ -1,18 +1,9 @@
 import { supabaseAdmin, supabaseClient } from "../../lib/supabase.ts";
 import { AppError } from "../../errors/app-error.ts";
 
-import type {
-  ChangePasswordRequest,
-  LoginRequest,
-  RefreshTokenRequest,
-} from "./auth.schema.ts";
+import type { ChangePasswordRequest, LoginRequest, RefreshTokenRequest } from "./auth.schema.ts";
 
-import type {
-  AuthUser,
-  LoginResponse,
-  Profile,
-  TokenResponse,
-} from "./auth.types.ts";
+import type { AuthUser, LoginResponse, Profile, TokenResponse } from "./auth.types.ts";
 
 import { logger } from "../../shared/logger.ts";
 
@@ -84,8 +75,11 @@ export class AuthService {
       throw new AppError(500, profileError.message);
     }
 
+    const user = await this.getCurrentUser(userId);
+
     return {
       message: "Password changed successfully.",
+      user,
     };
   }
 
