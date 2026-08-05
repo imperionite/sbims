@@ -1,7 +1,5 @@
 import { assertEquals, assertRejects } from "@std/assert";
 
-import { stub } from "@std/testing/mock";
-
 import { AuthService } from "../../../src/modules/auth/auth.service.ts";
 
 import { AppError } from "../../../src/errors/app-error.ts";
@@ -26,6 +24,7 @@ const mockProfile = {
   must_change_password: false,
 };
 
+// deno-lint-ignore require-await
 Deno.test("AuthService should map profile correctly", async () => {
   const service = new AuthService();
 
@@ -60,7 +59,6 @@ Deno.test("AuthService should reject missing profile", async () => {
       // @ts-ignore accessing private method
       await service.getProfile("missing-user");
     },
-
     AppError,
   );
 });

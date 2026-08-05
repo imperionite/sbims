@@ -13,6 +13,7 @@ async function findAuthUser(email: string) {
   );
 }
 
+// deno-lint-ignore no-explicit-any
 async function ensureAuthUser(user: any) {
   let authUser = await findAuthUser(user.email);
 
@@ -34,7 +35,9 @@ async function ensureAuthUser(user: any) {
 }
 
 async function resetProfile(
+  // deno-lint-ignore no-explicit-any
   user: any,
+  // deno-lint-ignore no-explicit-any
   authUser: any,
   mustChangePassword: boolean,
 ) {
@@ -68,13 +71,13 @@ async function resetProfile(
   }
 }
 
+// deno-lint-ignore no-explicit-any
 async function resetFirstLoginUser(authUser: any) {
   const user = TEST_USERS.firstLogin;
 
-  const { error: passwordError } =
-    await supabaseAdmin.auth.admin.updateUserById(authUser.id, {
-      password: user.password,
-    });
+  const { error: passwordError } = await supabaseAdmin.auth.admin.updateUserById(authUser.id, {
+    password: user.password,
+  });
 
   if (passwordError) {
     throw passwordError;

@@ -2,7 +2,8 @@
 
 ## 🪬 Core Collaboration Rules
 
-1. **Never commit directly to your `local main` but ensure it is alawys ensync with the `remote main`.**
+1. **Never commit directly to your `local main` but ensure it is alawys ensync with the
+   `remote main`.**
 2. **Always create a feature branch** for your work.
 3. **Name your branch using your first name and the approved requirement ID** (e.g., `arnel/fr-01`).
 4. Write **clear PR descriptions**. Explain what changed, why, and how to test it.
@@ -12,7 +13,8 @@
 8. **Announce your PR in the group chat** once it’s ready for review.
 9. **Test your changes thoroughly** and include **manual testing evidence** in your PR.
 10. **Resolve all known issues on your end before submitting your PR**, not after.
-11. **Respect deadlines and communicate early**. If you’re blocked or delayed, inform the team as soon as possible.
+11. **Respect deadlines and communicate early**. If you’re blocked or delayed, inform the team as
+    soon as possible.
 12. **Ask questions if anything is unclear**—collaboration is highly encouraged.
 
 To ensure smooth collaboration and maintain code quality, follow these instructions strictly:
@@ -48,7 +50,8 @@ git checkout -b arnel/fr-02
 
 - Implement **only what is described in the guided TODO instructions**.
 - Avoid over-engineering; **excessive complexity may result in returning the work for revisions**.
-- Provide **concise, meaningful comments only**. Detailed inline comments are discouraged; commit messages should be the primary documentation.
+- Provide **concise, meaningful comments only**. Detailed inline comments are discouraged; commit
+  messages should be the primary documentation.
 
 ---
 
@@ -62,7 +65,8 @@ git commit -m "add this feature...."
 ```
 
 - **Detailed commit messages are encouraged**, but avoid heavy inline comments in code.
-- If your implementation deviates from the TODO without proper documentation in commits, your work may be returned for revision.
+- If your implementation deviates from the TODO without proper documentation in commits, your work
+  may be returned for revision.
 
 ---
 
@@ -87,7 +91,8 @@ git push origin arnel/fr-02
 
 - On GitHub, create a **Pull Request (PR)** targeting `main`.
 - Clearly indicate the resource/task your PR addresses.
-- Failure to address first your development environment issues (if you have) result in PR being returned for revisions.
+- Failure to address first your development environment issues (if you have) result in PR being
+  returned for revisions.
 
 ---
 

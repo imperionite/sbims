@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertExists } from "@std/assert";
 
 import { app } from "../../src/app.ts";
 
@@ -109,7 +109,14 @@ Deno.test("FR-01 first login should require password change", async () => {
 
   assertEquals(response.status, 200);
 
-  assertEquals(body.data.requiresPasswordChange, true);
+  assertExists(body.data);
+  assertExists(body.data.user);
+
+  assertEquals(
+    body.data.user.mustChangePassword,
+    true,
+    "First login user should be required to change password",
+  );
 });
 
 Deno.test("FR-01 password change should clear first login state", async () => {

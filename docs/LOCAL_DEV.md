@@ -108,7 +108,7 @@ supabase --version
 
 # Fork or Clone the Repository
 
-*Repository*: [https://github.com/imperionite/sbims](https://github.com/imperionite/sbims)
+_Repository_: [https://github.com/imperionite/sbims](https://github.com/imperionite/sbims)
 
 ---
 
