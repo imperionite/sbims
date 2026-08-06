@@ -21,7 +21,7 @@
     "test:integration": "deno test --env-file=.env.test tests/integration --allow-read --allow-env --allow-net",
     "test:coverage": "deno test --env-file=.env.test tests --coverage=coverage --allow-env --allow-net --allow-read && deno coverage coverage",
     "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts",
-    "start": "deno serve --env-file=.env --allow-env --allow-net --allow-read src/main.ts"
+    "deploy": "deployctl deploy src/main.ts"
   },
   "fmt": {
     "lineWidth": 100
