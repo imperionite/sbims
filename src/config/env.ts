@@ -17,7 +17,7 @@ const envSchema = z.object({
 
   FRONTEND_URL: z.string().url(),
 
-  RATE_LIMIT_ENABLED: z.boolean(),
+  RATE_LIMIT_ENABLED: z.coerce.boolean(),
 });
 
 const parsed = envSchema.parse({
