@@ -72,3 +72,24 @@ export const supabaseAdmin = createClient(
     },
   },
 );
+
+/**
+ * Creates a fresh public Supabase client.
+ *
+ * Used for authentication flows that need to
+ * establish a session explicitly.
+ *
+ * Examples:
+ * - password recovery
+ * - email verification
+ *
+ * Does not persist sessions.
+ */
+export function createPublicClient() {
+  return createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
