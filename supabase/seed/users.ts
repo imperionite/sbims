@@ -33,7 +33,7 @@ const seedPassword = "Dev2026!";
 
 const seedUsers: SeedUser[] = [
   {
-    email: "adminsbims1@maildrop.cc",
+    email: "adminsbims1@grr.la",
     password: seedPassword,
     firstName: "Isaac",
     middleName: "Maradona",
@@ -43,7 +43,7 @@ const seedUsers: SeedUser[] = [
   },
 
   {
-    email: "coordinatorsbims1@maildrop.cc",
+    email: "coordinatorsbims1@grr.la",
     password: seedPassword,
     firstName: "Elise",
     middleName: "Manansala",
@@ -53,7 +53,7 @@ const seedUsers: SeedUser[] = [
   },
 
   {
-    email: "facultysbims1@maildrop.cc",
+    email: "facultysbims1@grr.la",
     password: seedPassword,
     firstName: "Nathaniel Andres",
     middleName: "Sarmiento",
@@ -63,7 +63,7 @@ const seedUsers: SeedUser[] = [
   },
 
   {
-    email: "studentsbims1@maildrop.cc",
+    email: "studentsbims1@grr.la",
     password: seedPassword,
     firstName: "Rafael Joaquin",
     middleName: "Bondoc",
@@ -73,7 +73,7 @@ const seedUsers: SeedUser[] = [
   },
 
   {
-    email: "htesbims1@maildrop.cc",
+    email: "htesbims1@grr.la",
     password: seedPassword,
     firstName: "Roberto Luis",
     middleName: "Fernandez",

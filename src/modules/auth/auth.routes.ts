@@ -1,13 +1,22 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 
-import { changePasswordSchema, loginSchema, refreshTokenSchema } from "./auth.schema.ts";
+import {
+  changePasswordSchema,
+  completePasswordResetSchema,
+  forgotPasswordSchema,
+  loginSchema,
+  refreshTokenSchema,
+} from "./auth.schema.ts";
 
 import { authService } from "./auth.service.ts";
 
 import { requireAuth } from "./auth.middleware.ts";
 import { createAuthenticatedClient } from "../../lib/supabase.ts";
 import { logger } from "../../shared/logger.ts";
+
+import { rateLimit } from "../../middlware/rate-limit.middlware.ts";
+import { rateLimitConfig } from "../../config/rate-limit.ts";
 
 const auth = new Hono<{
   Variables: {
@@ -18,20 +27,62 @@ const auth = new Hono<{
   };
 }>();
 
-auth.post("/login", zValidator("json", loginSchema), async (c) => {
-  const body = c.req.valid("json");
+auth.post(
+  "/login",
+  rateLimit(rateLimitConfig.login),
+  zValidator("json", loginSchema),
+  async (c) => {
+    const body = c.req.valid("json");
 
-  const result = await authService.login(body);
+    const result = await authService.login(body);
 
-  return c.json({
-    success: true,
-    data: result,
-  });
-});
+    return c.json({
+      success: true,
+      data: result,
+    });
+  },
+);
+
+auth.post(
+  "/forgot-password",
+  rateLimit(rateLimitConfig.forgotPassword),
+  zValidator("json", forgotPasswordSchema),
+  async (c) => {
+    const body = c.req.valid("json");
+
+    const result = await authService.forgotPassword(body);
+
+    return c.json({
+      success: true,
+      message: result.message,
+      data: null,
+    });
+  },
+);
+
+auth.post(
+  "/reset-password/complete",
+  rateLimit(rateLimitConfig.completePasswordReset),
+  zValidator("json", completePasswordResetSchema),
+  async (c) => {
+    const body = c.req.valid("json");
+
+    const result = await authService.completePasswordReset(body);
+
+    return c.json({
+      success: true,
+      message: result.message,
+      data: {
+        user: result.user,
+      },
+    });
+  },
+);
 
 auth.post(
   "/change-password",
   requireAuth,
+  rateLimit(rateLimitConfig.changePassword),
   zValidator("json", changePasswordSchema),
   async (c) => {
     const body = c.req.valid("json");
@@ -83,15 +134,20 @@ auth.post("/logout", requireAuth, async (c) => {
   });
 });
 
-auth.post("/refresh", zValidator("json", refreshTokenSchema), async (c) => {
-  const body = c.req.valid("json");
+auth.post(
+  "/refresh",
+  rateLimit(rateLimitConfig.refresh),
+  zValidator("json", refreshTokenSchema),
+  async (c) => {
+    const body = c.req.valid("json");
 
-  const result = await authService.refresh(body);
+    const result = await authService.refresh(body);
 
-  return c.json({
-    success: true,
-    data: result,
-  });
-});
+    return c.json({
+      success: true,
+      data: result,
+    });
+  },
+);
 
 export default auth;

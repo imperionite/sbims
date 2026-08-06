@@ -1,11 +1,21 @@
+import { env } from "../../config/env.ts";
 import { supabaseAdmin, supabaseClient } from "../../lib/supabase.ts";
+
 import { AppError } from "../../errors/app-error.ts";
 
-import type { ChangePasswordRequest, LoginRequest, RefreshTokenRequest } from "./auth.schema.ts";
+import type {
+  ChangePasswordRequest,
+  CompletePasswordResetRequest,
+  ForgotPasswordRequest,
+  LoginRequest,
+  RefreshTokenRequest,
+} from "./auth.schema.ts";
 
 import type { AuthUser, LoginResponse, Profile, TokenResponse } from "./auth.types.ts";
 
 import { logger } from "../../shared/logger.ts";
+
+const SUCCESS_MESSAGE = "If the email is registered, a password reset link has been sent.";
 
 export class AuthService {
   async login(request: LoginRequest): Promise<LoginResponse> {
@@ -79,6 +89,66 @@ export class AuthService {
 
     return {
       message: "Password changed successfully.",
+      user,
+    };
+  }
+
+  async forgotPassword(request: ForgotPasswordRequest) {
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("id, must_change_password")
+      .eq("email", request.email.toLowerCase())
+      .maybeSingle();
+
+    // Prevent email enumeration.
+    // If no profile exists, return silently.
+    if (!profile) {
+      return {
+        message: SUCCESS_MESSAGE,
+      };
+    }
+
+    if (profile.must_change_password) {
+      throw new AppError(
+        400,
+        "Please sign in using your temporary password before using Forgot Password.",
+      );
+    }
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(
+      request.email,
+      {
+        redirectTo: `${env.FRONTEND_URL}/reset-password`,
+      },
+    );
+
+    if (error) {
+      logger.error("Unable to initiate password recovery.", error);
+
+      throw new AppError(500, "Unable to process password reset request.");
+    }
+
+    return {
+      message: SUCCESS_MESSAGE,
+    };
+  }
+
+  async completePasswordReset(request: CompletePasswordResetRequest) {
+    const { error } = await supabaseAdmin
+      .from("profiles")
+      .update({
+        must_change_password: false,
+      })
+      .eq("id", request.userId);
+
+    if (error) {
+      throw new AppError(500, error.message);
+    }
+
+    const user = await this.getCurrentUser(request.userId);
+
+    return {
+      message: "Password reset completed.",
       user,
     };
   }
