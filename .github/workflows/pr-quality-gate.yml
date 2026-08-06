@@ -11,7 +11,6 @@ permissions:
 
 jobs:
   quality-gate:
-
     name: SBIMS Quality Gate
 
     runs-on: ubuntu-latest
@@ -27,19 +26,16 @@ jobs:
       RATE_LIMIT_ENABLED: false
       ENVIRONMENT: test
 
-
     steps:
 
       # ============================================
       # START TRACE
       # ============================================
-
       - name: Initialize CI Traceability
         run: |
           echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
 
           echo "START_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
-
 
       # ============================================
       # CHECKOUT
@@ -47,7 +43,6 @@ jobs:
 
       - name: Checkout Repository
         uses: actions/checkout@v4
-
 
       # ============================================
       # DENO SETUP
@@ -58,11 +53,9 @@ jobs:
         with:
           deno-version: 2.9.4
 
-
       - name: Cache Deno Dependencies
         uses: actions/cache@v4
         with:
-
           path: |
             ~/.cache/deno
             ~/.deno
@@ -72,14 +65,11 @@ jobs:
           restore-keys: |
             deno-${{ runner.os }}-
 
-
       - name: Install Dependencies
         run: |
           deno cache src/main.ts
           deno cache tests/unit/**/*.ts
           deno cache tests/integration/**/*.ts
-
-
 
       # ============================================
       # FORMAT
@@ -96,8 +86,6 @@ jobs:
 
           echo "FORMAT_TIME=$((END-START))s" >> $GITHUB_ENV
 
-
-
       # ============================================
       # LINT
       # ============================================
@@ -112,8 +100,6 @@ jobs:
           END=$(date +%s)
 
           echo "LINT_TIME=$((END-START))s" >> $GITHUB_ENV
-
-
 
       # ============================================
       # TYPE CHECK
@@ -130,8 +116,6 @@ jobs:
 
           echo "TYPE_TIME=$((END-START))s" >> $GITHUB_ENV
 
-
-
       # ============================================
       # UNIT TESTS
       # ============================================
@@ -147,8 +131,6 @@ jobs:
 
           echo "UNIT_TIME=$((END-START))s" >> $GITHUB_ENV
 
-
-
       # ============================================
       # INTEGRATION TESTS
       # ============================================
@@ -163,8 +145,6 @@ jobs:
           END=$(date +%s)
 
           echo "INTEGRATION_TIME=$((END-START))s" >> $GITHUB_ENV
-
-
 
       # ============================================
       # FINAL REPORT
