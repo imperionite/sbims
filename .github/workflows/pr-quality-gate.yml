@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   quality-gate:
+
     name: SBIMS Quality Gate
 
     runs-on: ubuntu-latest
@@ -19,46 +20,74 @@ jobs:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
       SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+
       FRONTEND_URL: http://localhost:5173
       ALLOWED_ORIGINS: http://localhost:5173
+
       RATE_LIMIT_ENABLED: false
       ENVIRONMENT: test
 
+
     steps:
-      - name: Start CI Timer
-        id: timer
+
+      # ============================================
+      # START TRACE
+      # ============================================
+
+      - name: Initialize CI Traceability
         run: |
           echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
 
+          echo "START_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
+
+
+      # ============================================
+      # CHECKOUT
+      # ============================================
+
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+
+      # ============================================
+      # DENO SETUP
+      # ============================================
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: v2.x
 
+
       - name: Cache Deno Dependencies
         uses: actions/cache@v4
         with:
+
           path: |
             ~/.cache/deno
             ~/.deno
+
           key: deno-${{ runner.os }}-${{ hashFiles('deno.json') }}
+
           restore-keys: |
             deno-${{ runner.os }}-
 
+
       - name: Install Dependencies
         run: |
-          deno cache src/main.ts tests/unit/**/*.ts tests/integration/**/*.ts
+          deno cache src/main.ts
+          deno cache tests/unit/**/*.ts
+          deno cache tests/integration/**/*.ts
 
-      # ===============================
-      # FORMAT CHECK
-      # ===============================
+
+
+      # ============================================
+      # FORMAT
+      # ============================================
 
       - name: Format Check
-        id: format
         run: |
+
           START=$(date +%s)
 
           deno fmt --check
@@ -67,12 +96,13 @@ jobs:
 
           echo "FORMAT_TIME=$((END-START))s" >> $GITHUB_ENV
 
-      # ===============================
-      # LINT CHECK
-      # ===============================
+
+
+      # ============================================
+      # LINT
+      # ============================================
 
       - name: Lint Check
-        id: lint
         run: |
 
           START=$(date +%s)
@@ -83,12 +113,13 @@ jobs:
 
           echo "LINT_TIME=$((END-START))s" >> $GITHUB_ENV
 
-      # ===============================
+
+
+      # ============================================
       # TYPE CHECK
-      # ===============================
+      # ============================================
 
       - name: Type Check
-        id: typecheck
         run: |
 
           START=$(date +%s)
@@ -99,12 +130,13 @@ jobs:
 
           echo "TYPE_TIME=$((END-START))s" >> $GITHUB_ENV
 
-      # ===============================
+
+
+      # ============================================
       # UNIT TESTS
-      # ===============================
+      # ============================================
 
       - name: Unit Tests
-        id: unit
         run: |
 
           START=$(date +%s)
@@ -115,12 +147,13 @@ jobs:
 
           echo "UNIT_TIME=$((END-START))s" >> $GITHUB_ENV
 
-      # ===============================
+
+
+      # ============================================
       # INTEGRATION TESTS
-      # ===============================
+      # ============================================
 
       - name: Integration Tests
-        id: integration
         run: |
 
           START=$(date +%s)
@@ -131,9 +164,11 @@ jobs:
 
           echo "INTEGRATION_TIME=$((END-START))s" >> $GITHUB_ENV
 
-      # ===============================
-      # FINAL TRACEABILITY REPORT
-      # ===============================
+
+
+      # ============================================
+      # FINAL REPORT
+      # ============================================
 
       - name: SBIMS Quality Gate Report
         if: always()
@@ -141,6 +176,8 @@ jobs:
         run: |
 
           END_TIME=$(date +%s)
+
+          END_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
           TOTAL=$((END_TIME-START_TIME))
 
@@ -154,12 +191,28 @@ jobs:
           echo ""
 
           echo "Repository : ${{ github.repository }}"
-          echo "Workflow   : PR Quality Gate"
-          echo "Branch     : ${{ github.head_ref }}"
-          echo "PR         : #${{ github.event.pull_request.number }}"
-          echo "Commit     : ${{ github.event.pull_request.head.sha }}"
-          echo "Actor      : ${{ github.actor }}"
-          echo "Run ID     : ${{ github.run_id }}"
+          echo "Workflow   : ${{ github.workflow }}"
+          echo "Event      : ${{ github.event_name }}"
+
+          echo ""
+
+          echo "Base Branch : ${{ github.base_ref }}"
+          echo "Head Branch : ${{ github.head_ref }}"
+
+          echo "PR          : #${{ github.event.pull_request.number }}"
+
+          echo "Commit      : ${{ github.event.pull_request.head.sha }}"
+
+          echo "Actor       : ${{ github.actor }}"
+
+          echo "Run ID      : ${{ github.run_id }}"
+
+          echo ""
+
+          echo "Started     : $START_TIMESTAMP"
+
+          echo "Finished    : $END_TIMESTAMP"
+
 
           echo ""
 
@@ -169,40 +222,57 @@ jobs:
 
           echo ""
 
-          echo "✓ Format                ${FORMAT_TIME:-FAILED}"
-          echo "✓ Lint                  ${LINT_TIME:-FAILED}"
+          echo "✓ Format Check          ${FORMAT_TIME:-FAILED}"
+
+          echo "✓ Lint Check            ${LINT_TIME:-FAILED}"
+
           echo "✓ Type Check            ${TYPE_TIME:-FAILED}"
+
           echo "✓ Unit Tests            ${UNIT_TIME:-FAILED}"
+
           echo "✓ Integration Tests     ${INTEGRATION_TIME:-FAILED}"
 
-          echo ""
-
-          echo "----------------------------------------------------------------------"
-          echo "Total CI Time : ${TOTAL}s"
-          echo "----------------------------------------------------------------------"
 
           echo ""
 
-          if [ "${{ job.status }}" = "success" ]; then
+          echo "----------------------------------------------------------------------"
 
-            echo "======================================================================"
-            echo "RESULT"
-            echo "======================================================================"
+          echo "Total CI Duration : ${TOTAL}s"
+
+          echo "----------------------------------------------------------------------"
+
+
+          echo ""
+
+          echo "======================================================================"
+          echo "RESULT"
+          echo "======================================================================"
+
+
+          if [ "${{ job.status }}" = "success" ]
+
+          then
 
             echo ""
+
             echo "STATUS : PASS"
+
             echo ""
-            echo "✓ Ready for Human Review"
+
+            echo "✓ Quality Gate Passed"
+
+            echo "✓ Ready for Review"
 
           else
 
-            echo "======================================================================"
-            echo "RESULT"
-            echo "======================================================================"
+            echo ""
+
+            echo "STATUS : FAIL"
 
             echo ""
-            echo "STATUS : FAIL"
-            echo ""
+
+            echo "✗ Quality Gate Failed"
+
             echo "✗ Merge blocked - Fix required"
 
             exit 1
