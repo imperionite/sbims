@@ -1,4 +1,4 @@
-import { env } from "../../config/env.ts";
+import { loadEnv } from "../../config/env.ts";
 import { supabaseAdmin, supabaseClient } from "../../lib/supabase.ts";
 
 import { AppError } from "../../errors/app-error.ts";
@@ -16,6 +16,8 @@ import type { AuthUser, LoginResponse, Profile, TokenResponse } from "./auth.typ
 import { logger } from "../../shared/logger.ts";
 
 const SUCCESS_MESSAGE = "If the email is registered, a password reset link has been sent.";
+
+const env = loadEnv();
 
 export class AuthService {
   async login(request: LoginRequest): Promise<LoginResponse> {

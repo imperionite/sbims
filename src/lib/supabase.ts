@@ -1,5 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
-import { env } from "../config/env.ts";
+import { loadEnv } from "../config/env.ts";
+
+const env = loadEnv();
 
 /**
  * Public Supabase client
