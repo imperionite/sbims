@@ -12,11 +12,14 @@ import {
 import { authService } from "./auth.service.ts";
 
 import { requireAuth } from "./auth.middleware.ts";
-import { createAuthenticatedClient } from "../../lib/supabase.ts";
+import { createAuthenticatedClient, supabaseAdmin } from "../../lib/supabase.ts";
 import { logger } from "../../shared/logger.ts";
+import { AppError } from "../../errors/app-error.ts";
 
 import { rateLimit } from "../../middlware/rate-limit.middlware.ts";
 import { rateLimitConfig } from "../../config/rate-limit.ts";
+import { requireRole } from "./role.middleware.ts";
+import { AuthRole } from "./auth.types.ts";
 
 const auth = new Hono<{
   Variables: {
@@ -24,6 +27,8 @@ const auth = new Hono<{
       id: string;
       email?: string;
     };
+
+    userRole: AuthRole;
   };
 }>();
 
@@ -146,6 +151,39 @@ auth.post(
     return c.json({
       success: true,
       data: result,
+    });
+  },
+);
+
+auth.get("/role", requireAuth, async (c) => {
+  const user = c.get("user");
+
+  const { data, error } = await supabaseAdmin
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (error || !data) {
+    throw new AppError(404, "Profile not found.");
+  }
+
+  return c.json({
+    success: true,
+    data: {
+      role: data.role,
+    },
+  });
+});
+
+auth.get(
+  "/admin-check",
+  requireAuth,
+  requireRole("administrator"),
+  (c) => {
+    return c.json({
+      success: true,
+      message: "Administrator access granted.",
     });
   },
 );
