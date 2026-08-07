@@ -1,0 +1,388 @@
+###############################################################
+
+# SBIMS API
+# User and Role Management Module (FR-02)
+
+# Order of execution:
+#
+# 1. Login Administrator
+# 2. List Users
+# 3. View Single User
+# 4. Create User
+# 5. Update User Profile
+# 6. Change User Role
+# 7. Disable User
+# 8. Enable User
+# 9. Authorization Tests
+
+###############################################################
+
+###############################################################
+
+# Variables
+
+###############################################################
+
+@apiUrl=http://localhost:8000/api/v1
+
+
+###############################################################
+
+# Seed Users
+
+###############################################################
+
+@admin=adminsbims1@grr.la
+@student=studentsbims1@grr.la
+@faculty=facultysbims1@grr.la
+
+@defaultPassword=Dev2026!
+
+
+###############################################################
+
+# Tokens
+
+###############################################################
+
+# Replace after login
+
+@adminToken=PASTE_ADMIN_ACCESS_TOKEN
+
+@studentToken=PASTE_STUDENT_ACCESS_TOKEN
+
+
+###############################################################
+
+# USER IDS
+
+###############################################################
+
+# Replace after creating user
+
+@userId=REPLACE_USER_UUID
+
+
+
+###############################################################
+
+# LOGIN ADMINISTRATOR
+
+###############################################################
+
+### Login Administrator
+
+### Expected:
+### - HTTP 200
+### - role = administrator
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{admin}}",
+  "password": "{{defaultPassword}}"
+}
+
+
+
+###############################################################
+
+# FR-02 LIST USERS
+
+###############################################################
+
+### List Users
+
+### Permission:
+### administrator only
+
+### Expected:
+### - HTTP 200
+### - Returns user list
+
+GET {{apiUrl}}/users
+Authorization: Bearer {{adminToken}}
+
+
+
+###############################################################
+
+# FR-02 VIEW USER
+
+###############################################################
+
+### View Single User
+
+### Replace USER_ID with existing user UUID
+
+### Expected:
+### - HTTP 200
+### - Returns profile information
+
+GET {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+
+
+###############################################################
+
+# FR-02 CREATE USER
+
+###############################################################
+
+### Create New Student Account
+
+### Expected:
+### - HTTP 201
+### - User created in Supabase Auth
+### - Profile created
+### - must_change_password = true
+
+POST {{apiUrl}}/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "email": "newstudent.sbims@test.com",
+  "firstName": "Juan",
+  "middleName": "Dela",
+  "lastName": "Cruz",
+  "suffix": null,
+  "role": "student",
+  "password": "Password2026!"
+}
+
+
+
+###############################################################
+
+# FR-02 UPDATE USER PROFILE
+
+###############################################################
+
+### Update User Information
+
+### Expected:
+### - HTTP 200
+### - Profile fields updated
+
+PATCH {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Juan Miguel",
+  "middleName": "Dela",
+  "lastName": "Cruz Updated",
+  "suffix": null
+}
+
+
+
+###############################################################
+
+# VERIFY PROFILE UPDATE
+
+###############################################################
+
+### Expected:
+### - HTTP 200
+### - Updated values returned
+
+GET {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+
+
+###############################################################
+
+# FR-02 CHANGE USER ROLE
+
+###############################################################
+
+### Change Student Role
+
+### Example:
+### student -> faculty_adviser
+
+### Expected:
+### - HTTP 200
+### - Role updated
+
+PATCH {{apiUrl}}/users/{{userId}}/role
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "role": "faculty_adviser"
+}
+
+
+
+###############################################################
+
+# VERIFY ROLE CHANGE
+
+###############################################################
+
+### Expected:
+### - role = faculty_adviser
+
+GET {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+
+
+###############################################################
+
+# FR-02 DISABLE USER
+
+###############################################################
+
+### Disable User
+
+### Expected:
+### - HTTP 200
+### - is_active = false
+
+PATCH {{apiUrl}}/users/{{userId}}/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+
+
+###############################################################
+
+# VERIFY DISABLED USER
+
+###############################################################
+
+GET {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+
+
+###############################################################
+
+# FR-02 ENABLE USER
+
+###############################################################
+
+### Enable User
+
+### Expected:
+### - HTTP 200
+### - is_active = true
+
+PATCH {{apiUrl}}/users/{{userId}}/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isActive": true
+}
+
+
+
+###############################################################
+
+# AUTHORIZATION TESTS
+
+###############################################################
+
+### Student Login
+
+### Copy token response
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{student}}",
+  "password": "{{defaultPassword}}"
+}
+
+
+
+###############################################################
+
+# Student Access User List
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+GET {{apiUrl}}/users
+Authorization: Bearer {{studentToken}}
+
+
+
+###############################################################
+
+# Student Access Single User
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+GET {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{studentToken}}
+
+
+
+###############################################################
+
+# Student Update User
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+PATCH {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Unauthorized Update"
+}
+
+
+
+###############################################################
+
+# Student Change Role
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+PATCH {{apiUrl}}/users/{{userId}}/role
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "role": "administrator"
+}
+
+
+
+###############################################################
+
+# Missing Token
+
+###############################################################
+
+### Expected:
+### HTTP 401 Unauthorized
+
+GET {{apiUrl}}/users
+
