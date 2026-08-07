@@ -1,7 +1,9 @@
 import type { Context, Next } from "hono";
 
 import { AppError } from "../errors/app-error.ts";
-import { RATE_LIMIT_ENABLED } from "../config/rate-limit.config.ts";
+import { loadEnv } from "../config/env.ts";
+
+const env = loadEnv();
 
 /**
  * ============================================================
@@ -95,7 +97,7 @@ export function rateLimit(config: RateLimitConfig) {
      *
      * Enabled by default.
      */
-    if (!RATE_LIMIT_ENABLED) {
+    if (!env.RATE_LIMIT_ENABLED) {
       await next();
       return;
     }

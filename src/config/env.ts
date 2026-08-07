@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { getEnv } from "./runtime.ts";
 
 const envSchema = z.object({
   SUPABASE_URL: z.string().url(),
@@ -17,31 +18,33 @@ const envSchema = z.object({
 
   FRONTEND_URL: z.string().url(),
 
-  RATE_LIMIT_ENABLED: z.coerce.boolean(),
+  RATE_LIMIT_ENABLED: z.coerce.boolean().default(true),
 });
 
-const parsed = envSchema.parse({
-  SUPABASE_URL: Deno.env.get("SUPABASE_URL"),
+export function loadEnv() {
+  const parsed = envSchema.parse({
+    SUPABASE_URL: getEnv("SUPABASE_URL"),
 
-  SUPABASE_ANON_KEY: Deno.env.get("SUPABASE_PUBLISHABLE_KEY"),
+    SUPABASE_ANON_KEY: getEnv("SUPABASE_PUBLISHABLE_KEY"),
 
-  SUPABASE_SERVICE_ROLE_KEY: Deno.env.get("SUPABASE_SECRET_KEY"),
+    SUPABASE_SERVICE_ROLE_KEY: getEnv("SUPABASE_SECRET_KEY"),
 
-  PORT: Deno.env.get("PORT"),
+    PORT: getEnv("PORT"),
 
-  ENVIRONMENT: Deno.env.get("ENVIRONMENT"),
+    ENVIRONMENT: getEnv("ENVIRONMENT"),
 
-  ALLOWED_ORIGINS: Deno.env.get("ALLOWED_ORIGINS"),
+    ALLOWED_ORIGINS: getEnv("ALLOWED_ORIGINS"),
 
-  FRONTEND_URL: Deno.env.get("FRONTEND_URL"),
+    FRONTEND_URL: getEnv("FRONTEND_URL"),
 
-  RATE_LIMIT_ENABLED: Deno.env.get("RATE_LIMIT_ENABLED") !== "false",
-});
+    RATE_LIMIT_ENABLED: getEnv("RATE_LIMIT_ENABLED") !== "false",
+  });
 
-export const env = {
-  ...parsed,
+  return {
+    ...parsed,
 
-  ALLOWED_ORIGINS: parsed.ALLOWED_ORIGINS.split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean),
-} as const;
+    ALLOWED_ORIGINS: parsed.ALLOWED_ORIGINS.split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean),
+  } as const;
+}

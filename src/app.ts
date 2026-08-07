@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger as honologger } from "hono/logger";
-import { env } from "./config/env.ts";
+import { loadEnv } from "./config/env.ts";
 import { logger as appLogger } from "./shared/logger.ts";
 
 import api from "./routes/index.ts";
@@ -11,6 +11,8 @@ import { AppError } from "./errors/app-error.ts";
 import { failure } from "./shared/response.ts";
 
 export const app = new Hono();
+
+const env = loadEnv();
 
 app.use("*", honologger());
 
