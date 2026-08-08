@@ -46,9 +46,9 @@
 
 ###############################################################
 
-@admin=[adminsbims1@grr.la](mailto:adminsbims1@grr.la)
-@student=[studentsbims1@grr.la](mailto:studentsbims1@grr.la)
-@faculty=[facultysbims1@grr.la](mailto:facultysbims1@grr.la)
+@admin=adminsbims1@grr.la
+@student=studentsbims1@grr.la
+@faculty=acultysbims1@grr.la
 
 @defaultPassword=Dev2026!
 @adminUserId=ADD_HERE
@@ -63,7 +63,7 @@
 
 @adminToken=PASTE_ADMIN_ACCESS_TOKEN
 
-@studentToken=PASTE_STUDENT_ACCESS_TOKEN
+@studentToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJhOGQ2YmZlNC00OTVlLTRhZmEtYTQzNS04MjEwZWU0NjAwNjYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg2MTkwMDY3LCJpYXQiOjE3ODYxODY0NjcsImVtYWlsIjoic3R1ZGVudHNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmFmYWVsIEpvYXF1aW4iLCJsYXN0X25hbWUiOiJEaW1hbGFudGEiLCJtaWRkbGVfbmFtZSI6IkJvbmRvYyIsInJvbGUiOiJzdHVkZW50Iiwic3VmZml4IjoiSUlJIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODYxODY0Njd9XSwic2Vzc2lvbl9pZCI6IjJlNzc5NzczLTZmNmYtNDU2My1iNTFmLTUzYzdkZjAxM2U3YyIsImlzX2Fub255bW91cyI6ZmFsc2V9.KyvC0c5L8hKOvC0DFrphtqi4vuz35N_OIwD9uy_nJ_GGT4BQz8I1Gqbw-6e0nI4ro1f5JZNCtiP2v45np5IO_Q
 
 @facultyToken=PASTE_FACULTY_ACCESS_TOKEN
 

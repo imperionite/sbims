@@ -26,7 +26,7 @@
 @apiUrl=http://localhost:8000/api/v1
 
 ### Access token from a successful login
-@accessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0Zjk5NTBhYS1mZWMwLTQ2YWQtODdiZC02YTA1OTg3NGZhZmYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg2MDk4NDc0LCJpYXQiOjE3ODYwOTQ4NzQsImVtYWlsIjoiYWRtaW5zYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IklzYWFjIiwibGFzdF9uYW1lIjoiQ2xhcmtlIiwibWlkZGxlX25hbWUiOiJNYXJhZG9uYSIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic3VmZml4IjpudWxsfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc4NjA5NDg3NH1dLCJzZXNzaW9uX2lkIjoiMThiNDYxY2UtNzc0Zi00NzVlLTk0MmEtNTA4NmI4OWQwNGU5IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.EHENwWTi2mCwS3D654rGS4aoK5-4CDVslGLtJ_8W4cDMWAAZSq3MXZNKGadL5TDJnmvv9Re14J4cPo2q7vi9LQ
+@accessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0Zjk5NTBhYS1mZWMwLTQ2YWQtODdiZC02YTA1OTg3NGZhZmYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg2MTkyMTc3LCJpYXQiOjE3ODYxODg1NzcsImVtYWlsIjoiYWRtaW5zYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IklzYWFjIiwibGFzdF9uYW1lIjoiQ2xhcmtlIiwibWlkZGxlX25hbWUiOiJNYXJhZG9uYSIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic3VmZml4IjpudWxsfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc4NjE4ODU3N31dLCJzZXNzaW9uX2lkIjoiYWYzYTQ3N2EtY2MyYy00NjkxLWI2ZTMtNWQ0ZTI2NTBhODc4IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.xRneNP4mZvCmuqfUnnOnrNGZRvBeVid2QuCGcbTKo8OlCUU696QfUCXyLg49k4eGqSFCjHnAd2CHZ4tflN5vOQ
 # Seed Users
 ###############################################################
 
@@ -119,7 +119,7 @@ POST {{apiUrl}}/auth/refresh
 Content-Type: application/json
 
 {
-  "refreshToken": "YOUR_REFRESH_TOKEN"
+  "refreshToken": "r57jzxcn2ksy"
 }
 
 ###############################################################
@@ -172,6 +172,11 @@ Content-Type: application/json
 {
   "email": "{{student}}"
 }
+
+###
+GET {{apiUrl}}/auth/admin-check
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
 
 ###############################################################
 # RESET PASSWORD

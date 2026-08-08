@@ -37,6 +37,9 @@
       ]
     }
   },
+  "exclude": [
+    "k6/"
+  ],
   "compilerOptions": {
     "strict": true
   }
