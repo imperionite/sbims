@@ -1,7 +1,9 @@
 name: Deploy and Verify
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -77,13 +79,13 @@ jobs:
 
       - name: Deploy to Deno Deploy
         env:
-          # The native deno deploy CLI looks specifically for DENO_ACCESS_TOKEN
-          DENO_ACCESS_TOKEN: ${{ secrets.DENO_ACCESS_TOKEN }}
+          # The native deno deploy CLI looks specifically for DENO_DEPLOY_TOKEN
+          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
         run: |
           START=$(date +%s)
 
-          if [ -z "$DENO_ACCESS_TOKEN" ]; then
-            echo "::error::DENO_ACCESS_TOKEN GitHub secret is missing."
+          if [ -z "$DENO_DEPLOY_TOKEN" ]; then
+            echo "::error::DENO_DEPLOY_TOKEN GitHub secret is missing."
             exit 1
           fi
 
