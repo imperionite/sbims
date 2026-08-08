@@ -1,0 +1,470 @@
+###############################################################
+
+# SBIMS API
+
+#
+
+# Student Internship Profile Module (FR-03)
+
+#
+
+# Order of execution:
+
+#
+
+# 1. Login Administrator
+
+# 2. Login Student
+
+# 3. Create Student Profile
+
+# 4. Retrieve Student Profile
+
+# 5. Student Retrieve Own Profile
+
+# 6. Student Update Own Information
+
+# 7. Verify Protected Fields
+
+# 8. Authorization Tests
+
+# 9. Unauthenticated Access
+
+###############################################################
+
+###############################################################
+
+# Variables
+
+###############################################################
+
+@apiUrl=http://localhost:8000/api/v1
+
+###############################################################
+
+# Seed Users
+
+###############################################################
+
+@admin=[adminsbims1@grr.la](mailto:adminsbims1@grr.la)
+@student=[studentsbims1@grr.la](mailto:studentsbims1@grr.la)
+@faculty=[facultysbims1@grr.la](mailto:facultysbims1@grr.la)
+
+@defaultPassword=Dev2026!
+@adminUserId=ADD_HERE
+
+###############################################################
+
+# Tokens
+
+###############################################################
+
+# Replace after login
+
+@adminToken=PASTE_ADMIN_ACCESS_TOKEN
+
+@studentToken=PASTE_STUDENT_ACCESS_TOKEN
+
+@facultyToken=PASTE_FACULTY_ACCESS_TOKEN
+
+###############################################################
+
+# STUDENT PROFILE
+
+###############################################################
+
+# Replace with the student user UUID returned by login
+
+# or existing student profile.
+
+@studentUserId=REPLACE_STUDENT_USER_UUID
+
+###############################################################
+
+# LOGIN ADMINISTRATOR
+
+###############################################################
+
+### Login Administrator
+
+### Expected:
+
+### - HTTP 200
+
+### - success = true
+
+### - accessToken returned
+
+### - user.id returned
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+"email": "{{admin}}",
+"password": "{{defaultPassword}}"
+}
+
+###############################################################
+
+# LOGIN STUDENT
+
+###############################################################
+
+### Login Student
+
+### Expected:
+
+### - HTTP 200
+
+### - success = true
+
+### - accessToken returned
+
+### - user.id returned
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+"email": "{{student}}",
+"password": "{{defaultPassword}}"
+}
+
+###############################################################
+
+# FR-03 CREATE STUDENT PROFILE
+
+###############################################################
+
+### Administrator Creates Student Profile
+
+### Permission:
+
+### - administrator
+
+### Expected:
+
+### - HTTP 201
+
+### - success = true
+
+### - Student profile created
+
+### - id matches student user ID
+
+### - internship_status = pending
+
+POST {{apiUrl}}/students
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+"userId": "{{studentUserId}}",
+"studentNumber": "FR03-MANUAL-001",
+"program": "BS Information Technology",
+"yearLevel": 4,
+"section": "A",
+"contactNumber": "09123456789",
+"address": "Bulacan, Philippines",
+"emergencyContactName": "Juan Cruz",
+"emergencyContactNumber": "09987654321"
+}
+
+###############################################################
+
+# FR-03 DUPLICATE STUDENT PROFILE
+
+###############################################################
+
+### Administrator Attempts Duplicate Profile
+
+### Run after successful profile creation.
+
+### Expected:
+
+### - HTTP 409 Conflict
+
+### - Existing student profile is not duplicated
+
+POST {{apiUrl}}/students
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+"userId": "{{studentUserId}}",
+"studentNumber": "FR03-MANUAL-002",
+"program": "BS Information Technology",
+"yearLevel": 4,
+"section": "A",
+"contactNumber": "09123456789",
+"address": "Bulacan, Philippines",
+"emergencyContactName": "Juan Cruz",
+"emergencyContactNumber": "09987654321"
+}
+
+###############################################################
+
+# FR-03 RETRIEVE STUDENT PROFILE
+
+###############################################################
+
+### Administrator Retrieves Student Profile
+
+### Expected:
+
+### - HTTP 200
+
+### - success = true
+
+### - Profile returned
+
+### - id = student user ID
+
+GET {{apiUrl}}/students/{{studentUserId}}
+Authorization: Bearer {{adminToken}}
+
+###############################################################
+
+# FR-03 STUDENT RETRIEVES OWN PROFILE
+
+###############################################################
+
+### Student Self-Service
+
+### Expected:
+
+### - HTTP 200
+
+### - success = true
+
+### - Student's own profile returned
+
+GET {{apiUrl}}/students/me
+Authorization: Bearer {{studentToken}}
+
+###############################################################
+
+# FR-03 STUDENT UPDATE OWN INFORMATION
+
+###############################################################
+
+### Student Updates Editable Information
+
+### Expected:
+
+### - HTTP 200
+
+### - contact_number updated
+
+### - address updated
+
+PATCH {{apiUrl}}/students/me
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+"contactNumber": "09999999999",
+"address": "Updated Student Address"
+}
+
+###############################################################
+
+# FR-03 VERIFY STUDENT UPDATE
+
+###############################################################
+
+### Verify Editable Information
+
+### Expected:
+
+### - HTTP 200
+
+### - Updated contact number returned
+
+### - Updated address returned
+
+GET {{apiUrl}}/students/me
+Authorization: Bearer {{studentToken}}
+
+###############################################################
+
+# FR-03 PROTECTED FIELD TEST
+
+###############################################################
+
+### Student Attempts To Modify Protected Fields
+
+### Protected fields:
+
+### - studentNumber
+
+### - program
+
+### - yearLevel
+
+### - internshipStatus
+
+### Expected:
+
+### - HTTP 400 or 403
+
+### - Protected fields remain unchanged
+
+PATCH {{apiUrl}}/students/me
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+"studentNumber": "HACKED-STUDENT-NUMBER",
+"program": "Hacked Program",
+"yearLevel": 1,
+"internshipStatus": "completed"
+}
+
+###############################################################
+
+# VERIFY PROTECTED FIELDS
+
+###############################################################
+
+### Expected:
+
+### - HTTP 200
+
+### - Original studentNumber remains unchanged
+
+### - Original program remains unchanged
+
+### - Original yearLevel remains unchanged
+
+GET {{apiUrl}}/students/me
+Authorization: Bearer {{studentToken}}
+
+###############################################################
+
+# FR-03 STUDENT CANNOT RETRIEVE PROFILE THROUGH /:id
+
+###############################################################
+
+### Student Attempts Staff Profile Endpoint
+
+### Expected:
+
+### - HTTP 403 Forbidden
+
+GET {{apiUrl}}/students/{{studentUserId}}
+Authorization: Bearer {{studentToken}}
+
+###############################################################
+
+# FR-03 FACULTY AUTHORIZATION TEST
+
+###############################################################
+
+### Faculty Adviser Attempts To Create Student Profile
+
+### Note:
+
+### Use a user ID that does not already have a student profile
+
+### when testing authorization so that 409 does not mask 403.
+
+### Expected:
+
+### - HTTP 403 Forbidden
+
+POST {{apiUrl}}/students
+Authorization: Bearer {{facultyToken}}
+Content-Type: application/json
+
+{
+"userId": "{{adminUserId}}",
+"studentNumber": "FR03-FACULTY-001",
+"program": "BS Information Technology",
+"yearLevel": 4,
+"section": "A",
+"contactNumber": "09123456789",
+"address": "Bulacan, Philippines",
+"emergencyContactName": "Juan Cruz",
+"emergencyContactNumber": "09987654321"
+}
+
+###############################################################
+
+# FR-03 STUDENT CANNOT CREATE PROFILE
+
+###############################################################
+
+### Student Attempts To Create Own Profile
+
+### Expected:
+
+### - HTTP 403 Forbidden
+
+### - Authorization checked before duplicate handling
+
+POST {{apiUrl}}/students
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+"userId": "{{studentUserId}}",
+"studentNumber": "FR03-STUDENT-001",
+"program": "BS Information Technology",
+"yearLevel": 4,
+"section": "A",
+"contactNumber": "09123456789",
+"address": "Bulacan, Philippines",
+"emergencyContactName": "Juan Cruz",
+"emergencyContactNumber": "09987654321"
+}
+
+###############################################################
+
+# FR-03 UNAUTHENTICATED ACCESS
+
+###############################################################
+
+### Missing Token - Student Profile
+
+### Expected:
+
+### - HTTP 401 Unauthorized
+
+GET {{apiUrl}}/students/me
+
+###############################################################
+
+# FR-03 UNAUTHENTICATED ACCESS BY ID
+
+###############################################################
+
+### Missing Token - Student Profile By ID
+
+### Expected:
+
+### - HTTP 401 Unauthorized
+
+GET {{apiUrl}}/students/{{studentUserId}}
+
+###############################################################
+
+# FR-03 VERIFY FINAL STUDENT PROFILE
+
+###############################################################
+
+### Final Student Self-Service Verification
+
+### Expected:
+
+### - HTTP 200
+
+### - Profile exists
+
+### - id matches authenticated student
+
+### - Editable information is preserved
+
+GET {{apiUrl}}/students/me
+Authorization: Bearer {{studentToken}}

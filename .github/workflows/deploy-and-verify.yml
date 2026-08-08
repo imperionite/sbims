@@ -1,0 +1,230 @@
+name: Deploy and Verify
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sbims-deployment-main
+  cancel-in-progress: true
+
+env:
+  DENO_VERSION: "2.9.4"
+  DENO_ORG: "imperionite"
+  DENO_APP: "sbims-dev"
+  HEALTH_URL: "https://sbims-dev.imperionite.deno.net/api/v1/health"
+
+jobs:
+  deploy:
+    name: Deploy SBIMS to Deno Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      # ============================================
+      # INITIALIZE DEPLOYMENT TRACE
+      # ============================================
+      - name: Initialize Deployment Trace
+        run: |
+          echo "START_TIME=$(date +%s)" >> "$GITHUB_ENV"
+          echo "START_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_ENV"
+
+      # ============================================
+      # CHECKOUT
+      # ============================================
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ============================================
+      # DENO SETUP
+      # ============================================
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+
+      # ============================================
+      # QUALITY CHECKS
+      # ============================================
+
+      - name: Format Check
+        run: |
+          START=$(date +%s)
+          deno fmt --check
+          END=$(date +%s)
+          echo "FORMAT_TIME=$((END - START))s" >> "$GITHUB_ENV"
+
+      - name: Lint Check
+        run: |
+          START=$(date +%s)
+          deno lint
+          END=$(date +%s)
+          echo "LINT_TIME=$((END - START))s" >> "$GITHUB_ENV"
+
+      - name: Type Check
+        run: |
+          START=$(date +%s)
+          deno check src/main.ts
+          END=$(date +%s)
+          echo "TYPE_TIME=$((END - START))s" >> "$GITHUB_ENV"
+
+      # ============================================
+      # DEPLOY TO DENO DEPLOY
+      # ============================================
+
+      - name: Deploy to Deno Deploy
+        env:
+          # The native deno deploy CLI looks specifically for DENO_ACCESS_TOKEN
+          DENO_ACCESS_TOKEN: ${{ secrets.DENO_ACCESS_TOKEN }}
+        run: |
+          START=$(date +%s)
+
+          if [ -z "$DENO_ACCESS_TOKEN" ]; then
+            echo "::error::DENO_ACCESS_TOKEN GitHub secret is missing."
+            exit 1
+          fi
+
+          deno deploy \
+            --org "${DENO_ORG}" \
+            --app "${DENO_APP}" \
+            --prod
+
+          END=$(date +%s)
+
+          echo "DEPLOY_TIME=$((END - START))s" >> "$GITHUB_ENV"
+          echo "DEPLOYMENT_STATUS=succeeded" >> "$GITHUB_ENV"
+
+      # ============================================
+      # HEALTH CHECK
+      # ============================================
+
+      - name: Health Check
+        run: |
+          START=$(date +%s)
+
+          MAX_ATTEMPTS=12
+          ATTEMPT=1
+
+          while [ "$ATTEMPT" -le "$MAX_ATTEMPTS" ]; do
+
+            STATUS=$(curl \
+              --silent \
+              --output /dev/null \
+              --write-out "%{http_code}" \
+              "$HEALTH_URL")
+
+            echo "Health check attempt $ATTEMPT: HTTP $STATUS"
+
+            if [ "$STATUS" = "200" ]; then
+              echo "HEALTH_STATUS=200" >> "$GITHUB_ENV"
+              echo "HEALTH_CHECK=PASS" >> "$GITHUB_ENV"
+              break
+            fi
+
+            if [ "$ATTEMPT" -eq "$MAX_ATTEMPTS" ]; then
+              echo "HEALTH_CHECK=FAIL" >> "$GITHUB_ENV"
+              echo "::error::Health check failed."
+              exit 1
+            fi
+
+            ATTEMPT=$((ATTEMPT + 1))
+            sleep 5
+
+          done
+
+          END=$(date +%s)
+
+          echo "HEALTH_TIME=$((END - START))s" >> "$GITHUB_ENV"
+
+      # ============================================
+      # DEPLOYMENT REPORT
+      # ============================================
+
+      - name: SBIMS Deployment Report
+        if: always()
+        run: |
+          END_TIME=$(date +%s)
+          END_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          TOTAL=$((END_TIME - START_TIME))
+
+          echo ""
+          echo "======================================================================"
+          echo "                    SBIMS DEPLOYMENT PIPELINE"
+          echo "======================================================================"
+
+          echo ""
+          echo "Repository   : ${{ github.repository }}"
+          echo "Branch       : ${{ github.ref_name }}"
+          echo "Commit       : ${{ github.sha }}"
+          echo "Actor        : ${{ github.actor }}"
+          echo "Run ID       : ${{ github.run_id }}"
+
+          echo ""
+          echo "Started      : $START_TIMESTAMP"
+          echo "Finished     : $END_TIMESTAMP"
+
+          echo ""
+          echo "======================================================================"
+          echo "QUALITY CHECKS"
+          echo "======================================================================"
+
+          echo ""
+          echo "Format Check : ${FORMAT_TIME:-FAILED}"
+          echo "Lint Check   : ${LINT_TIME:-FAILED}"
+          echo "Type Check   : ${TYPE_TIME:-FAILED}"
+
+          echo ""
+          echo "======================================================================"
+          echo "DEPLOYMENT"
+          echo "======================================================================"
+
+          echo ""
+          echo "Organization : ${DENO_ORG}"
+          echo "Application  : ${DENO_APP}"
+          echo "Deploy Status: ${DEPLOYMENT_STATUS:-FAILED}"
+          echo "Deploy Time  : ${DEPLOY_TIME:-FAILED}"
+
+          echo ""
+          echo "======================================================================"
+          echo "VERIFICATION"
+          echo "======================================================================"
+
+          echo ""
+          echo "Health URL   : ${HEALTH_URL}"
+          echo "HTTP Status  : ${HEALTH_STATUS:-FAILED}"
+          echo "Health Check : ${HEALTH_CHECK:-FAILED}"
+          echo "Health Time  : ${HEALTH_TIME:-FAILED}"
+
+          echo ""
+          echo "======================================================================"
+          echo "SUMMARY"
+          echo "======================================================================"
+
+          echo ""
+          echo "Total Duration : ${TOTAL}s"
+
+          echo ""
+
+          if [ "${{ job.status }}" = "success" ]; then
+
+            echo "STATUS : PASS"
+            echo ""
+            echo "✓ Format check passed."
+            echo "✓ Lint check passed."
+            echo "✓ Type check passed."
+            echo "✓ Deployment completed."
+            echo "✓ Health check passed."
+
+          else
+
+            echo "STATUS : FAIL"
+            echo ""
+            echo "✗ SBIMS deployment pipeline failed."
+            echo "✗ Review the failed step above."
+
+            exit 1
+
+          fi
