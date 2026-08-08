@@ -1,0 +1,117 @@
+name: K6 Performance Characterization
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sbims-k6-performance
+  cancel-in-progress: false
+
+env:
+  BASE_URL: "https://sbims-dev.imperionite.deno.net"
+
+jobs:
+  performance-test:
+    name: SBIMS k6 Performance Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Initialize Test Trace
+        run: |
+          echo "START_TIME=$(date +%s)" >> "$GITHUB_ENV"
+          echo "START_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_ENV"
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Run k6 Performance Test
+        env:
+          BASE_URL: ${{ env.BASE_URL }}
+          K6_EMAIL: ${{ secrets.K6_EMAIL }}
+          K6_PASSWORD: ${{ secrets.K6_PASSWORD }}
+        run: |
+          k6 run \
+            --summary-export=k6-summary.json \
+            k6/init-scenario.js
+
+      - name: Upload k6 Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-performance-results-${{ github.run_number }}
+          path: k6-summary.json
+          retention-days: 30
+
+      - name: SBIMS Performance Test Report
+        if: always()
+        run: |
+          END_TIME=$(date +%s)
+          END_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          TOTAL=$((END_TIME - START_TIME))
+
+          echo ""
+          echo "======================================================================"
+          echo "             SBIMS K6 PERFORMANCE CHARACTERIZATION"
+          echo "======================================================================"
+          echo ""
+          echo "Repository : ${{ github.repository }}"
+          echo "Workflow   : ${{ github.workflow }}"
+          echo "Event      : ${{ github.event_name }}"
+          echo "Commit     : ${{ github.sha }}"
+          echo "Actor      : ${{ github.actor }}"
+          echo "Run ID     : ${{ github.run_id }}"
+          echo ""
+          echo "Started    : $START_TIMESTAMP"
+          echo "Finished   : $END_TIMESTAMP"
+          echo ""
+          echo "======================================================================"
+          echo "TEST CONFIGURATION"
+          echo "======================================================================"
+          echo ""
+          echo "Target     : ${BASE_URL}"
+          echo "Scenario   : Student Profile"
+          echo "Workflow   : Login -> Retrieve Own Profile"
+          echo "Duration   : 2 minutes"
+          echo "Peak VUs   : 10"
+          echo "Warm-up    : 30 seconds"
+          echo ""
+          echo "======================================================================"
+          echo "PERFORMANCE MEASURES"
+          echo "======================================================================"
+          echo ""
+          echo "k6 collected:"
+          echo "- Average response time"
+          echo "- P50 response time"
+          echo "- P95 response time"
+          echo "- P99 response time"
+          echo "- Minimum response time"
+          echo "- Maximum response time"
+          echo "- Throughput (requests/second)"
+          echo "- Request/check results"
+          echo "- Total requests"
+          echo "- Completed iterations"
+          echo ""
+          echo "======================================================================"
+          echo "EXPERIMENTAL ARTIFACT"
+          echo "======================================================================"
+          echo ""
+          echo "Result file : k6-summary.json"
+          echo "Artifact    : k6-performance-results-${{ github.run_number }}"
+          echo ""
+          echo "======================================================================"
+          echo "EXECUTION"
+          echo "======================================================================"
+          echo ""
+          echo "Total Duration : ${TOTAL}s"
+          echo ""
+          echo "This workflow is an experimental performance"
+          echo "characterization run and does not define performance"
+          echo "PASS/FAIL thresholds."
+          echo ""
+          echo "======================================================================"
