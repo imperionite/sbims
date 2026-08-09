@@ -2,9 +2,9 @@ import http from "k6/http";
 import { check, sleep } from "k6";
 import { Counter, Trend } from "k6/metrics";
 
-const BASE_URL = __ENV.BASE_URL;
-const EMAIL = __ENV.K6_EMAIL;
-const PASSWORD = __ENV.K6_PASSWORD;
+const BASE_URL = "http://localhost:8000";
+const EMAIL = "adminsbims1@grr.la";
+const PASSWORD = "deV2026!";
 
 // ============================================================
 // Pilot configuration
@@ -19,7 +19,7 @@ const WORKFLOW_RATE = Number(__ENV.K6_RATE || 0.5);
 // as iterations per selected timeUnit.
 const WORKFLOW_RATE_PER_MINUTE = Math.round(WORKFLOW_RATE * 60);
 
-const TEST_DURATION = __ENV.K6_DURATION || "3m";
+const TEST_DURATION = __ENV.K6_DURATION || "1m";
 const THINK_TIME = Number(__ENV.K6_THINK_TIME || 2);
 
 // ============================================================
