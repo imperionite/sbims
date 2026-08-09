@@ -68,7 +68,7 @@ jobs:
             --silent \
             --show-error \
             --max-time 10 \
-            "${BASE_URL}/health"
+            "${BASE_URL}/api/v1/health"
 
           echo ""
           echo "SBIMS API health check passed."
