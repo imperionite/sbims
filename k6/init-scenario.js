@@ -2,7 +2,7 @@ import http from "k6/http";
 import { check, sleep } from "k6";
 import { Counter, Trend } from "k6/metrics";
 
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "https://sbims-dev.imperionite.deno.net";
 const EMAIL = "adminsbims1@grr.la";
 const PASSWORD = "deV2026!";
 
