@@ -46,6 +46,8 @@
     "runtime": {
       "mode": "dynamic",
       "entrypoint": "src/main.ts"
-    }
+    },
+    "org": "imperionite",
+    "app": "sbims-dev"
   }
 }
