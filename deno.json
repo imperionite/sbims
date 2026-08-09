@@ -24,8 +24,7 @@
     "test:integration:users": "deno test --env-file=.env.test tests/integration/users.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:students": "deno test --env-file=.env.test tests/integration/students.integration.test.ts --allow-read --allow-env --allow-net",
     "test:coverage": "deno test --env-file=.env.test tests --coverage=coverage --allow-env --allow-net --allow-read && deno coverage coverage",
-    "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts",
-    "deploy": "deployctl deploy src/main.ts"
+    "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts"
   },
   "fmt": {
     "lineWidth": 100
@@ -42,5 +41,11 @@
   ],
   "compilerOptions": {
     "strict": true
+  },
+  "deploy": {
+    "runtime": {
+      "mode": "dynamic",
+      "entrypoint": "src/main.ts"
+    }
   }
 }

@@ -13,32 +13,87 @@ concurrency:
 env:
   BASE_URL: "https://sbims-dev.imperionite.deno.net"
 
+  # Pilot workload configuration
+  #
+  # 0.5 workflow/s = approximately 30 workflow iterations/minute
+  K6_RATE: "0.5"
+  K6_DURATION: "3m"
+  K6_THINK_TIME: "2"
+
 jobs:
   performance-test:
-    name: SBIMS k6 Performance Test
+    name: SBIMS k6 Performance Pilot
     runs-on: ubuntu-latest
 
     steps:
+      # ==========================================================
+      # 1. Initialize test trace
+      # ==========================================================
       - name: Initialize Test Trace
         run: |
           echo "START_TIME=$(date +%s)" >> "$GITHUB_ENV"
           echo "START_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_ENV"
 
+      # ==========================================================
+      # 2. Checkout repository
+      # ==========================================================
+
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      # ==========================================================
+      # 3. Setup k6
+      # ==========================================================
 
       - name: Setup k6
         uses: grafana/setup-k6-action@v1
 
-      - name: Run k6 Performance Test
+      # ==========================================================
+      # 4. Check API availability
+      #
+      # IMPORTANT:
+      # This is a readiness check and is NOT part of the k6
+      # performance workload.
+      #
+      # If your actual health endpoint is different, replace
+      # /health with the correct endpoint.
+      # ==========================================================
+
+      - name: Check API Availability
+        run: |
+          echo "Checking SBIMS API availability..."
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --max-time 10 \
+            "${BASE_URL}/health"
+
+          echo ""
+          echo "SBIMS API health check passed."
+
+      # ==========================================================
+      # 5. Run k6 pilot
+      # ==========================================================
+
+      - name: Run k6 Performance Pilot
         env:
           BASE_URL: ${{ env.BASE_URL }}
           K6_EMAIL: ${{ secrets.K6_EMAIL }}
           K6_PASSWORD: ${{ secrets.K6_PASSWORD }}
+          K6_RATE: ${{ env.K6_RATE }}
+          K6_DURATION: ${{ env.K6_DURATION }}
+          K6_THINK_TIME: ${{ env.K6_THINK_TIME }}
+
         run: |
           k6 run \
             --summary-export=k6-summary.json \
             k6/init-scenario.js
+
+      # ==========================================================
+      # 6. Upload k6 results
+      # ==========================================================
 
       - name: Upload k6 Results
         if: always()
@@ -47,6 +102,10 @@ jobs:
           name: k6-performance-results-${{ github.run_number }}
           path: k6-summary.json
           retention-days: 30
+
+      # ==========================================================
+      # 7. Generate experimental report
+      # ==========================================================
 
       - name: SBIMS Performance Test Report
         if: always()
@@ -70,48 +129,251 @@ jobs:
           echo "Started    : $START_TIMESTAMP"
           echo "Finished   : $END_TIMESTAMP"
           echo ""
+
           echo "======================================================================"
-          echo "TEST CONFIGURATION"
+          echo "EXPERIMENT CONFIGURATION"
           echo "======================================================================"
           echo ""
+          echo "Evaluation : Authentication Workflow Pilot"
           echo "Target     : ${BASE_URL}"
-          echo "Scenario   : Student Profile"
-          echo "Workflow   : Login -> Retrieve Own Profile"
-          echo "Duration   : 2 minutes"
-          echo "Peak VUs   : 10"
-          echo "Warm-up    : 30 seconds"
+          echo "Workload   : ${K6_RATE} workflow/s"
+          echo "Equivalent : $(awk "BEGIN { printf \"%.0f\", ${K6_RATE} * 60 }") workflows/min"
+          echo "Duration   : ${K6_DURATION}"
+          echo "Think Time : ${K6_THINK_TIME}s"
+          echo "Executor   : constant-arrival-rate"
+          echo "VU Range   : 5 preallocated / 20 maximum"
           echo ""
-          echo "======================================================================"
-          echo "PERFORMANCE MEASURES"
-          echo "======================================================================"
+          echo "Workflow:"
+          echo "  1. Login"
+          echo "  2. Think Time"
+          echo "  3. Retrieve Current User"
+          echo "  4. Think Time"
+          echo "  5. Retrieve User Role"
+          echo "  6. Think Time"
+          echo "  7. Administrator Authorization Check"
+          echo "  8. Think Time"
+          echo "  9. Refresh Token"
           echo ""
-          echo "k6 collected:"
-          echo "- Average response time"
-          echo "- P50 response time"
-          echo "- P95 response time"
-          echo "- P99 response time"
-          echo "- Minimum response time"
-          echo "- Maximum response time"
-          echo "- Throughput (requests/second)"
-          echo "- Request/check results"
-          echo "- Total requests"
-          echo "- Completed iterations"
+          echo "Expected workload:"
+          echo "  Approximately 90 workflow iterations"
+          echo "  Approximately 450 HTTP requests if all workflows"
+          echo "  complete the five-request sequence."
           echo ""
-          echo "======================================================================"
-          echo "EXPERIMENTAL ARTIFACT"
-          echo "======================================================================"
+
+          echo "This is a pilot execution."
+          echo "It is used to validate workload generation, request volume,"
+          echo "authentication handling, metric collection, and deployment"
+          echo "stability before formal characterization."
           echo ""
-          echo "Result file : k6-summary.json"
-          echo "Artifact    : k6-performance-results-${{ github.run_number }}"
-          echo ""
+
+          if [ -f k6-summary.json ]; then
+
+            # ------------------------------------------------------
+            # Extract k6 metrics
+            # ------------------------------------------------------
+
+            HTTP_REQUESTS=$(jq -r \
+              '.metrics.http_reqs.values.count // 0' \
+              k6-summary.json)
+
+            HTTP_REQUEST_RATE=$(jq -r \
+              '.metrics.http_reqs.values.rate // 0' \
+              k6-summary.json)
+
+            HTTP_DURATION_AVG=$(jq -r \
+              '.metrics.http_req_duration.values.avg // 0' \
+              k6-summary.json)
+
+            HTTP_DURATION_MED=$(jq -r \
+              '.metrics.http_req_duration.values.med // 0' \
+              k6-summary.json)
+
+            HTTP_DURATION_P95=$(jq -r \
+              '.metrics.http_req_duration.values["p(95)"] // 0' \
+              k6-summary.json)
+
+            HTTP_DURATION_P99=$(jq -r \
+              '.metrics.http_req_duration.values["p(99)"] // 0' \
+              k6-summary.json)
+
+            HTTP_DURATION_MIN=$(jq -r \
+              '.metrics.http_req_duration.values.min // 0' \
+              k6-summary.json)
+
+            HTTP_DURATION_MAX=$(jq -r \
+              '.metrics.http_req_duration.values.max // 0' \
+              k6-summary.json)
+
+            HTTP_FAILED_RATE=$(jq -r \
+              '.metrics.http_req_failed.values.rate // 0' \
+              k6-summary.json)
+
+            CHECK_RATE=$(jq -r \
+              '.metrics.checks.values.rate // 0' \
+              k6-summary.json)
+
+            ITERATIONS=$(jq -r \
+              '.metrics.iterations.values.count // 0' \
+              k6-summary.json)
+
+            ITERATION_RATE=$(jq -r \
+              '.metrics.iterations.values.rate // 0' \
+              k6-summary.json)
+
+            DROPPED_ITERATIONS=$(jq -r \
+              '.metrics.dropped_iterations.values.count // 0' \
+              k6-summary.json)
+
+            VUS_MAX=$(jq -r \
+              '.metrics.vus.values.max // 0' \
+              k6-summary.json)
+
+            WORKFLOW_COMPLETED=$(jq -r \
+              '.metrics.workflow_completed.values.count // 0' \
+              k6-summary.json)
+
+            WORKFLOW_FAILED=$(jq -r \
+              '.metrics.workflow_failed.values.count // 0' \
+              k6-summary.json)
+
+            WORKFLOW_DURATION_AVG=$(jq -r \
+              '.metrics.workflow_duration.values.avg // 0' \
+              k6-summary.json)
+
+            # ------------------------------------------------------
+            # Derived measurements
+            # ------------------------------------------------------
+
+            if [ "$ITERATIONS" -gt 0 ]; then
+              REQUESTS_PER_WORKFLOW=$(awk \
+                "BEGIN { printf \"%.2f\", $HTTP_REQUESTS / $ITERATIONS }")
+            else
+              REQUESTS_PER_WORKFLOW="0.00"
+            fi
+
+            ERROR_PERCENT=$(awk \
+              "BEGIN { printf \"%.2f\", $HTTP_FAILED_RATE * 100 }")
+
+            CHECK_PERCENT=$(awk \
+              "BEGIN { printf \"%.2f\", $CHECK_RATE * 100 }")
+
+            TOTAL_WORKFLOWS=$((WORKFLOW_COMPLETED + WORKFLOW_FAILED))
+
+            if [ "$TOTAL_WORKFLOWS" -gt 0 ]; then
+              WORKFLOW_SUCCESS_PERCENT=$(awk \
+                "BEGIN { printf \"%.2f\", ($WORKFLOW_COMPLETED / $TOTAL_WORKFLOWS) * 100 }")
+            else
+              WORKFLOW_SUCCESS_PERCENT="0.00"
+            fi
+
+            # ------------------------------------------------------
+            # Performance measurements
+            # ------------------------------------------------------
+
+            echo "======================================================================"
+            echo "OBSERVED PERFORMANCE MEASURES"
+            echo "======================================================================"
+            echo ""
+
+            echo "HTTP Traffic"
+            echo "  Total Requests          : ${HTTP_REQUESTS}"
+            echo "  Achieved Throughput     : ${HTTP_REQUEST_RATE} req/s"
+            echo "  Observed Requests/Workflow : ${REQUESTS_PER_WORKFLOW}"
+            echo ""
+
+            echo "Response Time"
+            echo "  Average                 : ${HTTP_DURATION_AVG} ms"
+            echo "  Median (P50)            : ${HTTP_DURATION_MED} ms"
+            echo "  P95                     : ${HTTP_DURATION_P95} ms"
+            echo "  P99                     : ${HTTP_DURATION_P99} ms"
+            echo "  Minimum                 : ${HTTP_DURATION_MIN} ms"
+            echo "  Maximum                 : ${HTTP_DURATION_MAX} ms"
+            echo ""
+
+            echo "Reliability"
+            echo "  HTTP Error Rate         : ${ERROR_PERCENT}%"
+            echo "  Check Success Rate      : ${CHECK_PERCENT}%"
+            echo ""
+
+            echo "Workflow Execution"
+            echo "  Completed Iterations    : ${ITERATIONS}"
+            echo "  Iteration Rate          : ${ITERATION_RATE} iter/s"
+            echo "  Dropped Iterations      : ${DROPPED_ITERATIONS}"
+            echo "  Workflow Completed      : ${WORKFLOW_COMPLETED}"
+            echo "  Workflow Failed         : ${WORKFLOW_FAILED}"
+            echo "  Workflow Success        : ${WORKFLOW_SUCCESS_PERCENT}%"
+            echo "  Average Workflow Time   : ${WORKFLOW_DURATION_AVG} ms"
+            echo ""
+
+            echo "k6 Execution Resources"
+            echo "  Maximum VUs             : ${VUS_MAX}"
+            echo ""
+
+            # ------------------------------------------------------
+            # Interpretation
+            # ------------------------------------------------------
+
+            echo "======================================================================"
+            echo "EXPERIMENTAL INTERPRETATION"
+            echo "======================================================================"
+            echo ""
+            echo "The reported measurements describe the observed behavior of"
+            echo "the deployed SBIMS under the configured pilot workload."
+            echo ""
+            echo "The configured workflow arrival rate represents the offered"
+            echo "application workload. The observed HTTP request rate represents"
+            echo "the resulting HTTP traffic generated by the executed workflows."
+            echo ""
+            echo "The observed requests-per-workflow value provides supporting"
+            echo "information about the HTTP request volume generated by the"
+            echo "selected workflow."
+            echo ""
+            echo "No performance PASS/FAIL threshold is applied to this pilot."
+            echo ""
+            echo "The pilot is intended to validate the workload model,"
+            echo "authentication handling, request generation, metric collection,"
+            echo "and deployment stability before formal characterization."
+            echo ""
+
+            # ------------------------------------------------------
+            # Resource-safety observation
+            # ------------------------------------------------------
+
+            echo "======================================================================"
+            echo "RESOURCE-SAFETY OBSERVATION"
+            echo "======================================================================"
+            echo ""
+            echo "Configured Workflow Rate : ${K6_RATE} workflow/s"
+            echo "Configured Duration      : ${K6_DURATION}"
+            echo "Observed HTTP Requests   : ${HTTP_REQUESTS}"
+            echo "Dropped Iterations      : ${DROPPED_ITERATIONS}"
+            echo ""
+            echo "These observations should be reviewed before increasing the"
+            echo "workload rate or beginning formal repeated trials."
+            echo ""
+
+          else
+
+            echo "======================================================================"
+            echo "NO K6 SUMMARY AVAILABLE"
+            echo "======================================================================"
+            echo ""
+            echo "k6-summary.json was not generated."
+            echo "The k6 execution may have failed before producing the summary."
+            echo ""
+
+          fi
+
           echo "======================================================================"
           echo "EXECUTION"
           echo "======================================================================"
           echo ""
-          echo "Total Duration : ${TOTAL}s"
+          echo "Total GitHub Actions Duration : ${TOTAL}s"
           echo ""
-          echo "This workflow is an experimental performance"
-          echo "characterization run and does not define performance"
-          echo "PASS/FAIL thresholds."
+          echo "Result File : k6-summary.json"
+          echo "Artifact    : k6-performance-results-${{ github.run_number }}"
+          echo ""
+          echo "This execution is an experimental pilot."
+          echo "Pilot results are excluded from formal characterization results."
           echo ""
           echo "======================================================================"
