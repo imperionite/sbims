@@ -12,6 +12,6 @@ jobs:
     uses: ./.github/workflows/_quality-module.yml
     with:
       module: students
-      unit-task: test:unit:students
-      integration-task: test:integration:students
+      unit_task: test:unit:students
+      integration_task: test:integration:students
     secrets: inherit
