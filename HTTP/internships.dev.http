@@ -1,0 +1,1024 @@
+###############################################################
+
+# SBIMS API
+
+#
+
+# Internship Management Module
+
+#
+
+# FR-05 Manual API Test Suite
+
+# VS Code REST Client
+
+#
+
+# Prerequisites:
+
+# - API server is running
+
+# - Test users exist
+
+# - Administrator and coordinator accounts are active
+
+# - Student and HTE profiles can be created through their respective APIs
+
+#
+
+# Test order:
+
+# 1. Variables
+
+# 2. Health Check
+
+# 3. Administrator Login
+
+# 4. Internship Coordinator Login
+
+# 5. Student Login
+
+# 6. Faculty Login
+
+# 7. Create Test Student Profile
+
+# 8. Create Test HTE
+
+# 9. Internship List
+
+# 10. Internship Create
+
+# 11. Internship Retrieve
+
+# 12. Student Own Internship
+
+# 13. Pending -> Active
+
+# 14. Active -> Completed
+
+# 15. Invalid Status Transition
+
+# 16. Duplicate Internship Assignment
+
+# 17. Validation Tests
+
+# 18. Non-existent Internship
+
+# 19. Authentication Tests
+
+# 20. Authorization Tests
+
+#
+
+###############################################################
+
+###############################################################
+
+# VARIABLES
+
+###############################################################
+
+@apiUrl=http://localhost:8000/api/v1
+
+### Internship ID
+
+### Replace after creating an internship.
+
+@internshipId=00000000-0000-0000-0000-000000000000
+
+### Student Profile ID
+
+### Replace after creating/retrieving the test student profile.
+
+@studentId=00000000-0000-0000-0000-000000000000
+
+### HTE Profile ID
+
+### Replace after creating the test HTE.
+
+@hteId=00000000-0000-0000-0000-000000000000
+
+###############################################################
+
+# SEED USERS
+
+###############################################################
+
+@admin=[adminsbims1@grr.la](mailto:adminsbims1@grr.la)
+@coordinator=[coordinatorsbims1@grr.la](mailto:coordinatorsbims1@grr.la)
+@faculty=[facultysbims1@grr.la](mailto:facultysbims1@grr.la)
+@student=[studentsbims1@grr.la](mailto:studentsbims1@grr.la)
+@hte=[htesbims1@grr.la](mailto:htesbims1@grr.la)
+
+###############################################################
+
+# PASSWORDS
+
+###############################################################
+
+@defaultPassword=Dev2026!
+@newPassword=deV2026!
+@renewPassword=deV2026#
+
+###############################################################
+
+# ACCESS TOKENS
+
+###############################################################
+
+### Paste a valid administrator access token here.
+
+@adminAccessToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
+
+### Paste a valid internship coordinator access token here.
+
+@coordinatorAccessToken=PASTE_COORDINATOR_ACCESS_TOKEN_HERE
+
+### Paste a valid student access token here.
+
+@studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
+
+### Paste a valid faculty adviser access token here.
+
+@facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
+
+###############################################################
+
+# HEALTH
+
+###############################################################
+
+### Health Check
+
+GET {{apiUrl}}/health
+
+###
+
+### Expected:
+
+### HTTP 200
+
+### success = true
+
+###############################################################
+
+# ADMINISTRATOR LOGIN
+
+###############################################################
+
+### Administrator Login
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+"email": "{{admin}}",
+"password": "{{newPassword}}"
+}
+
+###
+
+### Expected:
+
+### HTTP 200
+
+### data.accessToken is returned
+
+###
+
+### Copy the accessToken from the response and assign it to:
+
+### @adminAccessToken
+
+###############################################################
+
+# INTERNSHIP COORDINATOR LOGIN
+
+###############################################################
+
+### Internship Coordinator Login
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+"email": "{{coordinator}}",
+"password": "{{newPassword}}"
+}
+
+###
+
+### Expected:
+
+### HTTP 200
+
+### data.accessToken is returned
+
+###
+
+### Copy the accessToken from the response and assign it to:
+
+### @coordinatorAccessToken
+
+###############################################################
+
+# STUDENT LOGIN
+
+###############################################################
+
+### Student Login
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+"email": "{{student}}",
+"password": "{{newPassword}}"
+}
+
+###
+
+### Expected:
+
+### HTTP 200
+
+### data.accessToken is returned
+
+###
+
+### Copy the accessToken from the response and assign it to:
+
+### @studentAccessToken
+
+###############################################################
+
+# FACULTY LOGIN
+
+###############################################################
+
+### Faculty Adviser Login
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+"email": "{{faculty}}",
+"password": "{{newPassword}}"
+}
+
+###
+
+### Expected:
+
+### HTTP 200
+
+### data.accessToken is returned
+
+###
+
+### Copy the accessToken from the response and assign it to:
+
+### @facultyAccessToken
+
+###############################################################
+
+# TEST STUDENT PROFILE
+
+###############################################################
+
+### FR-03 - Administrator Create Test Student Profile
+
+POST {{apiUrl}}/students
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"studentNumber": "REST-FR05-001",
+"program": "BSIT",
+"yearLevel": 4,
+"section": "A",
+"contactNumber": "09171234567",
+"address": "Test Address, Bulacan",
+"emergencyContactName": "Test Emergency Contact",
+"emergencyContactNumber": "09179876543"
+}
+
+###
+
+### Expected:
+
+### HTTP 201
+
+### success = true
+
+### data.id exists
+
+### data.student_number = "REST-FR05-001"
+
+###
+
+### Copy the returned data.id and assign it to:
+
+### @studentId
+
+###############################################################
+
+# TEST HTE PROFILE
+
+###############################################################
+
+### FR-04 - Administrator Create Test HTE
+
+POST {{apiUrl}}/htes
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"companyName": "REST Client FR05 Test HTE",
+"address": "Test Address, Bulacan",
+"contactPerson": "Test Contact Person",
+"contactEmail": "[fr05-test@example.com](mailto:fr05-test@example.com)",
+"contactNumber": "09171234567"
+}
+
+###
+
+### Expected:
+
+### HTTP 201
+
+### success = true
+
+### data.id exists
+
+### data.company_name = "REST Client FR05 Test HTE"
+
+### data.is_active = true
+
+###
+
+### Copy the returned data.id and assign it to:
+
+### @hteId
+
+###############################################################
+
+# INTERNSHIP LIST
+
+###############################################################
+
+### FR-05 - Administrator List Internships
+
+GET {{apiUrl}}/internships
+Authorization: Bearer {{adminAccessToken}}
+
+###
+
+### Expected:
+
+### HTTP 200
+
+### success = true
+
+### data = array
+
+###############################################################
+
+### FR-05 - Internship Coordinator List Internships
+
+GET {{apiUrl}}/internships
+Authorization: Bearer {{coordinatorAccessToken}}
+
+###
+
+### Expected:
+
+### HTTP 200
+
+### success = true
+
+### data = array
+
+###############################################################
+
+# INTERNSHIP CREATE
+
+###############################################################
+
+### FR-05 - Administrator Create Internship Assignment
+
+POST {{apiUrl}}/internships
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"studentId": "{{studentId}}",
+"hteId": "{{hteId}}"
+}
+
+###
+
+### Expected:
+
+### HTTP 201
+
+### success = true
+
+### data.id exists
+
+### data.student_id = {{studentId}}
+
+### data.hte_id = {{hteId}}
+
+### data.status = "pending"
+
+###
+
+### Copy the returned data.id and assign it to:
+
+### @internshipId
+
+###############################################################
+
+### FR-05 - Internship Coordinator Create Internship Assignment
+
+POST {{apiUrl}}/internships
+Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{
+"studentId": "{{studentId}}",
+"hteId": "{{hteId}}"
+}
+
+###
+
+### Expected:
+
+### HTTP 409
+
+###
+
+### The student already has an internship assignment.
+
+###
+
+### This test confirms the one-internship-per-student rule.
+
+###############################################################
+
+# INTERNSHIP RETRIEVE
+
+###############################################################
+
+### FR-05 - Administrator Retrieve Internship
+
+GET {{apiUrl}}/internships/{{internshipId}}
+Authorization: Bearer {{adminAccessToken}}
+
+###
+
+### Expected:
+
+### HTTP 200
+
+### success = true
+
+### data.id = {{internshipId}}
+
+### data.student_id = {{studentId}}
+
+### data.hte_id = {{hteId}}
+
+### data.status = "pending"
+
+###############################################################
+
+# STUDENT OWN INTERNSHIP
+
+###############################################################
+
+### FR-05 - Student Retrieve Own Internship
+
+GET {{apiUrl}}/internships/me
+Authorization: Bearer {{studentAccessToken}}
+
+###
+
+### Expected:
+
+### HTTP 200
+
+### success = true
+
+### data.id = {{internshipId}}
+
+### data.student_id = the authenticated student's ID
+
+### data.hte_id = {{hteId}}
+
+### data.status = "pending"
+
+###############################################################
+
+# STATUS - PENDING TO ACTIVE
+
+###############################################################
+
+### FR-05 - Administrator Activate Internship
+
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"status": "active"
+}
+
+###
+
+### Expected:
+
+### HTTP 200
+
+### success = true
+
+### data.id = {{internshipId}}
+
+### data.status = "active"
+
+###############################################################
+
+# STATUS - ACTIVE TO COMPLETED
+
+###############################################################
+
+### FR-05 - Administrator Complete Internship
+
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"status": "completed"
+}
+
+###
+
+### Expected:
+
+### HTTP 200
+
+### success = true
+
+### data.id = {{internshipId}}
+
+### data.status = "completed"
+
+###############################################################
+
+# STATUS - COMPLETED CANNOT TRANSITION
+
+###############################################################
+
+### FR-05 - Completed Internship Cannot Transition Again
+
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"status": "active"
+}
+
+###
+
+### Expected:
+
+### HTTP 400
+
+###
+
+### Invalid internship status transition.
+
+### Completed internships cannot transition to another status.
+
+###############################################################
+
+# DUPLICATE ASSIGNMENT
+
+###############################################################
+
+### FR-05 - Duplicate Internship Assignment
+
+POST {{apiUrl}}/internships
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"studentId": "{{studentId}}",
+"hteId": "{{hteId}}"
+}
+
+###
+
+### Expected:
+
+### HTTP 409
+
+###
+
+### The student already has an internship assignment.
+
+###############################################################
+
+# VALIDATION - CREATE
+
+###############################################################
+
+### Invalid Internship Data
+
+POST {{apiUrl}}/internships
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"studentId": "",
+"hteId": ""
+}
+
+###
+
+### Expected:
+
+### HTTP 400
+
+### Validation error
+
+###############################################################
+
+### Missing Required Internship Fields
+
+POST {{apiUrl}}/internships
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"studentId": "{{studentId}}"
+}
+
+###
+
+### Expected:
+
+### HTTP 400
+
+### Validation error
+
+###############################################################
+
+### Invalid Student ID
+
+POST {{apiUrl}}/internships
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"studentId": "not-a-uuid",
+"hteId": "{{hteId}}"
+}
+
+###
+
+### Expected:
+
+### HTTP 400
+
+### Validation error
+
+###############################################################
+
+### Invalid HTE ID
+
+POST {{apiUrl}}/internships
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"studentId": "{{studentId}}",
+"hteId": "not-a-uuid"
+}
+
+###
+
+### Expected:
+
+### HTTP 400
+
+### Validation error
+
+###############################################################
+
+# VALIDATION - STATUS
+
+###############################################################
+
+### Invalid Internship Status
+
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"status": "invalid"
+}
+
+###
+
+### Expected:
+
+### HTTP 400
+
+### Validation error
+
+###############################################################
+
+### Missing Internship Status
+
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### Expected:
+
+### HTTP 400
+
+### Validation error
+
+###############################################################
+
+# NOT FOUND
+
+###############################################################
+
+### Non-existent Internship
+
+GET {{apiUrl}}/internships/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{adminAccessToken}}
+
+###
+
+### Expected:
+
+### HTTP 404
+
+### Internship not found.
+
+###############################################################
+
+### Update Status of Non-existent Internship
+
+PATCH {{apiUrl}}/internships/00000000-0000-0000-0000-000000000000/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"status": "active"
+}
+
+###
+
+### Expected:
+
+### HTTP 404
+
+### Internship not found.
+
+###############################################################
+
+# AUTHENTICATION
+
+###############################################################
+
+### Unauthenticated - List Internships
+
+GET {{apiUrl}}/internships
+
+###
+
+### Expected:
+
+### HTTP 401
+
+### Missing authorization token.
+
+###############################################################
+
+### Invalid Token - List Internships
+
+GET {{apiUrl}}/internships
+Authorization: Bearer invalid-token
+
+###
+
+### Expected:
+
+### HTTP 401
+
+### Invalid authentication token.
+
+###############################################################
+
+# AUTHORIZATION
+
+###############################################################
+
+### Student Cannot List All Internships
+
+GET {{apiUrl}}/internships
+Authorization: Bearer {{studentAccessToken}}
+
+###
+
+### Expected:
+
+### HTTP 403
+
+### Insufficient permissions.
+
+###############################################################
+
+### Faculty Adviser Cannot List All Internships
+
+GET {{apiUrl}}/internships
+Authorization: Bearer {{facultyAccessToken}}
+
+###
+
+### Expected:
+
+### HTTP 403
+
+### Insufficient permissions.
+
+###############################################################
+
+# STUDENT - CREATE
+
+###############################################################
+
+### Student Cannot Create Internship Assignment
+
+POST {{apiUrl}}/internships
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+"studentId": "{{studentId}}",
+"hteId": "{{hteId}}"
+}
+
+###
+
+### Expected:
+
+### HTTP 403
+
+### Insufficient permissions.
+
+###############################################################
+
+# FACULTY - CREATE
+
+###############################################################
+
+### Faculty Adviser Cannot Create Internship Assignment
+
+POST {{apiUrl}}/internships
+Authorization: Bearer {{facultyAccessToken}}
+Content-Type: application/json
+
+{
+"studentId": "{{studentId}}",
+"hteId": "{{hteId}}"
+}
+
+###
+
+### Expected:
+
+### HTTP 403
+
+### Insufficient permissions.
+
+###############################################################
+
+# STUDENT - RETRIEVE OWN INTERNSHIP
+
+###############################################################
+
+### Student Can Retrieve Own Internship
+
+GET {{apiUrl}}/internships/me
+Authorization: Bearer {{studentAccessToken}}
+
+###
+
+### Expected:
+
+### HTTP 200
+
+### success = true
+
+### data.id = {{internshipId}}
+
+###############################################################
+
+# STUDENT - RETRIEVE SPECIFIC INTERNSHIP
+
+###############################################################
+
+### Student Cannot Retrieve Internship Through Admin Endpoint
+
+GET {{apiUrl}}/internships/{{internshipId}}
+Authorization: Bearer {{studentAccessToken}}
+
+###
+
+### Expected:
+
+### HTTP 403
+
+### Insufficient permissions.
+
+###############################################################
+
+# FACULTY - RETRIEVE
+
+###############################################################
+
+### Faculty Adviser Cannot Retrieve Internship Through Admin Endpoint
+
+GET {{apiUrl}}/internships/{{internshipId}}
+Authorization: Bearer {{facultyAccessToken}}
+
+###
+
+### Expected:
+
+### HTTP 403
+
+### Insufficient permissions.
+
+###############################################################
+
+# STUDENT - STATUS
+
+###############################################################
+
+### Student Cannot Change Internship Status
+
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+"status": "active"
+}
+
+###
+
+### Expected:
+
+### HTTP 403
+
+### Insufficient permissions.
+
+###############################################################
+
+# FACULTY - STATUS
+
+###############################################################
+
+### Faculty Adviser Cannot Change Internship Status
+
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{facultyAccessToken}}
+Content-Type: application/json
+
+{
+"status": "active"
+}
+
+###
+
+### Expected:
+
+### HTTP 403
+
+### Insufficient permissions.
+

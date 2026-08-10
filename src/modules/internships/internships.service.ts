@@ -1,0 +1,218 @@
+import { supabaseAdmin } from "../../lib/supabase.ts";
+import { AppError } from "../../errors/app-error.ts";
+
+import type { CreateInternshipRequest, InternshipStatus } from "./internships.types.ts";
+
+const INTERNSHIP_SELECT = `
+  id,
+  student_id,
+  hte_id,
+  status,
+  created_at,
+  updated_at,
+  student_profiles (
+    id,
+    student_number,
+    program,
+    year_level,
+    section
+  ),
+  hte_profiles (
+    id,
+    company_name,
+    contact_person,
+    contact_email,
+    is_active
+  )
+`;
+
+const STATUS_TRANSITIONS: Record<InternshipStatus, InternshipStatus[]> = {
+  pending: ["active"],
+  active: ["completed"],
+  completed: [],
+};
+
+export class InternshipService {
+  async listInternships() {
+    const { data, error } = await supabaseAdmin
+      .from("internships")
+      .select(INTERNSHIP_SELECT)
+      .order("created_at", {
+        ascending: false,
+      });
+
+    if (error) {
+      throw new AppError(500, "Unable to retrieve internships.");
+    }
+
+    return data;
+  }
+
+  async getInternship(id: string) {
+    const { data, error } = await supabaseAdmin
+      .from("internships")
+      .select(INTERNSHIP_SELECT)
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) {
+      throw new AppError(500, "Unable to retrieve the internship.");
+    }
+
+    if (!data) {
+      throw new AppError(404, "Internship not found.");
+    }
+
+    return data;
+  }
+
+  async getMyInternship(studentId: string) {
+    const { data, error } = await supabaseAdmin
+      .from("internships")
+      .select(INTERNSHIP_SELECT)
+      .eq("student_id", studentId)
+      .maybeSingle();
+
+    if (error) {
+      throw new AppError(500, "Unable to retrieve your internship.");
+    }
+
+    if (!data) {
+      throw new AppError(404, "No internship assignment found.");
+    }
+
+    return data;
+  }
+
+  async createInternship(request: CreateInternshipRequest) {
+    const { data: student, error: studentError } = await supabaseAdmin
+      .from("student_profiles")
+      .select(
+        `
+          id,
+          profiles!inner (
+            is_active
+          )
+        `,
+      )
+      .eq("id", request.studentId)
+      .maybeSingle();
+
+    if (studentError) {
+      throw new AppError(500, "Unable to verify the student.");
+    }
+
+    if (!student) {
+      throw new AppError(404, "Student not found.");
+    }
+
+    const profile = Array.isArray(student.profiles) ? student.profiles[0] : student.profiles;
+
+    if (!profile?.is_active) {
+      throw new AppError(400, "The selected student account is inactive.");
+    }
+
+    const { data: hte, error: hteError } = await supabaseAdmin
+      .from("hte_profiles")
+      .select(
+        `
+          id,
+          is_active
+        `,
+      )
+      .eq("id", request.hteId)
+      .maybeSingle();
+
+    if (hteError) {
+      throw new AppError(500, "Unable to verify the HTE.");
+    }
+
+    if (!hte) {
+      throw new AppError(404, "HTE not found.");
+    }
+
+    if (!hte.is_active) {
+      throw new AppError(400, "The selected HTE is inactive.");
+    }
+
+    const { data: existingInternship, error: existingError } = await supabaseAdmin
+      .from("internships")
+      .select("id")
+      .eq("student_id", request.studentId)
+      .maybeSingle();
+
+    if (existingError) {
+      throw new AppError(
+        500,
+        "Unable to check the student's existing internship.",
+      );
+    }
+
+    if (existingInternship) {
+      throw new AppError(
+        409,
+        "The student already has an internship assignment.",
+      );
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from("internships")
+      .insert({
+        student_id: request.studentId,
+        hte_id: request.hteId,
+        status: "pending",
+      })
+      .select(INTERNSHIP_SELECT)
+      .single();
+
+    if (error) {
+      throw new AppError(500, "Unable to create the internship assignment.");
+    }
+
+    return data;
+  }
+
+  async updateStatus(id: string, status: InternshipStatus) {
+    const { data: internship, error: findError } = await supabaseAdmin
+      .from("internships")
+      .select("id, status")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (findError) {
+      throw new AppError(500, "Unable to retrieve the internship.");
+    }
+
+    if (!internship) {
+      throw new AppError(404, "Internship not found.");
+    }
+
+    const currentStatus = internship.status as InternshipStatus;
+
+    const allowedTransitions = STATUS_TRANSITIONS[currentStatus];
+
+    if (!allowedTransitions.includes(status)) {
+      throw new AppError(
+        400,
+        `Invalid internship status transition from "${currentStatus}" to "${status}".`,
+      );
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from("internships")
+      .update({
+        status,
+      })
+      .eq("id", id)
+      .select(INTERNSHIP_SELECT)
+      .single();
+
+    if (error) {
+      throw new AppError(500, "Unable to update the internship status.");
+    }
+
+    return data;
+  }
+}
+
+export const internshipService = new InternshipService();
