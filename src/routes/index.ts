@@ -4,6 +4,7 @@ import health from "../modules/health/health.routes.ts";
 import auth from "../modules/auth/auth.routes.ts";
 import users from "../modules/users/users.routes.ts";
 import students from "../modules/students/students.routes.ts";
+import htes from "../modules/htes/htes.routes.ts";
 
 const api = new Hono();
 
@@ -14,5 +15,7 @@ api.route("/auth", auth);
 api.route("/users", users);
 
 api.route("/students", students);
+
+api.route("/htes", htes);
 
 export default api;

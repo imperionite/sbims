@@ -70,16 +70,11 @@ export class UserService {
   async createUser(request: CreateUserRequest) {
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email: request.email,
-
       password: request.password,
-
       email_confirm: true,
-
       user_metadata: {
         first_name: request.firstName,
-
         last_name: request.lastName,
-
         role: request.role,
       },
     });
@@ -94,21 +89,13 @@ export class UserService {
       .from("profiles")
       .insert({
         id: userId,
-
         email: request.email,
-
         first_name: request.firstName,
-
         middle_name: request.middleName ?? null,
-
         last_name: request.lastName,
-
         suffix: request.suffix ?? null,
-
         role: request.role,
-
         is_active: true,
-
         must_change_password: true,
       });
 
@@ -130,11 +117,8 @@ export class UserService {
       .from("profiles")
       .update({
         first_name: request.firstName,
-
         middle_name: request.middleName ?? null,
-
         last_name: request.lastName,
-
         suffix: request.suffix ?? null,
       })
       .eq("id", id);
@@ -177,8 +161,30 @@ export class UserService {
       throw new AppError(500, error.message);
     }
 
+    // When an account is deactivated, revoke all existing
+    // Supabase sessions for that user.
+    //
+    // The auth middleware also checks profiles.is_active on
+    // every protected request, providing a second layer of
+    // protection even if an access token remains valid.
+    if (!request.isActive) {
+      const { error: signOutError } = await supabaseAdmin.auth.admin.signOut(
+        id,
+        "global",
+      );
+
+      if (signOutError) {
+        throw new AppError(
+          500,
+          "User was deactivated, but existing sessions could not be revoked.",
+        );
+      }
+    }
+
     return {
-      message: "User status updated.",
+      message: request.isActive
+        ? "User status updated."
+        : "User deactivated and existing sessions revoked.",
     };
   }
 }

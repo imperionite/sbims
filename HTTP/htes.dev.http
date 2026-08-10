@@ -1,0 +1,780 @@
+###############################################################
+# SBIMS API
+#
+# HTE Management Module
+#
+# Manual API Test Suite
+# VS Code REST Client
+#
+# Prerequisites:
+# - API server is running
+# - Test users exist
+# - Administrator and coordinator accounts are active
+#
+# Test order:
+# 1. Variables
+# 2. Health Check
+# 3. Administrator Login
+# 4. Coordinator Login
+# 5. HTE List
+# 6. HTE Create
+# 7. HTE Retrieve
+# 8. HTE Update
+# 9. HTE Deactivate
+# 10. HTE Reactivate
+# 11. Validation Tests
+# 12. Non-existent HTE
+# 13. Authorization Tests
+#
+###############################################################
+
+
+###############################################################
+# VARIABLES
+###############################################################
+
+@apiUrl=http://localhost:8000/api/v1
+
+### HTE ID
+### Replace after creating an HTE.
+@hteId=00000000-0000-0000-0000-000000000000
+
+
+###############################################################
+# SEED USERS
+###############################################################
+
+@admin=adminsbims1@grr.la
+@coordinator=coordinatorsbims1@grr.la
+@faculty=facultysbims1@grr.la
+@student=studentsbims1@grr.la
+@hte=htesbims1@grr.la
+
+
+###############################################################
+# PASSWORDS
+###############################################################
+
+@defaultPassword=Dev2026!
+@newPassword=deV2026!
+@renewPassword=deV2026#
+
+
+###############################################################
+# ACCESS TOKENS
+###############################################################
+
+### Paste a valid administrator access token here.
+@adminAccessToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
+
+### Paste a valid internship coordinator access token here.
+@coordinatorAccessToken=PASTE_COORDINATOR_ACCESS_TOKEN_HERE
+
+### Paste a valid student access token here.
+@studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
+
+### Paste a valid faculty adviser access token here.
+@facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
+
+
+###############################################################
+# HEALTH
+###############################################################
+
+### Health Check
+
+GET {{apiUrl}}/health
+
+### Expected:
+### HTTP 200
+### success = true
+
+
+###############################################################
+# ADMINISTRATOR LOGIN
+###############################################################
+
+### Administrator Login
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{admin}}",
+  "password": "{{newPassword}}"
+}
+
+###
+
+### Expected:
+### HTTP 200
+### data.accessToken is returned
+###
+### Copy the accessToken from the response and assign it to:
+### @adminAccessToken
+
+
+###############################################################
+# INTERNSHIP COORDINATOR LOGIN
+###############################################################
+
+### Internship Coordinator Login
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{coordinator}}",
+  "password": "{{newPassword}}"
+}
+
+###
+
+### Expected:
+### HTTP 200
+### data.accessToken is returned
+###
+### Copy the accessToken from the response and assign it to:
+### @coordinatorAccessToken
+
+
+###############################################################
+# HTE LIST
+###############################################################
+
+### FR-04 - Administrator List HTE Profiles
+
+GET {{apiUrl}}/htes
+Authorization: Bearer {{adminAccessToken}}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data = array
+
+
+###############################################################
+
+### FR-04 - Internship Coordinator List HTE Profiles
+
+GET {{apiUrl}}/htes
+Authorization: Bearer {{coordinatorAccessToken}}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data = array
+
+
+###############################################################
+# HTE CREATE
+###############################################################
+
+### FR-04 - Administrator Create HTE
+
+POST {{apiUrl}}/htes
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "REST Client Test HTE",
+  "address": "Test Address, Bulacan",
+  "contactPerson": "Test Contact Person",
+  "contactEmail": "contact@example.com",
+  "contactNumber": "09171234567"
+}
+
+###
+
+### Expected:
+### HTTP 201
+### success = true
+### data.id exists
+### data.company_name = "REST Client Test HTE"
+### data.address = "Test Address, Bulacan"
+### data.contact_person = "Test Contact Person"
+### data.contact_email = "contact@example.com"
+### data.contact_number = "09171234567"
+### data.is_active = true
+### data.created_at exists
+### data.updated_at exists
+###
+### Copy the returned data.id and assign it to:
+### @hteId
+
+
+###############################################################
+
+### FR-04 - Internship Coordinator Create HTE
+
+POST {{apiUrl}}/htes
+Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "Coordinator Test HTE",
+  "address": "Coordinator Test Address",
+  "contactPerson": "Coordinator Contact",
+  "contactEmail": "coordinator@example.com",
+  "contactNumber": "09181234567"
+}
+
+###
+
+### Expected:
+### HTTP 201
+### success = true
+### HTE profile is created
+
+
+###############################################################
+# HTE RETRIEVE
+###############################################################
+
+### FR-04 - Retrieve HTE Profile
+
+GET {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{adminAccessToken}}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.id = {{hteId}}
+
+
+###############################################################
+# HTE UPDATE
+###############################################################
+
+### FR-04 - Update HTE Profile
+
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "Updated REST Client HTE",
+  "contactPerson": "Updated Contact Person"
+}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.id = {{hteId}}
+### data.company_name = "Updated REST Client HTE"
+### data.contact_person = "Updated Contact Person"
+### Existing address remains unchanged
+
+
+###############################################################
+
+### FR-04 - Partial HTE Update
+
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "address": "Updated HTE Address, Bulacan"
+}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.address = "Updated HTE Address, Bulacan"
+
+
+###############################################################
+# HTE DEACTIVATE
+###############################################################
+
+### FR-04 - Deactivate HTE
+
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.is_active = false
+
+
+###############################################################
+# HTE REACTIVATE
+###############################################################
+
+### FR-04 - Reactivate HTE
+
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "isActive": true
+}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.is_active = true
+
+
+###############################################################
+# VALIDATION - CREATE
+###############################################################
+
+### Invalid HTE Data
+
+POST {{apiUrl}}/htes
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "",
+  "address": "",
+  "contactPerson": "",
+  "contactEmail": "not-an-email",
+  "contactNumber": ""
+}
+
+###
+
+### Expected:
+### HTTP 400
+### Validation error
+
+
+###############################################################
+
+### Missing Required HTE Fields
+
+POST {{apiUrl}}/htes
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "Incomplete HTE"
+}
+
+###
+
+### Expected:
+### HTTP 400
+### Validation error
+
+
+###############################################################
+
+### Invalid Contact Email
+
+POST {{apiUrl}}/htes
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "Invalid Email HTE",
+  "address": "Test Address",
+  "contactPerson": "Test Person",
+  "contactEmail": "invalid-email",
+  "contactNumber": "09171234567"
+}
+
+###
+
+### Expected:
+### HTTP 400
+
+
+###############################################################
+
+### Empty Contact Number
+
+POST {{apiUrl}}/htes
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "Empty Number HTE",
+  "address": "Test Address",
+  "contactPerson": "Test Person",
+  "contactEmail": "test@example.com",
+  "contactNumber": ""
+}
+
+###
+
+### Expected:
+### HTTP 400
+
+
+###############################################################
+# VALIDATION - UPDATE
+###############################################################
+
+### Empty HTE Update
+
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### Expected:
+### HTTP 400
+### At least one HTE profile field is required.
+
+
+###############################################################
+
+### Empty Company Name
+
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": ""
+}
+
+###
+
+### Expected:
+### HTTP 400
+
+
+###############################################################
+
+### Empty Address
+
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "address": ""
+}
+
+###
+
+### Expected:
+### HTTP 400
+
+
+###############################################################
+
+### Invalid Update Email
+
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "contactEmail": "invalid-email"
+}
+
+###
+
+### Expected:
+### HTTP 400
+
+
+###############################################################
+# VALIDATION - STATUS
+###############################################################
+
+### Invalid HTE Status
+
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "isActive": "false"
+}
+
+###
+
+### Expected:
+### HTTP 400
+### isActive must be a boolean
+
+
+###############################################################
+
+### Missing HTE Status
+
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### Expected:
+### HTTP 400
+
+
+###############################################################
+# NOT FOUND
+###############################################################
+
+### Non-existent HTE
+
+GET {{apiUrl}}/htes/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{adminAccessToken}}
+
+###
+
+### Expected:
+### HTTP 404
+### HTE profile not found.
+
+
+###############################################################
+
+### Update Non-existent HTE
+
+PATCH {{apiUrl}}/htes/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "Should Not Exist"
+}
+
+###
+
+### Expected:
+### HTTP 404
+
+
+###############################################################
+
+### Change Status of Non-existent HTE
+
+PATCH {{apiUrl}}/htes/00000000-0000-0000-0000-000000000000/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+###
+
+### Expected:
+### HTTP 404
+
+
+###############################################################
+# AUTHENTICATION
+###############################################################
+
+### Unauthenticated - List HTE Profiles
+
+GET {{apiUrl}}/htes
+
+###
+
+### Expected:
+### HTTP 401
+### Missing authorization token.
+
+
+###############################################################
+
+### Invalid Token - List HTE Profiles
+
+GET {{apiUrl}}/htes
+Authorization: Bearer invalid-token
+
+###
+
+### Expected:
+### HTTP 401
+### Invalid authentication token.
+
+
+###############################################################
+# AUTHORIZATION
+###############################################################
+
+### Student Cannot List HTE Profiles
+
+GET {{apiUrl}}/htes
+Authorization: Bearer {{studentAccessToken}}
+
+###
+
+### Expected:
+### HTTP 403
+### Insufficient permissions.
+
+
+###############################################################
+
+### Faculty Adviser Cannot List HTE Profiles
+
+GET {{apiUrl}}/htes
+Authorization: Bearer {{facultyAccessToken}}
+
+###
+
+### Expected:
+### HTTP 403
+### Insufficient permissions.
+
+
+###############################################################
+# STUDENT - CREATE
+###############################################################
+
+### Student Cannot Create HTE
+
+POST {{apiUrl}}/htes
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "Unauthorized Student HTE",
+  "address": "Test Address",
+  "contactPerson": "Test Person",
+  "contactEmail": "student@example.com",
+  "contactNumber": "09171234567"
+}
+
+###
+
+### Expected:
+### HTTP 403
+
+
+###############################################################
+# FACULTY - CREATE
+###############################################################
+
+### Faculty Adviser Cannot Create HTE
+
+POST {{apiUrl}}/htes
+Authorization: Bearer {{facultyAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "Unauthorized Faculty HTE",
+  "address": "Test Address",
+  "contactPerson": "Test Person",
+  "contactEmail": "faculty@example.com",
+  "contactNumber": "09171234567"
+}
+
+###
+
+### Expected:
+### HTTP 403
+
+
+###############################################################
+# STUDENT - UPDATE
+###############################################################
+
+### Student Cannot Update HTE
+
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "Unauthorized Update"
+}
+
+###
+
+### Expected:
+### HTTP 403
+
+
+###############################################################
+# FACULTY - UPDATE
+###############################################################
+
+### Faculty Adviser Cannot Update HTE
+
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{facultyAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "Unauthorized Faculty Update"
+}
+
+###
+
+### Expected:
+### HTTP 403
+
+
+###############################################################
+# STUDENT - STATUS
+###############################################################
+
+### Student Cannot Change HTE Status
+
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+###
+
+### Expected:
+### HTTP 403
+
+
+###############################################################
+# FACULTY - STATUS
+###############################################################
+
+### Faculty Adviser Cannot Change HTE Status
+
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{facultyAccessToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+###
+
+### Expected:
+### HTTP 403
+
+
+###############################################################
+# END OF HTE MANAGEMENT TEST SUITE
+###############################################################
