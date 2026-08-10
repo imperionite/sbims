@@ -1,0 +1,17 @@
+name: Quality Check - Internships Management
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  quality-gate:
+    uses: ./.github/workflows/_quality-module.yml
+    with:
+      module: htes
+      unit_task: test:unit:internships
+      integration_task: test:integration:internships
+    secrets: inherit

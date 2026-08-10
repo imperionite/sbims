@@ -26,12 +26,14 @@
     "test:unit:auth": "deno test --env-file=.env.test tests/unit/auth/auth.service.test.ts --allow-read --allow-env --allow-net",
     "test:unit:users": "deno test --env-file=.env.test tests/unit/users/role.middleware.test.ts --allow-read --allow-env --allow-net",
     "test:unit:students": "deno test --env-file=.env.test tests/unit/students/students.service.test.ts --allow-read --allow-env --allow-net",
+    "test:unit:internships": "deno test --env-file=.env.test tests/unit/internships/internships.service.test.ts --allow-read --allow-env --allow-net",
 
     "test:integration": "deno test --env-file=.env.test tests/integration --allow-read --allow-env --allow-net",
     "test:integration:auth": "deno test --env-file=.env.test tests/integration/auth.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:users": "deno test --env-file=.env.test tests/integration/users.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:students": "deno test --env-file=.env.test tests/integration/students.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:htes": "deno test --env-file=.env.test tests/integration/htes.integration.test.ts --allow-read --allow-env --allow-net",
+    "test:integration:internships": "deno test --env-file=.env.test tests/integration/internships.integration.test.ts --allow-read --allow-env --allow-net",
 
     "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts"
   },
