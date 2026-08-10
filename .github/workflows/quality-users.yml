@@ -1,0 +1,19 @@
+name: Quality Check - Users
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  auth:
+    uses: ./.github/workflows/_quality-module.yml
+
+    with:
+      module: users
+      unit_task: test:unit:users
+      integration_task: test:integration:users
+
+    secrets: inherit

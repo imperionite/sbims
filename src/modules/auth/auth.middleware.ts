@@ -1,6 +1,7 @@
 import type { Context, Next } from "hono";
 
-import { supabaseClient } from "../../lib/supabase.ts";
+import { supabaseAdmin, supabaseClient } from "../../lib/supabase.ts";
+
 import { AppError } from "../../errors/app-error.ts";
 
 export async function requireAuth(c: Context, next: Next) {
@@ -20,6 +21,27 @@ export async function requireAuth(c: Context, next: Next) {
 
   if (error || !data.user) {
     throw new AppError(401, "Invalid authentication token.");
+  }
+
+  // Check the current profile status on every authenticated request.
+  // This prevents users who were deactivated after login from
+  // continuing to access protected routes with an existing token.
+  const { data: profile, error: profileError } = await supabaseAdmin
+    .from("profiles")
+    .select("is_active")
+    .eq("id", data.user.id)
+    .maybeSingle();
+
+  if (profileError) {
+    throw new AppError(500, "Unable to verify account status.");
+  }
+
+  if (!profile) {
+    throw new AppError(401, "User profile not found.");
+  }
+
+  if (!profile.is_active) {
+    throw new AppError(403, "Account disabled.");
   }
 
   c.set("user", {

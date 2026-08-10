@@ -30,11 +30,25 @@ export class AuthService {
       throw new AppError(401, "Invalid credentials.");
     }
 
-    // getProfile throws AppError internally if not found or inactive,
-    // so we just await it directly.
+    // Check the application's profile status after Supabase
+    // authentication succeeds.
     const profile = await this.getProfile(data.user.id);
 
     if (!profile.is_active) {
+      // Revoke the newly authenticated user's sessions before
+      // rejecting the login.
+      const { error: signOutError } = await supabaseAdmin.auth.admin.signOut(
+        data.user.id,
+        "global",
+      );
+
+      if (signOutError) {
+        logger.warn("Unable to revoke inactive user's sessions", {
+          userId: data.user.id,
+          error: signOutError,
+        });
+      }
+
       throw new AppError(403, "Account disabled.");
     }
 
@@ -60,6 +74,25 @@ export class AuthService {
 
   async refresh(request: RefreshTokenRequest): Promise<TokenResponse> {
     const session = await this.refreshSession(request.refreshToken);
+
+    // Re-check the profile status after refreshing the session.
+    const profile = await this.getProfile(session.user.id);
+
+    if (!profile.is_active) {
+      const { error: signOutError } = await supabaseAdmin.auth.admin.signOut(
+        session.user.id,
+        "global",
+      );
+
+      if (signOutError) {
+        logger.warn("Unable to revoke inactive user's sessions", {
+          userId: session.user.id,
+          error: signOutError,
+        });
+      }
+
+      throw new AppError(403, "Account disabled.");
+    }
 
     return this.mapTokens(session);
   }
@@ -173,7 +206,6 @@ export class AuthService {
   }): TokenResponse {
     return {
       accessToken: session.access_token,
-
       refreshToken: session.refresh_token,
     };
   }
@@ -181,19 +213,12 @@ export class AuthService {
   private mapProfile(profile: Profile): AuthUser {
     return {
       id: profile.id,
-
       email: profile.email,
-
       firstName: profile.first_name,
-
       middleName: profile.middle_name,
-
       lastName: profile.last_name,
-
       suffix: profile.suffix,
-
       role: profile.role,
-
       mustChangePassword: profile.must_change_password,
     };
   }

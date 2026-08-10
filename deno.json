@@ -17,13 +17,22 @@
     "verify": "deno fmt --check && deno lint && deno check src/main.ts",
     "refresh": "deno cache --reload src/main.ts",
     "check": "deno check src/main.ts",
+
     "test": "deno task test:unit && deno task test:integration",
+    "test:coverage": "deno test --env-file=.env.test tests --coverage=coverage --allow-env --allow-net --allow-read && deno coverage coverage",
+
     "test:unit": "deno test --env-file=.env.test tests/unit --allow-read --allow-env --allow-net",
+    "test:unit:htes": "deno test --env-file=.env.test tests/unit/htes/htes.service.test.ts --allow-read --allow-env --allow-net",
+    "test:unit:auth": "deno test --env-file=.env.test tests/unit/auth/auth.service.test.ts --allow-read --allow-env --allow-net",
+    "test:unit:users": "deno test --env-file=.env.test tests/unit/users/role.middleware.test.ts --allow-read --allow-env --allow-net",
+    "test:unit:students": "deno test --env-file=.env.test tests/unit/students/students.service.test.ts --allow-read --allow-env --allow-net",
+
     "test:integration": "deno test --env-file=.env.test tests/integration --allow-read --allow-env --allow-net",
     "test:integration:auth": "deno test --env-file=.env.test tests/integration/auth.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:users": "deno test --env-file=.env.test tests/integration/users.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:students": "deno test --env-file=.env.test tests/integration/students.integration.test.ts --allow-read --allow-env --allow-net",
-    "test:coverage": "deno test --env-file=.env.test tests --coverage=coverage --allow-env --allow-net --allow-read && deno coverage coverage",
+    "test:integration:htes": "deno test --env-file=.env.test tests/integration/htes.integration.test.ts --allow-read --allow-env --allow-net",
+
     "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts"
   },
   "fmt": {

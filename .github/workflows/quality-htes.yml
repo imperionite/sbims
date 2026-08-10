@@ -1,0 +1,17 @@
+name: Quality Check - HTEs
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  quality-gate:
+    uses: ./.github/workflows/_quality-module.yml
+    with:
+      module: htes
+      unit-task: test:unit:htes
+      integration-task: test:integration:htes
+    secrets: inherit
