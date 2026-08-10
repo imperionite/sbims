@@ -9,13 +9,15 @@ on:
         type: string
 
       unit_task:
-        description: "Unit-test task"
-        required: true
+        description: "Unit-test task. Optional for pipelines without tests."
+        required: false
+        default: ""
         type: string
 
       integration_task:
-        description: "Integration-test task"
-        required: true
+        description: "Integration-test task. Optional for pipelines without tests."
+        required: false
+        default: ""
         type: string
 
     secrets:
@@ -70,9 +72,9 @@ jobs:
       # ============================================
 
       - name: Setup Deno
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v2
         with:
-          deno-version: 2.9.4
+          deno-version: "2.9.4"
 
       - name: Cache Deno Dependencies
         uses: actions/cache@v4
@@ -87,8 +89,6 @@ jobs:
       - name: Install Dependencies
         run: |
           deno cache src/main.ts
-          deno cache "tests/unit/**/*.ts"
-          deno cache "tests/integration/**/*.ts"
 
       # ============================================
       # FORMAT
@@ -137,6 +137,7 @@ jobs:
       # ============================================
 
       - name: Unit Tests (${{ inputs.module }})
+        if: ${{ inputs.unit_task != '' }}
         run: |
           START=$(date +%s)
 
@@ -151,6 +152,7 @@ jobs:
       # ============================================
 
       - name: Integration Tests (${{ inputs.module }})
+        if: ${{ inputs.integration_task != '' }}
         run: |
           START=$(date +%s)
 
@@ -167,7 +169,6 @@ jobs:
       - name: SBIMS Quality Gate Report
         if: always()
         run: |
-
           END_TIME=$(date +%s)
           END_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
@@ -179,29 +180,24 @@ jobs:
           echo "======================================================================"
 
           echo ""
-
           echo "Module      : ${{ inputs.module }}"
           echo "Repository  : ${{ github.repository }}"
           echo "Workflow    : ${{ github.workflow }}"
           echo "Event       : ${{ github.event_name }}"
 
           echo ""
-
           echo "Base Branch : ${{ github.base_ref }}"
           echo "Head Branch : ${{ github.head_ref }}"
-
           echo "PR          : #${{ github.event.pull_request.number }}"
           echo "Commit      : ${{ github.sha }}"
           echo "Actor       : ${{ github.actor }}"
           echo "Run ID      : ${{ github.run_id }}"
 
           echo ""
-
           echo "Started     : $START_TIMESTAMP"
           echo "Finished    : $END_TIMESTAMP"
 
           echo ""
-
           echo "======================================================================"
           echo "QUALITY CHECKS"
           echo "======================================================================"
@@ -211,17 +207,25 @@ jobs:
           echo "Format Check          ${FORMAT_TIME:-FAILED}"
           echo "Lint Check            ${LINT_TIME:-FAILED}"
           echo "Type Check            ${TYPE_TIME:-FAILED}"
-          echo "Unit Tests            ${UNIT_TIME:-FAILED}"
-          echo "Integration Tests     ${INTEGRATION_TIME:-FAILED}"
+
+          if [ -n "${UNIT_TIME:-}" ]; then
+            echo "Unit Tests            ${UNIT_TIME}"
+          else
+            echo "Unit Tests            NOT RUN"
+          fi
+
+          if [ -n "${INTEGRATION_TIME:-}" ]; then
+            echo "Integration Tests     ${INTEGRATION_TIME}"
+          else
+            echo "Integration Tests     NOT RUN"
+          fi
 
           echo ""
-
           echo "----------------------------------------------------------------------"
           echo "Total CI Duration : ${TOTAL}s"
           echo "----------------------------------------------------------------------"
 
           echo ""
-
           echo "======================================================================"
           echo "RESULT"
           echo "======================================================================"
@@ -233,6 +237,13 @@ jobs:
             echo ""
             echo "Quality Gate Passed"
             echo "Module : ${{ inputs.module }}"
+
+            if [ -z "${UNIT_TIME:-}" ] && [ -z "${INTEGRATION_TIME:-}" ]; then
+              echo "Tests  : Not configured"
+            else
+              echo "Tests  : Configured"
+            fi
+
             echo "Ready for Review"
 
           else
@@ -243,6 +254,7 @@ jobs:
             echo "Quality Gate Failed"
             echo "Module : ${{ inputs.module }}"
             echo "Fix required"
+
             exit 1
 
           fi
