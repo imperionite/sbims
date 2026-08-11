@@ -1,6 +1,8 @@
-let runtimeEnv: Record<string, string> | undefined;
+import type { RuntimeEnv } from "./env.ts";
 
-export function initializeRuntime(env?: Record<string, string>) {
+let runtimeEnv: RuntimeEnv | undefined;
+
+export function initializeRuntime(env?: RuntimeEnv): void {
   runtimeEnv = env;
 }
 
