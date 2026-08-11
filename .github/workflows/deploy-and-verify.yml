@@ -21,7 +21,6 @@ env:
   HEALTH_URL: "https://sbims-dev.imperionite.deno.net/api/v1/health"
 
 jobs:
-
   # ============================================================
   # QUALITY VERIFICATION
   # ============================================================
@@ -123,6 +122,9 @@ jobs:
 
       - id: cf-step
         name: Build and Deploy to Cloudflare Workers
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           START=$(date +%s)
 
@@ -135,12 +137,6 @@ jobs:
           END=$(date +%s)
           echo "time=$((END - START))s" >> $GITHUB_OUTPUT
           echo "status=succeeded" >> $GITHUB_OUTPUT
-
-      - name: Deploy Action
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
   # ============================================================
   # UNIFIED DEPLOYMENT REPORT
