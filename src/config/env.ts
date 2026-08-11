@@ -21,30 +21,50 @@ const envSchema = z.object({
   RATE_LIMIT_ENABLED: z.coerce.boolean().default(true),
 });
 
-export function loadEnv() {
+export type AppConfig =
+  & Omit<
+    z.infer<typeof envSchema>,
+    "ALLOWED_ORIGINS"
+  >
+  & {
+    ALLOWED_ORIGINS: string[];
+  };
+
+export type RuntimeEnv = Record<string, string | undefined>;
+
+export function loadEnv(source?: RuntimeEnv): AppConfig {
+  const get = (name: string): string | undefined => {
+    if (source && source[name] !== undefined) {
+      return source[name];
+    }
+
+    return getEnv(name);
+  };
+
   const parsed = envSchema.parse({
-    SUPABASE_URL: getEnv("SUPABASE_URL"),
+    SUPABASE_URL: get("SUPABASE_URL"),
 
-    SUPABASE_ANON_KEY: getEnv("SUPABASE_PUBLISHABLE_KEY"),
+    SUPABASE_ANON_KEY: get("SUPABASE_PUBLISHABLE_KEY"),
 
-    SUPABASE_SERVICE_ROLE_KEY: getEnv("SUPABASE_SECRET_KEY"),
+    SUPABASE_SERVICE_ROLE_KEY: get("SUPABASE_SECRET_KEY"),
 
-    PORT: getEnv("PORT"),
+    PORT: get("PORT"),
 
-    ENVIRONMENT: getEnv("ENVIRONMENT"),
+    ENVIRONMENT: get("ENVIRONMENT"),
 
-    ALLOWED_ORIGINS: getEnv("ALLOWED_ORIGINS"),
+    ALLOWED_ORIGINS: get("ALLOWED_ORIGINS"),
 
-    FRONTEND_URL: getEnv("FRONTEND_URL"),
+    FRONTEND_URL: get("FRONTEND_URL"),
 
-    RATE_LIMIT_ENABLED: getEnv("RATE_LIMIT_ENABLED") !== "false",
+    RATE_LIMIT_ENABLED: get("RATE_LIMIT_ENABLED") !== "false",
   });
 
   return {
     ...parsed,
 
-    ALLOWED_ORIGINS: parsed.ALLOWED_ORIGINS.split(",")
+    ALLOWED_ORIGINS: parsed.ALLOWED_ORIGINS
+      .split(",")
       .map((origin) => origin.trim())
       .filter(Boolean),
-  } as const;
+  };
 }

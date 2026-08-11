@@ -10,9 +10,6 @@ export default {
   ) {
     initializeRuntime(env);
 
-    // After the first import, the JavaScript module is cached by the runtime,
-    // so we are not rebuilding the application on every request
-
     const { app } = await import("./app.ts");
 
     return app.fetch(request, env, ctx);
