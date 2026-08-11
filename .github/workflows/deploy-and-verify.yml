@@ -72,7 +72,7 @@ jobs:
 
           END=$(date +%s)
           DURATION=$((END - START))
-          
+
           echo "status=succeeded" >> $GITHUB_OUTPUT
           echo "time=${DURATION}s" >> $GITHUB_OUTPUT
 
@@ -175,7 +175,7 @@ jobs:
           echo " Build Time   : ${{ needs.deploy-cloudflare.outputs.time || 'N/A' }}"
           echo ""
           echo "======================================================================"
-          
+
           if [ "${{ job.status }}" = "success" ]; then
             echo " STATUS : PASS - All deployments and verifications succeeded."
           else
