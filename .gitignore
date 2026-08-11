@@ -11,3 +11,5 @@ supabase/archive/
 NOTES.md
 coverage/
 .deno/
+build/
+dist/
