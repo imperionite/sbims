@@ -1,6 +1,7 @@
 .env
 .env.test
 .env.dev
+.env.production
 .vscode/
 logs/
 .DS_Store
