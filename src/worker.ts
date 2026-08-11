@@ -1,11 +1,19 @@
-import { ExecutionContext } from "hono";
-import { app } from "./app.ts";
+import type { ExecutionContext } from "hono";
+
 import { initializeRuntime } from "./config/runtime.ts";
 
-// Cloudflare Worker enry point for portability
 export default {
-  fetch(request: Request, env: Record<string, string>, ctx: ExecutionContext) {
+  async fetch(
+    request: Request,
+    env: Record<string, string>,
+    ctx: ExecutionContext,
+  ) {
     initializeRuntime(env);
+
+    // After the first import, the JavaScript module is cached by the runtime,
+    // so we are not rebuilding the application on every request
+
+    const { app } = await import("./app.ts");
 
     return app.fetch(request, env, ctx);
   },
