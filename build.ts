@@ -6,10 +6,10 @@ await esbuild.build({
   outfile: "dist/server.js",
   format: "esm",
   bundle: true,
-  minify: true,
+  minify: false,
   treeShaking: true,
   keepNames: true,
-  target: "esnext",
+  target: "es2022",
   plugins: [denoPlugin()],
 });
 
