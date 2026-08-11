@@ -9,7 +9,6 @@ await esbuild.build({
   minify: true,
   treeShaking: true,
   keepNames: true,
-  platform: "neutral",
   target: "esnext",
   plugins: [denoPlugin()],
 });
