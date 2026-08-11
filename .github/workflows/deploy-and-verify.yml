@@ -121,19 +121,13 @@ jobs:
           deno-version: ${{ env.DENO_VERSION }}
 
       - id: cf-step
-        name: Build and Deploy to Cloudflare Workers
+        name: Deploy to Cloudflare Workers
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           START=$(date +%s)
-
-          deno install
-
-          deno task build
-
           npx wrangler deploy
-
           END=$(date +%s)
           echo "time=$((END - START))s" >> $GITHUB_OUTPUT
           echo "status=succeeded" >> $GITHUB_OUTPUT
