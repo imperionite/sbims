@@ -163,10 +163,8 @@ jobs:
             exit 1
           fi
 
-          echo "Deploying SBIMS to Cloudflare Workers..."
+          echo "Deploying SBIMS to Cloudflare Workers"
 
-          # Wrangler invokes the existing Deno build configured
-          # in wrangler.jsonc before deploying the Worker bundle.
           npx wrangler@4.120.1 deploy
 
           END=$(date +%s)

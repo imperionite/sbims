@@ -2,8 +2,8 @@ import * as esbuild from "esbuild";
 import { denoPlugin } from "@deno/esbuild-plugin";
 
 await esbuild.build({
-  entryPoints: ["src/main.ts"],
-  outfile: "dist/server.js",
+  entryPoints: ["src/worker.ts"],
+  outfile: "dist/worker.js",
   format: "esm",
   bundle: true,
   minify: true,

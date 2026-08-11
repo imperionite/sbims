@@ -40,7 +40,8 @@
     "test:integration:internships": "deno test --env-file=.env.test tests/integration/internships.integration.test.ts --allow-read --allow-env --allow-net",
 
     "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts",
-    "build": "deno run --allow-read --allow-write --allow-net --allow-env --allow-run build.ts"
+    "build": "deno run --allow-read --allow-write --allow-net --allow-env --allow-run build.ts",
+    "build:worker": "deno run --allow-read --allow-write --allow-net --allow-env --allow-run build-worker.ts"
   },
   "fmt": {
     "lineWidth": 100
