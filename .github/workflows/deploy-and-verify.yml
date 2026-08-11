@@ -21,7 +21,6 @@ env:
   HEALTH_URL: "https://sbims-dev.imperionite.deno.net/api/v1/health"
 
 jobs:
-
   # ============================================================
   # QUALITY VERIFICATION
   # ============================================================
@@ -135,6 +134,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
 
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -160,6 +164,7 @@ jobs:
 
           echo "Deploying SBIMS to Cloudflare Workers..."
 
+          # Wrangler will automatically trigger 'deno task build' via wrangler.jsonc build configuration
           npx wrangler@4.120.1 deploy
 
           END=$(date +%s)
