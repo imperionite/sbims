@@ -1,5 +1,6 @@
 {
   "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
+  "nodeModulesDir": "auto",
   "imports": {
     "@deno/esbuild-plugin": "jsr:@deno/esbuild-plugin@^1.2.1",
     "@std/assert": "jsr:@std/assert@^1.0.19",
@@ -53,7 +54,8 @@
   },
   "exclude": [
     "k6/",
-    "dist/"
+    "dist/",
+    "node_modules/"
   ],
   "compilerOptions": {
     "strict": true
