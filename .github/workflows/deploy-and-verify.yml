@@ -130,6 +130,8 @@ jobs:
 
           deno task build
 
+          npx wrangler deploy
+
           END=$(date +%s)
           echo "time=$((END - START))s" >> $GITHUB_OUTPUT
           echo "status=succeeded" >> $GITHUB_OUTPUT
