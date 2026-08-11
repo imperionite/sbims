@@ -16,6 +16,6 @@
   },
 
   "build": {
-    "command": "echo 'No custom build'"
+    "command": "deno task build"
   }
 }
