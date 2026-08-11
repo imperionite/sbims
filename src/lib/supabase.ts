@@ -1,10 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
+
 import { loadEnv } from "../config/env.ts";
 
 const env = loadEnv();
 
 /**
- * Public Supabase client
+ * Public Supabase client.
  *
  * Used for:
  * - sign in
@@ -31,11 +32,6 @@ export const supabaseClient = createClient(
  *
  * Used for operations that require the
  * authenticated user's session context.
- *
- * Examples:
- * - change password
- * - update own profile
- * - user-scoped operations
  */
 export function createAuthenticatedClient(accessToken: string) {
   return createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
@@ -53,14 +49,9 @@ export function createAuthenticatedClient(accessToken: string) {
 }
 
 /**
- * Admin Supabase client
+ * Admin Supabase client.
  *
  * Used only for privileged backend operations.
- *
- * Examples:
- * - profile management
- * - administrative workflows
- * - service-role operations
  *
  * Never expose this client to frontend applications.
  */
@@ -78,14 +69,8 @@ export const supabaseAdmin = createClient(
 /**
  * Creates a fresh public Supabase client.
  *
- * Used for authentication flows that need to
- * establish a session explicitly.
- *
- * Examples:
- * - password recovery
- * - email verification
- *
- * Does not persist sessions.
+ * Used for authentication flows that need
+ * a separate client instance.
  */
 export function createPublicClient() {
   return createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
