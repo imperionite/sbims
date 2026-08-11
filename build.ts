@@ -1,4 +1,3 @@
-// build.ts
 import * as esbuild from "esbuild";
 import { denoPlugin } from "@deno/esbuild-plugin";
 
@@ -9,6 +8,9 @@ await esbuild.build({
   bundle: true,
   minify: true,
   treeShaking: true,
+  keepNames: true,
+  platform: "neutral",
+  target: "esnext",
   plugins: [denoPlugin()],
 });
 
