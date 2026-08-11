@@ -125,7 +125,11 @@ jobs:
         name: Build and Deploy to Cloudflare Workers
         run: |
           START=$(date +%s)
+
+          deno install
+
           deno task build
+          
           END=$(date +%s)
           echo "time=$((END - START))s" >> $GITHUB_OUTPUT
           echo "status=succeeded" >> $GITHUB_OUTPUT
