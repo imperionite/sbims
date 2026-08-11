@@ -54,7 +54,8 @@
   },
   "exclude": [
     "k6/",
-    "dist/"
+    "dist/",
+    "node_modules/"
   ],
   "compilerOptions": {
     "strict": true
