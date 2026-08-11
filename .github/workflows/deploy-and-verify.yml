@@ -129,7 +129,7 @@ jobs:
           deno install
 
           deno task build
-          
+
           END=$(date +%s)
           echo "time=$((END - START))s" >> $GITHUB_OUTPUT
           echo "status=succeeded" >> $GITHUB_OUTPUT
