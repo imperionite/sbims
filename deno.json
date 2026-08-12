@@ -1,11 +1,8 @@
 {
   "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
-  "nodeModulesDir": "auto",
   "imports": {
-    "@deno/esbuild-plugin": "jsr:@deno/esbuild-plugin@^1.2.1",
     "@std/assert": "jsr:@std/assert@^1.0.19",
     "@std/testing": "jsr:@std/testing@^1.0.20",
-    "esbuild": "npm:esbuild@^0.28.2",
     "hono": "npm:hono@^4.12.32",
     "@hono/zod-validator": "npm:@hono/zod-validator@^0.4.3",
     "zod": "npm:zod@^3.25.0",
@@ -21,26 +18,21 @@
     "verify": "deno fmt --check && deno lint && deno check src/main.ts",
     "refresh": "deno cache --reload src/main.ts",
     "check": "deno check src/main.ts",
-
     "test": "deno task test:unit && deno task test:integration",
     "test:coverage": "deno test --env-file=.env.test tests --coverage=coverage --allow-env --allow-net --allow-read && deno coverage coverage",
-
     "test:unit": "deno test --env-file=.env.test tests/unit --allow-read --allow-env --allow-net",
     "test:unit:htes": "deno test --env-file=.env.test tests/unit/htes/htes.service.test.ts --allow-read --allow-env --allow-net",
     "test:unit:auth": "deno test --env-file=.env.test tests/unit/auth/auth.service.test.ts --allow-read --allow-env --allow-net",
     "test:unit:users": "deno test --env-file=.env.test tests/unit/users/role.middleware.test.ts --allow-read --allow-env --allow-net",
     "test:unit:students": "deno test --env-file=.env.test tests/unit/students/students.service.test.ts --allow-read --allow-env --allow-net",
     "test:unit:internships": "deno test --env-file=.env.test tests/unit/internships/internships.service.test.ts --allow-read --allow-env --allow-net",
-
     "test:integration": "deno test --env-file=.env.test tests/integration --allow-read --allow-env --allow-net",
     "test:integration:auth": "deno test --env-file=.env.test tests/integration/auth.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:users": "deno test --env-file=.env.test tests/integration/users.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:students": "deno test --env-file=.env.test tests/integration/students.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:htes": "deno test --env-file=.env.test tests/integration/htes.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:internships": "deno test --env-file=.env.test tests/integration/internships.integration.test.ts --allow-read --allow-env --allow-net",
-
-    "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts",
-    "build": "deno run --allow-read --allow-write --allow-net --allow-env --allow-run build.ts"
+    "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts"
   },
   "fmt": {
     "lineWidth": 100
@@ -53,9 +45,7 @@
     }
   },
   "exclude": [
-    "k6/",
-    "dist/",
-    "node_modules/"
+    "k6/"
   ],
   "compilerOptions": {
     "strict": true
