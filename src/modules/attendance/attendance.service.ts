@@ -113,21 +113,14 @@ class AttendanceService {
 
     // Detailed diagnostic logging.
     if (error || !data) {
-      console.error("=== CREATE ATTENDANCE FAILED ===");
-
-      console.error("Supabase error:", error);
-
-      console.error("Input:", {
-        internship_id,
-        attendance_date,
-        time_in,
-        time_out,
+      console.error("CREATE ATTENDANCE SUPABASE ERROR:", {
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code,
       });
 
-      throw new AppError(
-        500,
-        error?.message ?? "Failed to create attendance record.",
-      );
+      throw new AppError(500, "Failed to create attendance record.");
     }
 
     return data as AttendanceRecord;
