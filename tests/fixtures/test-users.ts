@@ -15,6 +15,14 @@ export const TEST_USERS = {
     role: "student",
   },
 
+  coordinator: {
+    email: "sbims-test-coordinator@maildrop.cc",
+    password: "TestPassword2026!",
+    firstName: "Test",
+    lastName: "Internship Coordinator",
+    role: "internship_coordinator",
+  },
+
   firstLogin: {
     email: "sbims-test-first-login@maildrop.cc",
     password: "TestPassword2026!",

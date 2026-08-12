@@ -6,6 +6,7 @@ import users from "../modules/users/users.routes.ts";
 import students from "../modules/students/students.routes.ts";
 import htes from "../modules/htes/htes.routes.ts";
 import internships from "../modules/internships/internships.routes.ts";
+import attendance from "../modules/attendance/attendance.routes.ts";
 
 const api = new Hono();
 
@@ -20,5 +21,7 @@ api.route("/students", students);
 api.route("/htes", htes);
 
 api.route("/internships", internships);
+
+api.route("/attendance", attendance);
 
 export default api;

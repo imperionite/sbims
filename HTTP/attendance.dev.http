@@ -1,0 +1,1215 @@
+###############################################################
+# SBIMS API
+#
+# Attendance Management Module
+#
+# FR-07 Manual API Test Suite
+# VS Code REST Client
+#
+# Prerequisites:
+# - API server is running
+# - Supabase database is running
+# - Attendance migration has been pushed
+# - Test users exist
+# - Administrator and internship coordinator accounts are active
+# - Student account is active
+#
+# Test order:
+# 1. Variables
+# 2. Seed Users
+# 3. Passwords
+# 4. Access Tokens
+# 5. Health Check
+# 6. Administrator Login
+# 7. Internship Coordinator Login
+# 8. Student Login
+# 9. Create Test HTE
+# 10. Create Test Internship
+# 11. Activate Internship
+# 12. Student Create Attendance
+# 13. Student Retrieve Own Attendance
+# 14. Retrieve Attendance by Internship
+# 15. Retrieve Attendance by ID
+# 16. Update Pending Attendance
+# 17. Duplicate Attendance
+# 18. Coordinator Validate Attendance
+# 19. Student Cannot Update Validated Attendance
+# 20. Coordinator Reject Attendance
+# 21. Rendered Hours
+# 22. Validation Tests
+# 23. Not Found Tests
+# 24. Authentication Tests
+# 25. Authorization Tests
+#
+###############################################################
+
+
+###############################################################
+# VARIABLES
+###############################################################
+
+@apiUrl=http://localhost:8000/api/v1
+
+### Internship ID
+### Replace after creating the test internship.
+
+@internshipId=00000000-0000-0000-0000-000000000000
+
+### Attendance ID
+### Replace after creating an attendance record.
+
+@attendanceId=00000000-0000-0000-0000-000000000000
+
+### Second Attendance ID
+### Used for validation/rejection tests.
+
+@attendanceId2=00000000-0000-0000-0000-000000000000
+
+### Student ID
+### Use the ID of the student account being tested.
+
+@studentId=00000000-0000-0000-0000-000000000000
+
+### HTE ID
+### Replace after creating the test HTE.
+
+@hteId=00000000-0000-0000-0000-000000000000
+
+
+###############################################################
+# SEED USERS
+###############################################################
+
+@admin=adminsbims1@grr.la
+@coordinator=coordinatorsbims1@grr.la
+@student=studentsbims1@grr.la
+@faculty=facultysbims1@grr.la
+
+
+###############################################################
+# PASSWORDS
+###############################################################
+
+@defaultPassword=Dev2026!
+@newPassword=deV2026!
+@renewPassword=deV2026#
+
+
+###############################################################
+# ACCESS TOKENS
+###############################################################
+
+### Paste a valid administrator access token here.
+
+@adminAccessToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
+
+### Paste a valid internship coordinator access token here.
+
+@coordinatorAccessToken=PASTE_COORDINATOR_ACCESS_TOKEN_HERE
+
+### Paste a valid student access token here.
+
+@studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
+
+### Paste a valid faculty adviser access token here.
+
+@facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
+
+
+###############################################################
+# HEALTH
+###############################################################
+
+### Health Check
+
+GET {{apiUrl}}/health
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+
+
+###############################################################
+# ADMINISTRATOR LOGIN
+###############################################################
+
+### Administrator Login
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{admin}}",
+  "password": "{{newPassword}}"
+}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.accessToken is returned
+###
+### Copy the returned accessToken and assign it to:
+### @adminAccessToken
+
+
+###############################################################
+# INTERNSHIP COORDINATOR LOGIN
+###############################################################
+
+### Internship Coordinator Login
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{coordinator}}",
+  "password": "{{newPassword}}"
+}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.accessToken is returned
+###
+### Copy the returned accessToken and assign it to:
+### @coordinatorAccessToken
+
+
+###############################################################
+# STUDENT LOGIN
+###############################################################
+
+### Student Login
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{student}}",
+  "password": "{{newPassword}}"
+}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.accessToken is returned
+###
+### Copy the returned accessToken and assign it to:
+### @studentAccessToken
+
+
+###############################################################
+# FACULTY LOGIN
+###############################################################
+
+### Faculty Adviser Login
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{faculty}}",
+  "password": "{{newPassword}}"
+}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.accessToken is returned
+###
+### Copy the returned accessToken and assign it to:
+### @facultyAccessToken
+
+
+###############################################################
+# TEST HTE
+###############################################################
+
+### FR-07 - Administrator Create Test HTE
+
+POST {{apiUrl}}/htes
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "REST Client FR07 Test HTE",
+  "address": "Test Address, Bulacan",
+  "contactPerson": "FR07 Test Contact",
+  "contactEmail": "fr07-test@example.com",
+  "contactNumber": "09171234567"
+}
+
+###
+
+### Expected:
+### HTTP 201
+### success = true
+### data.id exists
+### data.company_name = "REST Client FR07 Test HTE"
+### data.is_active = true
+###
+### Copy data.id and assign it to:
+### @hteId
+
+
+###############################################################
+# TEST INTERNSHIP
+###############################################################
+
+### FR-07 - Administrator Create Test Internship
+
+POST {{apiUrl}}/internships
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "studentId": "{{studentId}}",
+  "hteId": "{{hteId}}"
+}
+
+###
+
+### Expected:
+### HTTP 201
+### success = true
+### data.id exists
+### data.student_id = {{studentId}}
+### data.hte_id = {{hteId}}
+### data.status = "pending"
+###
+### Copy data.id and assign it to:
+### @internshipId
+
+
+###############################################################
+# ACTIVATE INTERNSHIP
+###############################################################
+
+### FR-07 - Administrator Activate Internship
+
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "status": "active"
+}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.id = {{internshipId}}
+### data.status = "active"
+###
+### Attendance creation requires an active internship.
+
+
+###############################################################
+# STUDENT - CREATE ATTENDANCE
+###############################################################
+
+### FR-07 - Student Create Attendance
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "2026-08-10",
+  "time_in": "08:00",
+  "time_out": "17:00"
+}
+
+###
+
+### Expected:
+### HTTP 201
+### success = true
+### data.id exists
+### data.internship_id = {{internshipId}}
+### data.attendance_date = "2026-08-10"
+### data.time_in = "08:00:00"
+### data.time_out = "17:00:00"
+### data.validation_status = "pending"
+###
+### Expected rendered hours:
+### 8 hours
+###
+### Calculation:
+### 09:00 elapsed - 01:00 meal break = 08:00 rendered
+###
+### Copy data.id and assign it to:
+### @attendanceId
+
+
+###############################################################
+# STUDENT - RETRIEVE OWN ATTENDANCE
+###############################################################
+
+### FR-07 - Student Retrieve Own Attendance
+
+GET {{apiUrl}}/attendance/me
+Authorization: Bearer {{studentAccessToken}}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data = array
+### Created attendance record is present
+### data contains the attendance for {{internshipId}}
+
+
+###############################################################
+# ATTENDANCE BY INTERNSHIP
+###############################################################
+
+### FR-07 - Student Retrieve Attendance by Internship
+
+GET {{apiUrl}}/attendance/internship/{{internshipId}}
+Authorization: Bearer {{studentAccessToken}}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data = array
+### Attendance record is present
+### data.id = {{attendanceId}}
+
+
+###############################################################
+# ATTENDANCE BY ID
+###############################################################
+
+### FR-07 - Student Retrieve Attendance by ID
+
+GET {{apiUrl}}/attendance/{{attendanceId}}
+Authorization: Bearer {{studentAccessToken}}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.id = {{attendanceId}}
+### data.internship_id = {{internshipId}}
+### data.validation_status = "pending"
+
+
+###############################################################
+# UPDATE PENDING ATTENDANCE
+###############################################################
+
+### FR-07 - Student Update Pending Attendance
+
+PATCH {{apiUrl}}/attendance/{{attendanceId}}
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "time_in": "08:30",
+  "time_out": "17:30"
+}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.id = {{attendanceId}}
+### data.time_in = "08:30:00"
+### data.time_out = "17:30:00"
+### data.validation_status = "pending"
+
+
+###############################################################
+# DUPLICATE ATTENDANCE
+###############################################################
+
+### FR-07 - Student Cannot Create Duplicate Attendance
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "2026-08-10",
+  "time_in": "09:00",
+  "time_out": "18:00"
+}
+
+###
+
+### Expected:
+### HTTP 409
+###
+### Attendance for this date already exists.
+
+
+###############################################################
+# SECOND ATTENDANCE RECORD
+###############################################################
+
+### FR-07 - Student Create Second Attendance Record
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "2026-08-11",
+  "time_in": "08:00",
+  "time_out": "17:00"
+}
+
+###
+
+### Expected:
+### HTTP 201
+### success = true
+### data.id exists
+### data.validation_status = "pending"
+###
+### Copy data.id and assign it to:
+### @attendanceId2
+
+
+###############################################################
+# COORDINATOR - VALIDATE ATTENDANCE
+###############################################################
+
+### FR-07 - Internship Coordinator Validate Attendance
+
+PATCH {{apiUrl}}/attendance/{{attendanceId}}
+/validation
+Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{
+  "validation_status": "validated"
+}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.id = {{attendanceId}}
+### data.validation_status = "validated"
+### data.validated_by = coordinator user ID
+### data.validated_at exists
+
+
+###############################################################
+# STUDENT - CANNOT UPDATE VALIDATED ATTENDANCE
+###############################################################
+
+### FR-07 - Student Cannot Update Validated Attendance
+
+PATCH {{apiUrl}}/attendance/{{attendanceId}}
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "time_in": "09:00"
+}
+
+###
+
+### Expected:
+### HTTP 400
+###
+### Only pending attendance records can be updated.
+
+
+###############################################################
+# COORDINATOR - REJECT ATTENDANCE
+###############################################################
+
+### FR-07 - Internship Coordinator Reject Attendance
+
+PATCH {{apiUrl}}/attendance/{{attendanceId2}}/validation
+Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{
+  "validation_status": "rejected"
+}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.id = {{attendanceId2}}
+### data.validation_status = "rejected"
+### data.validated_by = coordinator user ID
+### data.validated_at exists
+
+
+###############################################################
+# RENDERED HOURS
+###############################################################
+
+### FR-07 - Student Retrieve Rendered Hours
+
+GET {{apiUrl}}/attendance/internship/{{internshipId}}/rendered-hours
+Authorization: Bearer {{studentAccessToken}}
+
+###
+
+### Expected:
+### HTTP 200
+### success = true
+### data.internshipId = {{internshipId}
+### data.totalHours = 8
+###
+### Only the validated attendance record is counted.
+### The rejected record is not counted.
+
+
+###############################################################
+# VALIDATION - CREATE ATTENDANCE
+###############################################################
+
+### Invalid Internship ID
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "not-a-uuid",
+  "attendance_date": "2026-08-12",
+  "time_in": "08:00",
+  "time_out": "17:00"
+}
+
+###
+
+### Expected:
+### HTTP 400
+### Validation error
+
+
+###############################################################
+
+### Missing Internship ID
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "attendance_date": "2026-08-12",
+  "time_in": "08:00",
+  "time_out": "17:00"
+}
+
+###
+
+### Expected:
+### HTTP 400
+### Validation error
+
+
+###############################################################
+
+### Invalid Attendance Date
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "not-a-date",
+  "time_in": "08:00",
+  "time_out": "17:00"
+}
+
+###
+
+### Expected:
+### HTTP 400
+### Validation error
+
+
+###############################################################
+
+### Invalid Time In
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "2026-08-12",
+  "time_in": "25:00",
+  "time_out": "17:00"
+}
+
+###
+
+### Expected:
+### HTTP 400
+### Validation error
+
+
+###############################################################
+
+### Invalid Time Out
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "2026-08-12",
+  "time_in": "08:00",
+  "time_out": "25:00"
+}
+
+###
+
+### Expected:
+### HTTP 400
+### Validation error
+
+
+###############################################################
+
+### Time Out Before Time In
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "2026-08-12",
+  "time_in": "17:00",
+  "time_out": "08:00"
+}
+
+###
+
+### Expected:
+### HTTP 400
+###
+### Time-out must be later than time-in.
+
+
+###############################################################
+
+### Attendance Duration Too Short
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "2026-08-12",
+  "time_in": "08:00",
+  "time_out": "09:00"
+}
+
+###
+
+### Expected:
+### HTTP 400
+###
+### Attendance duration is too short for the standard one-hour break.
+
+
+###############################################################
+# VALIDATION - UPDATE
+###############################################################
+
+### Empty Update Body
+
+PATCH {{apiUrl}}/attendance/{{attendanceId2}}
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### Expected:
+### HTTP 400
+###
+### At least one attendance field must be provided.
+
+
+###############################################################
+
+### Invalid Update Date
+
+PATCH {{apiUrl}}/attendance/{{attendanceId2}}
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "attendance_date": "invalid-date"
+}
+
+###
+
+### Expected:
+### HTTP 400
+### Validation error
+
+
+###############################################################
+
+### Invalid Update Time
+
+PATCH {{apiUrl}}/attendance/{{attendanceId2}}
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "time_in": "invalid-time"
+}
+
+###
+
+### Expected:
+### HTTP 400
+### Validation error
+
+
+###############################################################
+# VALIDATION - ATTENDANCE STATUS
+###############################################################
+
+### Invalid Validation Status
+
+PATCH {{apiUrl}}/attendance/{{attendanceId2}}/validation
+Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{
+  "validation_status": "invalid"
+}
+
+###
+
+### Expected:
+### HTTP 400
+### Validation error
+
+
+###############################################################
+
+### Missing Validation Status
+
+PATCH {{apiUrl}}/attendance/{{attendanceId2}}/validation
+Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### Expected:
+### HTTP 400
+### Validation error
+
+
+###############################################################
+# NOT FOUND
+###############################################################
+
+### Non-existent Attendance
+
+GET {{apiUrl}}/attendance/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{studentAccessToken}}
+
+###
+
+### Expected:
+### HTTP 404
+###
+### Attendance record not found.
+
+
+###############################################################
+
+### Update Non-existent Attendance
+
+PATCH {{apiUrl}}/attendance/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "time_in": "08:00"
+}
+
+###
+
+### Expected:
+### HTTP 404
+###
+### Attendance record not found.
+
+
+###############################################################
+
+### Validate Non-existent Attendance
+
+PATCH {{apiUrl}}/attendance/00000000-0000-0000-0000-000000000000/validation
+Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{
+  "validation_status": "validated"
+}
+
+###
+
+### Expected:
+### HTTP 404
+###
+### Attendance record not found.
+
+
+###############################################################
+# AUTHENTICATION
+###############################################################
+
+### Unauthenticated - Create Attendance
+
+POST {{apiUrl}}/attendance
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "2026-08-12",
+  "time_in": "08:00",
+  "time_out": "17:00"
+}
+
+###
+
+### Expected:
+### HTTP 401
+###
+### Missing authorization token.
+
+
+###############################################################
+
+### Unauthenticated - Retrieve Attendance
+
+GET {{apiUrl}}/attendance/me
+
+###
+
+### Expected:
+### HTTP 401
+###
+### Missing authorization token.
+
+
+###############################################################
+
+### Invalid Token - Retrieve Attendance
+
+GET {{apiUrl}}/attendance/me
+Authorization: Bearer invalid-token
+
+###
+
+### Expected:
+### HTTP 401
+###
+### Invalid authentication token.
+
+
+###############################################################
+# AUTHORIZATION
+###############################################################
+
+### Administrator Cannot Create Student Attendance
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "2026-08-12",
+  "time_in": "08:00",
+  "time_out": "17:00"
+}
+
+###
+
+### Expected:
+### HTTP 403
+###
+### Insufficient permissions.
+
+
+###############################################################
+
+### Faculty Adviser Cannot Create Attendance
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{facultyAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "2026-08-12",
+  "time_in": "08:00",
+  "time_out": "17:00"
+}
+
+###
+
+### Expected:
+### HTTP 403
+###
+### Insufficient permissions.
+
+
+###############################################################
+# STUDENT AUTHORIZATION
+###############################################################
+
+### Student Cannot Validate Attendance
+
+PATCH {{apiUrl}}/attendance/{{attendanceId2}}/validation
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "validation_status": "validated"
+}
+
+###
+
+### Expected:
+### HTTP 403
+###
+### Insufficient permissions.
+
+
+###############################################################
+# STUDENT - CANNOT VALIDATE
+###############################################################
+
+### Student Cannot Reject Attendance
+
+PATCH {{apiUrl}}/attendance/{{attendanceId2}}/validation
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "validation_status": "rejected"
+}
+
+###
+
+### Expected:
+### HTTP 403
+###
+### Insufficient permissions.
+
+
+###############################################################
+# FACULTY AUTHORIZATION
+###############################################################
+
+### Faculty Adviser Cannot Validate Attendance
+
+PATCH {{apiUrl}}/attendance/{{attendanceId2}}/validation
+Authorization: Bearer {{facultyAccessToken}}
+Content-Type: application/json
+
+{
+  "validation_status": "validated"
+}
+
+###
+
+### Expected:
+### HTTP 403
+###
+### Insufficient permissions.
+
+
+###############################################################
+# ADMINISTRATOR AUTHORIZATION
+###############################################################
+
+### Administrator Cannot Validate Attendance
+
+PATCH {{apiUrl}}/attendance/{{attendanceId2}}/validation
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "validation_status": "validated"
+}
+
+###
+
+### Expected:
+### HTTP 403
+###
+### Insufficient permissions.
+
+
+###############################################################
+# ATTENDANCE RETRIEVAL AUTHORIZATION
+###############################################################
+
+### Faculty Adviser Cannot Retrieve Attendance by ID
+
+GET {{apiUrl}}/attendance/{{attendanceId}}
+Authorization: Bearer {{facultyAccessToken}}
+
+###
+
+### Expected:
+### HTTP 403
+###
+### Insufficient permissions.
+
+
+###############################################################
+
+### Administrator Cannot Retrieve Attendance by ID
+
+GET {{apiUrl}}/attendance/{{attendanceId}}
+Authorization: Bearer {{adminAccessToken}}
+
+###
+
+### Expected:
+### HTTP 403
+###
+### Insufficient permissions.
+
+
+###############################################################
+# STUDENT - OWNERSHIP
+###############################################################
+
+### Student Cannot Update Another Student's Attendance
+
+### This test requires a second student's attendance record.
+### Replace @attendanceId with an attendance record belonging
+### to another student if available.
+
+PATCH {{apiUrl}}/attendance/{{attendanceId}}
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "time_in": "09:00"
+}
+
+###
+
+### Expected:
+### HTTP 403
+###
+### You can only update your own attendance.
+
+
+###############################################################
+# ACTIVE INTERNSHIP REQUIREMENT
+###############################################################
+
+### Student Cannot Create Attendance for Inactive Internship
+
+### Replace @internshipId with a pending/completed internship
+### when performing this test.
+
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "2026-08-13",
+  "time_in": "08:00",
+  "time_out": "17:00"
+}
+
+###
+
+### Expected when internship is not active:
+### HTTP 400
+###
+### Attendance can only be recorded for an active internship.
+
+
+###############################################################
+# COMPLETED ATTENDANCE CANNOT BE VALIDATED TWICE
+###############################################################
+
+### Coordinator Cannot Re-validate Already Validated Attendance
+
+PATCH {{apiUrl}}/attendance/{{attendanceId}}/validation
+Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{
+  "validation_status": "validated"
+}
+
+###
+
+### Expected:
+### HTTP 400
+###
+### Only pending attendance records can be validated.
+
+
+###############################################################
+# REJECTED ATTENDANCE CANNOT BE VALIDATED AGAIN
+###############################################################
+
+### Coordinator Cannot Validate Already Rejected Attendance
+
+PATCH {{apiUrl}}/attendance/{{attendanceId2}}/validation
+Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{
+  "validation_status": "validated"
+}
+
+###
+
+### Expected:
+### HTTP 400
+###
+### Only pending attendance records can be validated.

@@ -1,0 +1,17 @@
+name: Quality Check - Attendance
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  quality-gate:
+    uses: ./.github/workflows/_quality-module.yml
+    with:
+      module: attendance
+      unit_task: test:unit:attendance
+      integration_task: test:integration:attendance
+    secrets: inherit
