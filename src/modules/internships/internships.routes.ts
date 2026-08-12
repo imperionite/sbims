@@ -4,7 +4,12 @@ import { zValidator } from "@hono/zod-validator";
 import { requireAuth } from "../auth/auth.middleware.ts";
 import { requireRole } from "../auth/role.middleware.ts";
 
-import { createInternshipSchema, updateInternshipStatusSchema } from "./internships.schema.ts";
+import {
+  createInternshipSchema,
+  updateFacultyAdviserSchema,
+  updateInternshipSchema,
+  updateInternshipStatusSchema,
+} from "./internships.schema.ts";
 
 import { internshipService } from "./internships.service.ts";
 
@@ -99,6 +104,44 @@ internships.patch(
     const result = await internshipService.updateStatus(
       c.req.param("id"),
       body.status,
+    );
+
+    return c.json({
+      success: true,
+      data: result,
+    });
+  },
+);
+
+internships.patch(
+  "/:id/adviser",
+  requireAuth,
+  requireRole("administrator", "internship_coordinator"),
+  zValidator("json", updateFacultyAdviserSchema),
+  async (c) => {
+    const body = c.req.valid("json");
+
+    const result = await internshipService.assignFacultyAdviser(
+      c.req.param("id"),
+      body.facultyAdviserId,
+    );
+
+    return c.json({
+      success: true,
+      data: result,
+    });
+  },
+);
+
+internships.patch(
+  "/:id",
+  requireAuth,
+  requireRole("administrator", "internship_coordinator"),
+  zValidator("json", updateInternshipSchema),
+  async (c) => {
+    const result = await internshipService.updateInternship(
+      c.req.param("id"),
+      c.req.valid("json"),
     );
 
     return c.json({

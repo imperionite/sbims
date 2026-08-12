@@ -274,6 +274,133 @@ Deno.test("FR-05 student can retrieve own internship", async () => {
 });
 
 Deno.test(
+  "FR-05 administrator can update required internship hours",
+  async () => {
+    await setupTestUsers();
+
+    const student = await ensureTestStudentProfile();
+
+    const { response: loginResponse, body: loginBody } = await login();
+
+    assertEquals(loginResponse.status, 200);
+
+    const hte = await createTestHte(loginBody.data.accessToken);
+
+    const internship = await createTestInternship(
+      loginBody.data.accessToken,
+      student.id,
+      hte.id,
+    );
+
+    const response = await authenticatedRequest(
+      `/api/v1/internships/${internship.id}`,
+      loginBody.data.accessToken,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          requiredHours: 486,
+        }),
+      },
+    );
+
+    const body = await response.json();
+
+    assertEquals(response.status, 200);
+    assertEquals(body.success, true);
+    assertEquals(body.data.id, internship.id);
+    assertEquals(body.data.required_hours, 486);
+  },
+);
+
+Deno.test(
+  "FR-05 administrator can change internship HTE assignment",
+  async () => {
+    await setupTestUsers();
+
+    const student = await ensureTestStudentProfile();
+
+    const { response: loginResponse, body: loginBody } = await login();
+
+    assertEquals(loginResponse.status, 200);
+
+    const firstHte = await createTestHte(loginBody.data.accessToken);
+
+    const secondHte = await createTestHte(loginBody.data.accessToken);
+
+    const internship = await createTestInternship(
+      loginBody.data.accessToken,
+      student.id,
+      firstHte.id,
+    );
+
+    const response = await authenticatedRequest(
+      `/api/v1/internships/${internship.id}`,
+      loginBody.data.accessToken,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          hteId: secondHte.id,
+        }),
+      },
+    );
+
+    const body = await response.json();
+
+    assertEquals(response.status, 200);
+    assertEquals(body.success, true);
+    assertEquals(body.data.id, internship.id);
+    assertEquals(body.data.hte_id, secondHte.id);
+  },
+);
+
+Deno.test("FR-05 student cannot update an internship assignment", async () => {
+  await setupTestUsers();
+
+  const student = await ensureTestStudentProfile();
+
+  const { response: adminLoginResponse, body: adminLoginBody } = await login();
+
+  assertEquals(adminLoginResponse.status, 200);
+
+  const hte = await createTestHte(adminLoginBody.data.accessToken);
+
+  const internship = await createTestInternship(
+    adminLoginBody.data.accessToken,
+    student.id,
+    hte.id,
+  );
+
+  const { response: studentLoginResponse, body: studentLoginBody } = await login(
+    TEST_USERS.student.email,
+    TEST_USERS.student.password,
+  );
+
+  assertEquals(studentLoginResponse.status, 200);
+
+  const response = await authenticatedRequest(
+    `/api/v1/internships/${internship.id}`,
+    studentLoginBody.data.accessToken,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        requiredHours: 486,
+      }),
+    },
+  );
+
+  assertEquals(response.status, 403);
+});
+
+Deno.test(
   "FR-05 administrator can transition internship from pending to active",
   async () => {
     await setupTestUsers();
@@ -592,26 +719,15 @@ Deno.test(
 
     const student = await ensureTestStudentProfile();
 
-    const {
-      response: loginResponse,
-      body: loginBody,
-    } = await login();
+    const { response: loginResponse, body: loginBody } = await login();
 
     assertEquals(loginResponse.status, 200);
 
-    const hte = await createTestHte(
-      loginBody.data.accessToken,
-    );
+    const hte = await createTestHte(loginBody.data.accessToken);
 
-    await createTestInternship(
-      loginBody.data.accessToken,
-      student.id,
-      hte.id,
-    );
+    await createTestInternship(loginBody.data.accessToken, student.id, hte.id);
 
-    const secondHte = await createTestHte(
-      loginBody.data.accessToken,
-    );
+    const secondHte = await createTestHte(loginBody.data.accessToken);
 
     const response = await authenticatedRequest(
       "/api/v1/internships",

@@ -1,12 +1,18 @@
 import { supabaseAdmin } from "../../lib/supabase.ts";
 import { AppError } from "../../errors/app-error.ts";
 
-import type { CreateInternshipRequest, InternshipStatus } from "./internships.types.ts";
+import type {
+  CreateInternshipRequest,
+  InternshipStatus,
+  UpdateInternshipRequest,
+} from "./internships.types.ts";
 
 const INTERNSHIP_SELECT = `
   id,
   student_id,
   hte_id,
+  faculty_adviser_id,
+  required_hours,
   status,
   created_at,
   updated_at,
@@ -160,6 +166,7 @@ export class InternshipService {
       .insert({
         student_id: request.studentId,
         hte_id: request.hteId,
+        required_hours: request.requiredHours ?? null,
         status: "pending",
       })
       .select(INTERNSHIP_SELECT)
@@ -167,6 +174,58 @@ export class InternshipService {
 
     if (error) {
       throw new AppError(500, "Unable to create the internship assignment.");
+    }
+
+    return data;
+  }
+
+  async updateInternship(id: string, request: UpdateInternshipRequest) {
+    const updateData = {
+      ...(request.hteId !== undefined && {
+        hte_id: request.hteId,
+      }),
+      ...(request.requiredHours !== undefined && {
+        required_hours: request.requiredHours,
+      }),
+    };
+
+    if (Object.keys(updateData).length === 0) {
+      throw new AppError(400, "At least one internship field is required.");
+    }
+
+    if (request.hteId !== undefined) {
+      const { data: hte, error: hteError } = await supabaseAdmin
+        .from("hte_profiles")
+        .select("id, is_active")
+        .eq("id", request.hteId)
+        .maybeSingle();
+
+      if (hteError) {
+        throw new AppError(500, "Unable to verify the HTE.");
+      }
+
+      if (!hte) {
+        throw new AppError(404, "HTE not found.");
+      }
+
+      if (!hte.is_active) {
+        throw new AppError(400, "The selected HTE is inactive.");
+      }
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from("internships")
+      .update(updateData)
+      .eq("id", id)
+      .select(INTERNSHIP_SELECT)
+      .maybeSingle();
+
+    if (error) {
+      throw new AppError(500, "Unable to update the internship.");
+    }
+
+    if (!data) {
+      throw new AppError(404, "Internship not found.");
     }
 
     return data;
@@ -188,7 +247,6 @@ export class InternshipService {
     }
 
     const currentStatus = internship.status as InternshipStatus;
-
     const allowedTransitions = STATUS_TRANSITIONS[currentStatus];
 
     if (!allowedTransitions.includes(status)) {
@@ -209,6 +267,54 @@ export class InternshipService {
 
     if (error) {
       throw new AppError(500, "Unable to update the internship status.");
+    }
+
+    return data;
+  }
+
+  async assignFacultyAdviser(id: string, facultyAdviserId: string | null) {
+    if (facultyAdviserId !== null) {
+      const { data: adviser, error: adviserError } = await supabaseAdmin
+        .from("profiles")
+        .select("id, role, is_active")
+        .eq("id", facultyAdviserId)
+        .maybeSingle();
+
+      if (adviserError) {
+        throw new AppError(500, "Unable to verify the faculty adviser.");
+      }
+
+      if (!adviser) {
+        throw new AppError(404, "Faculty adviser profile not found.");
+      }
+
+      if (adviser.role !== "faculty_adviser") {
+        throw new AppError(400, "The selected user is not a faculty adviser.");
+      }
+
+      if (!adviser.is_active) {
+        throw new AppError(
+          400,
+          "The selected faculty adviser account is inactive.",
+        );
+      }
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from("internships")
+      .update({
+        faculty_adviser_id: facultyAdviserId,
+      })
+      .eq("id", id)
+      .select(INTERNSHIP_SELECT)
+      .maybeSingle();
+
+    if (error) {
+      throw new AppError(500, "Unable to update the faculty adviser.");
+    }
+
+    if (!data) {
+      throw new AppError(404, "Internship not found.");
     }
 
     return data;
