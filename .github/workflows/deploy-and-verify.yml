@@ -21,7 +21,6 @@ env:
   HEALTH_URL: "https://sbims-dev.imperionite.deno.net/api/v1/health"
 
 jobs:
-
   # ============================================================
   # QUALITY VERIFICATION
   # ============================================================
@@ -119,82 +118,22 @@ jobs:
           done
 
   # ============================================================
-  # DEPLOY TO CLOUDFLARE WORKERS
-  # ============================================================
-
-  deploy-cloudflare:
-    name: Deploy SBIMS to Cloudflare Workers
-    needs: quality
-    runs-on: ubuntu-latest
-
-    outputs:
-      status: ${{ steps.cf-step.outputs.status }}
-      time: ${{ steps.cf-step.outputs.time }}
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v5
-
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: ${{ env.DENO_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - id: cf-step
-        name: Deploy to Cloudflare Workers
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          START=$(date +%s)
-
-          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-            echo "::error::CLOUDFLARE_API_TOKEN GitHub secret is missing."
-            exit 1
-          fi
-
-          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "::error::CLOUDFLARE_ACCOUNT_ID GitHub secret is missing."
-            exit 1
-          fi
-
-          echo "Deploying SBIMS to Cloudflare Workers"
-
-          npx wrangler@4.120.1 deploy
-
-          END=$(date +%s)
-          DURATION=$((END - START))
-
-          echo "status=succeeded" >> "$GITHUB_OUTPUT"
-          echo "time=${DURATION}s" >> "$GITHUB_OUTPUT"
-
-          echo "Cloudflare Workers deployment completed successfully in ${DURATION}s."
-
-  # ============================================================
-  # UNIFIED DEPLOYMENT REPORT
+  # DEPLOYMENT REPORT
   # ============================================================
 
   report:
     name: SBIMS Deployment Report
     needs:
       - deploy-deno
-      - deploy-cloudflare
-
     if: always()
-
     runs-on: ubuntu-latest
 
     steps:
-      - name: Generate Unified Deployment Report
+      - name: Generate Deployment Report
         run: |
           echo ""
           echo "======================================================================"
-          echo "                 SBIMS UNIFIED DEPLOYMENT REPORT"
+          echo "                    SBIMS DEPLOYMENT REPORT"
           echo "======================================================================"
 
           echo "Repository   : ${{ github.repository }}"
@@ -205,37 +144,22 @@ jobs:
 
           echo ""
           echo "----------------------------------------------------------------------"
-          echo " TARGET 1: DENO DEPLOY"
+          echo " TARGET: DENO DEPLOY"
           echo "----------------------------------------------------------------------"
 
           echo "Organization : ${DENO_ORG}"
           echo "Application  : ${DENO_APP}"
-
           echo "Status       : ${{ needs.deploy-deno.result == 'success' && 'SUCCESS' || 'FAILED' }}"
           echo "Deploy Time  : ${{ needs.deploy-deno.outputs.time || 'N/A' }}"
-
           echo "Health URL   : ${HEALTH_URL}"
           echo "Health Check : ${{ needs.deploy-deno.outputs.health || 'FAILED' }}"
 
           echo ""
-          echo "----------------------------------------------------------------------"
-          echo " TARGET 2: CLOUDFLARE WORKERS"
-          echo "----------------------------------------------------------------------"
-
-          echo "Status       : ${{ needs.deploy-cloudflare.result == 'success' && 'SUCCESS' || 'FAILED' }}"
-          echo "Deploy Time  : ${{ needs.deploy-cloudflare.outputs.time || 'N/A' }}"
-
-          echo ""
           echo "======================================================================"
 
-          if [ "${{ needs.deploy-deno.result }}" = "success" ] && \
-             [ "${{ needs.deploy-cloudflare.result }}" = "success" ]; then
-
-            echo " STATUS : PASS - All deployments and verifications succeeded."
-
+          if [ "${{ needs.deploy-deno.result }}" = "success" ]; then
+            echo " STATUS : PASS - Deployment and health verification succeeded."
           else
-
-            echo " STATUS : FAIL - One or more deployment targets failed."
+            echo " STATUS : FAIL - Deno deployment or health verification failed."
             exit 1
-
           fi
