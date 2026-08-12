@@ -15,6 +15,7 @@ const mockHte = {
   contact_email: "contact@example.com",
   contact_number: "09171234567",
   is_active: true,
+  supervisor_id: null,
   created_at: "2026-08-10T00:00:00.000Z",
   updated_at: "2026-08-10T00:00:00.000Z",
 };

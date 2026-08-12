@@ -52,6 +52,14 @@ export const updateHTESchema = z.object({
     .optional(),
 });
 
+export const updateHTESupervisorSchema = z.object({
+  supervisorId: z.string().uuid().nullable(),
+});
+
 export const updateHTEStatusSchema = z.object({
   isActive: z.boolean(),
 });
+
+export type UpdateHTESupervisorRequest = z.infer<
+  typeof updateHTESupervisorSchema
+>;

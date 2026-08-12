@@ -7,6 +7,8 @@ export interface HTEProfile {
   contact_email: string | null;
   contact_number: string | null;
 
+  supervisor_id: string | null;
+
   is_active: boolean;
 
   created_at: string;
@@ -31,4 +33,8 @@ export interface UpdateHTERequest {
 
 export interface UpdateHTEStatusRequest {
   isActive: boolean;
+}
+
+export interface UpdateHTESupervisorRequest {
+  supervisorId: string | null;
 }

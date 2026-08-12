@@ -4,15 +4,16 @@ import { AppError } from "../../errors/app-error.ts";
 import type { CreateHTERequest, UpdateHTERequest, UpdateHTEStatusRequest } from "./htes.types.ts";
 
 const HTE_SELECT = `
-id,
-company_name,
-address,
-contact_person,
-contact_email,
-contact_number,
-is_active,
-created_at,
-updated_at
+  id,
+  company_name,
+  address,
+  contact_person,
+  contact_email,
+  contact_number,
+  supervisor_id,
+  is_active,
+  created_at,
+  updated_at
 `;
 
 export class HteService {
@@ -122,6 +123,54 @@ export class HteService {
       .from("hte_profiles")
       .update({
         is_active: request.isActive,
+      })
+      .eq("id", id)
+      .select(HTE_SELECT)
+      .maybeSingle();
+
+    if (error) {
+      throw new AppError(400, error.message);
+    }
+
+    if (!data) {
+      throw new AppError(404, "HTE profile not found.");
+    }
+
+    return data;
+  }
+
+  async assignSupervisor(id: string, supervisorId: string | null) {
+    if (supervisorId !== null) {
+      const { data: supervisor, error: supervisorError } = await supabaseAdmin
+        .from("profiles")
+        .select("id, role, is_active")
+        .eq("id", supervisorId)
+        .maybeSingle();
+
+      if (supervisorError) {
+        throw new AppError(500, "Unable to verify the HTE supervisor.");
+      }
+
+      if (!supervisor) {
+        throw new AppError(404, "HTE supervisor profile not found.");
+      }
+
+      if (supervisor.role !== "hte_supervisor") {
+        throw new AppError(400, "The selected user is not an HTE supervisor.");
+      }
+
+      if (!supervisor.is_active) {
+        throw new AppError(
+          400,
+          "The selected HTE supervisor account is inactive.",
+        );
+      }
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from("hte_profiles")
+      .update({
+        supervisor_id: supervisorId,
       })
       .eq("id", id)
       .select(HTE_SELECT)
