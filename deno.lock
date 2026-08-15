@@ -198,6 +198,17 @@
       "npm:hono-rate-limiter@*",
       "npm:hono@^4.12.32",
       "npm:zod@^3.25.0"
-    ]
+    ],
+    "packageJson": {
+      "dependencies": [
+        "npm:@hono/zod-validator@~0.4.3",
+        "npm:@supabase/supabase-js@^2.49.0",
+        "npm:@upstash/redis@^1.38.2",
+        "npm:hono-rate-limiter@latest",
+        "npm:hono@^4.12.32",
+        "npm:wrangler@4",
+        "npm:zod@^3.25.0"
+      ]
+    }
   }
 }
