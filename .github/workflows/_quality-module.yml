@@ -37,10 +37,10 @@ on:
         required: true
 
       UPSTASH_REDIS_REST_URL:
-        required: false
+        required: true
 
       UPSTASH_REDIS_REST_TOKEN:
-        required: false
+        required: true
 
 permissions:
   contents: read
@@ -58,6 +58,9 @@ jobs:
 
       FRONTEND_URL: http://localhost:5173
       ALLOWED_ORIGINS: http://localhost:5173
+
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
 
       RATE_LIMIT_ENABLED: false
       ENVIRONMENT: test
@@ -145,8 +148,6 @@ jobs:
         if: ${{ inputs.unit_task != '' }}
         env:
           RATE_LIMIT_ENABLED: false
-          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
         run: |
           START=$(date +%s)
 
@@ -163,8 +164,6 @@ jobs:
         if: ${{ inputs.integration_task != '' }}
         env:
           RATE_LIMIT_ENABLED: false
-          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
         run: |
           START=$(date +%s)
 
@@ -181,8 +180,6 @@ jobs:
         if: ${{ inputs.smoke_task != '' }}
         env:
           RATE_LIMIT_ENABLED: true
-          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
         run: |
           START=$(date +%s)
 
