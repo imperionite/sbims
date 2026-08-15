@@ -1,0 +1,22 @@
+{
+  "name": "sbims",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cf:dev": "wrangler dev",
+    "cf:types": "wrangler types",
+    "cf:dry-run": "wrangler deploy --dry-run --outdir dist",
+    "cf:deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.4.3",
+    "@supabase/supabase-js": "^2.49.0",
+    "@upstash/redis": "^1.38.2",
+    "hono": "^4.12.32",
+    "hono-rate-limiter": "latest",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
