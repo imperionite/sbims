@@ -11,6 +11,8 @@ import htes from "../modules/htes/htes.routes.ts";
 import internships from "../modules/internships/internships.routes.ts";
 import attendance from "../modules/attendance/attendance.routes.ts";
 
+import { performanceRoutes } from "../modules/performance/performance.routes.ts";
+
 import type { RateLimitStore } from "../infrastructure/rate-limit/rate-limit.types.ts";
 
 export function createApiRoutes(
@@ -30,6 +32,8 @@ export function createApiRoutes(
   api.route("/htes", htes);
   api.route("/internships", internships);
   api.route("/attendance", attendance);
+
+  api.route("/performance", performanceRoutes);
 
   return api;
 }

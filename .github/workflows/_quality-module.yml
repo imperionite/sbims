@@ -306,8 +306,6 @@ jobs:
               echo "Tests  : Configured"
             fi
 
-            echo "Ready for Review"
-
           else
 
             echo ""
