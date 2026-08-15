@@ -143,6 +143,10 @@ jobs:
       # ============================================
       - name: Unit Tests (${{ inputs.module }})
         if: ${{ inputs.unit_task != '' }}
+        env:
+          RATE_LIMIT_ENABLED: false
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
         run: |
           START=$(date +%s)
 
@@ -157,6 +161,10 @@ jobs:
       # ============================================
       - name: Integration Tests (${{ inputs.module }})
         if: ${{ inputs.integration_task != '' }}
+        env:
+          RATE_LIMIT_ENABLED: false
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
         run: |
           START=$(date +%s)
 
