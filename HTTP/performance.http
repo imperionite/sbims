@@ -1,0 +1,55 @@
+### Configuration
+
+@deno=https://sbims-dev.imperionite.deno.net/api/v1/performance
+@cf=https://sbims.lr-aimperial.workers.dev/api/v1/performance
+
+@denoDev=http://localhost:8000/api/v1/performance
+@cfDev=http://localhost:8787/api/v1/performance
+
+
+### ============================================================
+### DENO DEPLOY
+### ============================================================
+
+### Performance Ping
+GET {{denoDev}}/ping
+
+
+### Performance Compute - Default Work
+GET {{deno}}/compute
+
+
+### Performance Compute - work=1000
+GET {{denoDev}}/compute?work=1000
+
+
+### Performance Compute - work=5000
+GET {{denoDev}}/compute?work=5000
+
+
+### Performance Compute - Maximum Work
+GET {{deno}}/compute?work=10000
+
+
+### ============================================================
+### cf WORKERS
+### ============================================================
+
+### Performance Ping
+GET {{cfDev}}/ping
+
+
+### Performance Compute - Default Work
+GET {{cfDev}}/compute
+
+
+### Performance Compute - work=1000
+GET {{cf}}/compute?work=1000
+
+
+### Performance Compute - work=5000
+GET {{cf}}/compute?work=5000
+
+
+### Performance Compute - Maximum Work
+GET {{cf}}/compute?work=10000
