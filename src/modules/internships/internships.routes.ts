@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 
+import type { AppVariables } from "../../types/context.ts";
+
 import { requireAuth } from "../auth/auth.middleware.ts";
 import { requireRole } from "../auth/role.middleware.ts";
 
@@ -11,22 +13,24 @@ import {
   updateInternshipStatusSchema,
 } from "./internships.schema.ts";
 
-import { internshipService } from "./internships.service.ts";
+import { InternshipService } from "./internships.service.ts";
 
 const internships = new Hono<{
-  Variables: {
-    user: {
-      id: string;
-      email?: string;
-    };
-  };
+  Variables: AppVariables;
 }>();
 
+/**
+ * GET /internships
+ *
+ * Administrator and internship coordinator.
+ */
 internships.get(
   "/",
   requireAuth,
   requireRole("administrator", "internship_coordinator"),
   async (c) => {
+    const internshipService = new InternshipService(c.get("supabase"));
+
     const result = await internshipService.listInternships();
 
     return c.json({
@@ -36,7 +40,16 @@ internships.get(
   },
 );
 
+/**
+ * GET /internships/me
+ *
+ * Student's own internship.
+ *
+ * Keep this route before /:id.
+ */
 internships.get("/me", requireAuth, requireRole("student"), async (c) => {
+  const internshipService = new InternshipService(c.get("supabase"));
+
   const user = c.get("user");
 
   const result = await internshipService.getMyInternship(user.id);
@@ -47,18 +60,23 @@ internships.get("/me", requireAuth, requireRole("student"), async (c) => {
   });
 });
 
+/**
+ * GET /internships/:id
+ */
 internships.get(
   "/:id",
   requireAuth,
   requireRole("administrator", "internship_coordinator"),
   async (c) => {
+    const internshipService = new InternshipService(c.get("supabase"));
+
     const internshipId = c.req.param("id");
 
     if (!internshipId) {
       return c.json(
         {
           success: false,
-          error: "Internship ID is required",
+          message: "Internship ID is required.",
         },
         400,
       );
@@ -73,12 +91,17 @@ internships.get(
   },
 );
 
+/**
+ * POST /internships
+ */
 internships.post(
   "/",
   requireAuth,
   requireRole("administrator", "internship_coordinator"),
   zValidator("json", createInternshipSchema),
   async (c) => {
+    const internshipService = new InternshipService(c.get("supabase"));
+
     const body = c.req.valid("json");
 
     const result = await internshipService.createInternship(body);
@@ -93,12 +116,17 @@ internships.post(
   },
 );
 
+/**
+ * PATCH /internships/:id/status
+ */
 internships.patch(
   "/:id/status",
   requireAuth,
   requireRole("administrator", "internship_coordinator"),
   zValidator("json", updateInternshipStatusSchema),
   async (c) => {
+    const internshipService = new InternshipService(c.get("supabase"));
+
     const body = c.req.valid("json");
 
     const result = await internshipService.updateStatus(
@@ -113,12 +141,17 @@ internships.patch(
   },
 );
 
+/**
+ * PATCH /internships/:id/adviser
+ */
 internships.patch(
   "/:id/adviser",
   requireAuth,
   requireRole("administrator", "internship_coordinator"),
   zValidator("json", updateFacultyAdviserSchema),
   async (c) => {
+    const internshipService = new InternshipService(c.get("supabase"));
+
     const body = c.req.valid("json");
 
     const result = await internshipService.assignFacultyAdviser(
@@ -133,15 +166,22 @@ internships.patch(
   },
 );
 
+/**
+ * PATCH /internships/:id
+ */
 internships.patch(
   "/:id",
   requireAuth,
   requireRole("administrator", "internship_coordinator"),
   zValidator("json", updateInternshipSchema),
   async (c) => {
+    const internshipService = new InternshipService(c.get("supabase"));
+
+    const body = c.req.valid("json");
+
     const result = await internshipService.updateInternship(
       c.req.param("id"),
-      c.req.valid("json"),
+      body,
     );
 
     return c.json({

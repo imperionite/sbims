@@ -1,27 +1,35 @@
 import { Hono } from "hono";
 
+import type { AppVariables } from "../types/context.ts";
+
 import health from "../modules/health/health.routes.ts";
-import auth from "../modules/auth/auth.routes.ts";
+import { createAuthRoutes } from "../modules/auth/auth.routes.ts";
+
 import users from "../modules/users/users.routes.ts";
 import students from "../modules/students/students.routes.ts";
 import htes from "../modules/htes/htes.routes.ts";
 import internships from "../modules/internships/internships.routes.ts";
 import attendance from "../modules/attendance/attendance.routes.ts";
 
-const api = new Hono();
+import type { RateLimitStore } from "../infrastructure/rate-limit/rate-limit.types.ts";
 
-api.route("/health", health);
+export function createApiRoutes(
+  frontendUrl: string,
+  rateLimitStore: RateLimitStore,
+) {
+  const api = new Hono<{
+    Variables: AppVariables;
+  }>();
 
-api.route("/auth", auth);
+  api.route("/health", health);
 
-api.route("/users", users);
+  api.route("/auth", createAuthRoutes(frontendUrl, rateLimitStore));
 
-api.route("/students", students);
+  api.route("/users", users);
+  api.route("/students", students);
+  api.route("/htes", htes);
+  api.route("/internships", internships);
+  api.route("/attendance", attendance);
 
-api.route("/htes", htes);
-
-api.route("/internships", internships);
-
-api.route("/attendance", attendance);
-
-export default api;
+  return api;
+}

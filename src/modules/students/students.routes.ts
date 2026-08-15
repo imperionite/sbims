@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 
+import type { AppVariables } from "../../types/context.ts";
+
 import { requireAuth } from "../auth/auth.middleware.ts";
 import { requireRole } from "../auth/role.middleware.ts";
 
@@ -10,21 +12,14 @@ import {
   updateStudentSchema,
 } from "./students.schema.ts";
 
-import { studentService } from "./students.service.ts";
+import { StudentService } from "./students.service.ts";
 
 const students = new Hono<{
-  Variables: {
-    user: {
-      id: string;
-      email?: string;
-    };
-  };
+  Variables: AppVariables;
 }>();
 
 /**
- * -------------------------------------------------------
  * GET /students
- * -------------------------------------------------------
  *
  * Administrator and internship coordinator only.
  */
@@ -33,6 +28,8 @@ students.get(
   requireAuth,
   requireRole("administrator", "internship_coordinator"),
   async (c) => {
+    const studentService = new StudentService(c.get("supabase"));
+
     const result = await studentService.listStudents();
 
     return c.json({
@@ -43,15 +40,15 @@ students.get(
 );
 
 /**
- * -------------------------------------------------------
  * GET /students/me
- * -------------------------------------------------------
  *
  * Student can view their own student profile.
  *
- * This route is intentionally declared before /:id.
+ * Keep this route before /:id.
  */
 students.get("/me", requireAuth, requireRole("student"), async (c) => {
+  const studentService = new StudentService(c.get("supabase"));
+
   const user = c.get("user");
 
   const result = await studentService.getMyStudentProfile(user.id);
@@ -63,17 +60,9 @@ students.get("/me", requireAuth, requireRole("student"), async (c) => {
 });
 
 /**
- * -------------------------------------------------------
  * PATCH /students/me
- * -------------------------------------------------------
  *
  * Student can update their own personal/contact data.
- *
- * Students cannot change:
- * - student number
- * - program
- * - year level
- * - internship status
  */
 students.patch(
   "/me",
@@ -81,6 +70,8 @@ students.patch(
   requireRole("student"),
   zValidator("json", updateMyStudentSchema),
   async (c) => {
+    const studentService = new StudentService(c.get("supabase"));
+
     const user = c.get("user");
     const body = c.req.valid("json");
 
@@ -94,21 +85,18 @@ students.patch(
 );
 
 /**
- * -------------------------------------------------------
  * GET /students/:id
- * -------------------------------------------------------
  *
- * Administrator, internship coordinator, and faculty
- * adviser may access this endpoint at the API layer.
- *
- * Faculty adviser access is intentionally limited here
- * until adviser/student assignment is implemented.
+ * Administrator, internship coordinator,
+ * and faculty adviser.
  */
 students.get(
   "/:id",
   requireAuth,
   requireRole("administrator", "internship_coordinator", "faculty_adviser"),
   async (c) => {
+    const studentService = new StudentService(c.get("supabase"));
+
     const id = c.req.param("id");
 
     if (!id) {
@@ -131,12 +119,11 @@ students.get(
 );
 
 /**
- * -------------------------------------------------------
  * POST /students
- * -------------------------------------------------------
  *
- * Administrator and internship coordinator create a
- * student profile for an EXISTING student user.
+ * Administrator and internship coordinator
+ * create a student profile for an existing
+ * student user.
  */
 students.post(
   "/",
@@ -144,6 +131,8 @@ students.post(
   requireRole("administrator", "internship_coordinator"),
   zValidator("json", createStudentSchema),
   async (c) => {
+    const studentService = new StudentService(c.get("supabase"));
+
     const body = c.req.valid("json");
 
     const result = await studentService.createStudent(body);
@@ -159,12 +148,10 @@ students.post(
 );
 
 /**
- * -------------------------------------------------------
  * PATCH /students/:id
- * -------------------------------------------------------
  *
- * Administrator and internship coordinator may update
- * the complete student internship profile.
+ * Administrator and internship coordinator
+ * may update the complete student profile.
  */
 students.patch(
   "/:id",
@@ -172,6 +159,8 @@ students.patch(
   requireRole("administrator", "internship_coordinator"),
   zValidator("json", updateStudentSchema),
   async (c) => {
+    const studentService = new StudentService(c.get("supabase"));
+
     const body = c.req.valid("json");
 
     const result = await studentService.updateStudent(c.req.param("id"), body);

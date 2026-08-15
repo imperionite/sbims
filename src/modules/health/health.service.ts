@@ -1,7 +1,9 @@
-import { supabaseClient } from "../../lib/supabase.ts";
+import type { SupabaseClients } from "../../lib/supabase.ts";
 
-export async function checkDatabase(): Promise<boolean> {
-  const { data, error } = await supabaseClient.rpc("health_check");
+export async function checkDatabase(
+  clients: SupabaseClients,
+): Promise<boolean> {
+  const { data, error } = await clients.supabaseClient.rpc("health_check");
 
   if (error) {
     return false;

@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 
+import type { AppVariables } from "../../types/context.ts";
+
 import { requireAuth } from "../auth/auth.middleware.ts";
 import { requireRole } from "../auth/role.middleware.ts";
 
@@ -11,9 +13,11 @@ import {
   updateHTESupervisorSchema,
 } from "./htes.schema.ts";
 
-import { hteService } from "./htes.service.ts";
+import { HteService } from "./htes.service.ts";
 
-const htes = new Hono();
+const htes = new Hono<{
+  Variables: AppVariables;
+}>();
 
 htes.use(
   "*",
@@ -22,14 +26,13 @@ htes.use(
 );
 
 /**
-
-* ---
-* GET /htes
-* ---
-*
-* Administrator and internship coordinator only.
-  */
+ * GET /htes
+ *
+ * Administrator and internship coordinator only.
+ */
 htes.get("/", async (c) => {
+  const hteService = new HteService(c.get("supabase"));
+
   const result = await hteService.listHtes();
 
   return c.json({
@@ -39,14 +42,11 @@ htes.get("/", async (c) => {
 });
 
 /**
-
-* ---
-* GET /htes/:id
-* ---
-*
-* Administrator and internship coordinator only.
-  */
+ * GET /htes/:id
+ */
 htes.get("/:id", async (c) => {
+  const hteService = new HteService(c.get("supabase"));
+
   const result = await hteService.getHte(c.req.param("id"));
 
   return c.json({
@@ -56,15 +56,11 @@ htes.get("/:id", async (c) => {
 });
 
 /**
-
-* ---
-* POST /htes
-* ---
-*
-* Administrator and internship coordinator may
-* create HTE profiles.
-  */
+ * POST /htes
+ */
 htes.post("/", zValidator("json", createHTESchema), async (c) => {
+  const hteService = new HteService(c.get("supabase"));
+
   const body = c.req.valid("json");
 
   const result = await hteService.createHte(body);
@@ -79,15 +75,11 @@ htes.post("/", zValidator("json", createHTESchema), async (c) => {
 });
 
 /**
-
-* ---
-* PATCH /htes/:id
-* ---
-*
-* Administrator and internship coordinator may
-* update HTE profile information.
-  */
+ * PATCH /htes/:id
+ */
 htes.patch("/:id", zValidator("json", updateHTESchema), async (c) => {
+  const hteService = new HteService(c.get("supabase"));
+
   const body = c.req.valid("json");
 
   const result = await hteService.updateHte(c.req.param("id"), body);
@@ -99,18 +91,14 @@ htes.patch("/:id", zValidator("json", updateHTESchema), async (c) => {
 });
 
 /**
-
-* ---
-* PATCH /htes/:id/status
-* ---
-*
-* Administrator and internship coordinator may
-* activate or deactivate an HTE profile.
-  */
+ * PATCH /htes/:id/status
+ */
 htes.patch(
   "/:id/status",
   zValidator("json", updateHTEStatusSchema),
   async (c) => {
+    const hteService = new HteService(c.get("supabase"));
+
     const body = c.req.valid("json");
 
     const result = await hteService.updateStatus(c.req.param("id"), body);
@@ -122,10 +110,15 @@ htes.patch(
   },
 );
 
+/**
+ * PATCH /htes/:id/supervisor
+ */
 htes.patch(
   "/:id/supervisor",
   zValidator("json", updateHTESupervisorSchema),
   async (c) => {
+    const hteService = new HteService(c.get("supabase"));
+
     const body = c.req.valid("json");
 
     const result = await hteService.assignSupervisor(

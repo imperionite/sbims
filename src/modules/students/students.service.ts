@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "../../lib/supabase.ts";
+import type { SupabaseClients } from "../../lib/supabase.ts";
 import { AppError } from "../../errors/app-error.ts";
 
 import type {
@@ -23,8 +23,9 @@ const STUDENT_SELECT = `
 `;
 
 export class StudentService {
+  constructor(private readonly clients: SupabaseClients) {}
   async listStudents() {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("student_profiles")
       .select(STUDENT_SELECT)
       .order("created_at", {
@@ -39,7 +40,7 @@ export class StudentService {
   }
 
   async getStudent(id: string) {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("student_profiles")
       .select(STUDENT_SELECT)
       .eq("id", id)
@@ -69,7 +70,7 @@ export class StudentService {
    * - be active
    */
   async createStudent(request: CreateStudentProfileRequest) {
-    const { data: profile, error: profileError } = await supabaseAdmin
+    const { data: profile, error: profileError } = await this.clients.supabaseAdmin
       .from("profiles")
       .select("id, role, is_active")
       .eq("id", request.userId)
@@ -94,7 +95,7 @@ export class StudentService {
       throw new AppError(400, "The selected student account is inactive.");
     }
 
-    const { data: existingStudent, error: existingError } = await supabaseAdmin
+    const { data: existingStudent, error: existingError } = await this.clients.supabaseAdmin
       .from("student_profiles")
       .select("id")
       .eq("id", request.userId)
@@ -111,7 +112,7 @@ export class StudentService {
       );
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("student_profiles")
       .insert({
         id: request.userId,
@@ -183,7 +184,7 @@ export class StudentService {
       );
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("student_profiles")
       .update(updateData)
       .eq("id", id)
@@ -230,7 +231,7 @@ export class StudentService {
       );
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("student_profiles")
       .update(updateData)
       .eq("id", userId)
@@ -248,5 +249,3 @@ export class StudentService {
     return data;
   }
 }
-
-export const studentService = new StudentService();

@@ -1,10 +1,14 @@
-import { supabaseAdmin } from "../../src/lib/supabase.ts";
+import { loadEnv } from "../../src/config/env.ts";
+import { getDenoEnv } from "../../src/config/runtime.ts";
+import { createSupabaseClients } from "../../src/lib/supabase.ts";
 
-const environment = Deno.env.get("ENVIRONMENT");
+const env = loadEnv(getDenoEnv());
 
-if (environment === "production") {
+if (env.ENVIRONMENT === "production") {
   throw new Error("Cannot seed production database");
 }
+
+const { supabaseAdmin } = createSupabaseClients(env);
 
 type UserRole =
   | "administrator"
@@ -15,17 +19,11 @@ type UserRole =
 
 interface SeedUser {
   email: string;
-
   password: string;
-
   firstName: string;
-
   middleName?: string;
-
   lastName: string;
-
   suffix?: string | null;
-
   role: UserRole;
 }
 
@@ -85,14 +83,16 @@ const seedUsers: SeedUser[] = [
 async function findUser(email: string) {
   const { data, error } = await supabaseAdmin.auth.admin.listUsers();
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
   return data.users.find(
     (user) => user.email?.toLowerCase() === email.toLowerCase(),
   );
 }
 
-async function createSeedUser(user: SeedUser) {
+async function createSeedUser(user: SeedUser): Promise<void> {
   console.log(`Creating ${user.email}`);
 
   const existing = await findUser(user.email);
@@ -106,20 +106,13 @@ async function createSeedUser(user: SeedUser) {
   } else {
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email: user.email,
-
       password: user.password,
-
       email_confirm: true,
-
       user_metadata: {
         first_name: user.firstName,
-
         middle_name: user.middleName ?? null,
-
         last_name: user.lastName,
-
         suffix: user.suffix ?? null,
-
         role: user.role,
       },
     });
@@ -134,23 +127,14 @@ async function createSeedUser(user: SeedUser) {
   const { error: profileError } = await supabaseAdmin.from("profiles").upsert(
     {
       id: userId,
-
       email: user.email,
-
       first_name: user.firstName,
-
       middle_name: user.middleName ?? null,
-
       last_name: user.lastName,
-
       suffix: user.suffix ?? null,
-
       role: user.role,
-
       is_active: true,
-
       must_change_password: true,
-
       created_by: null,
     },
     {
@@ -165,7 +149,7 @@ async function createSeedUser(user: SeedUser) {
   console.log(`✓ ${user.email}`);
 }
 
-async function seed() {
+async function seed(): Promise<void> {
   console.log("SBIMS Development Seed");
 
   for (const user of seedUsers) {

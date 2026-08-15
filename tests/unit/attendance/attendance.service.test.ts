@@ -1,11 +1,10 @@
-// deno-lint-ignore-file require-await no-explicit-any
-import { assertEquals, assertRejects } from "@std/assert";
+// deno-lint-ignore-file no-explicit-any
+import { assertEquals, assertThrows } from "@std/assert";
 
 import { AppError } from "../../../src/errors/app-error.ts";
-import { supabaseAdmin } from "../../../src/lib/supabase.ts";
 
 import {
-  attendanceService,
+  AttendanceService,
   calculateRenderedHours,
 } from "../../../src/modules/attendance/attendance.service.ts";
 
@@ -35,7 +34,15 @@ function createAttendanceRecord(
   };
 }
 
-function mockFromSequence(
+/**
+ * Creates an AttendanceService instance backed by a mocked
+ * Supabase admin client.
+ *
+ * The service uses dependency injection through SupabaseClients,
+ * so the unit tests do not need real Supabase credentials,
+ * environment variables, network access, or database state.
+ */
+function createMockAttendanceService(
   responses: Array<{
     data?: unknown;
     error?: unknown;
@@ -43,9 +50,7 @@ function mockFromSequence(
 ) {
   let index = 0;
 
-  const originalFrom = supabaseAdmin.from.bind(supabaseAdmin);
-
-  (supabaseAdmin as any).from = (_table: string) => {
+  const mockFrom = (_table: string) => {
     const response = responses[index++];
 
     if (!response) {
@@ -57,7 +62,7 @@ function mockFromSequence(
       error: response.error ?? null,
     };
 
-    const builder = {
+    const builder: any = {
       select: () => builder,
 
       eq: () => builder,
@@ -68,20 +73,30 @@ function mockFromSequence(
 
       update: () => builder,
 
-      order: async () => result,
+      order: () => result,
 
-      single: async () => result,
+      single: () => result,
 
-      maybeSingle: async () => result,
+      maybeSingle: () => result,
     };
 
     return builder;
   };
 
-  return () => {
-    (supabaseAdmin as any).from = originalFrom;
-  };
+  const clients = {
+    supabaseAdmin: {
+      from: mockFrom,
+    },
+  } as any;
+
+  return new AttendanceService(clients);
 }
+
+/*
+ * ---------------------------------------------------------
+ * CALCULATED RENDERED HOURS
+ * ---------------------------------------------------------
+ */
 
 Deno.test(
   "calculateRenderedHours - calculates rendered hours after one-hour break",
@@ -94,26 +109,19 @@ Deno.test(
   },
 );
 
-Deno.test(
-  "calculateRenderedHours - rejects time-out equal to time-in",
-  async () => {
-    await assertRejects(
-      async () => {
-        calculateRenderedHours("08:00:00", "08:00:00");
-      },
-      AppError,
-      "Time-out must be later than time-in.",
-    );
-  },
-);
+Deno.test("calculateRenderedHours - rejects time-out equal to time-in", () => {
+  assertThrows(
+    () => calculateRenderedHours("08:00:00", "08:00:00"),
+    AppError,
+    "Time-out must be later than time-in.",
+  );
+});
 
 Deno.test(
   "calculateRenderedHours - rejects time-out earlier than time-in",
-  async () => {
-    await assertRejects(
-      async () => {
-        calculateRenderedHours("17:00:00", "08:00:00");
-      },
+  () => {
+    assertThrows(
+      () => calculateRenderedHours("17:00:00", "08:00:00"),
       AppError,
       "Time-out must be later than time-in.",
     );
@@ -122,23 +130,27 @@ Deno.test(
 
 Deno.test(
   "calculateRenderedHours - rejects duration that is too short for the break",
-  async () => {
-    await assertRejects(
-      async () => {
-        calculateRenderedHours("08:00:00", "09:00:00");
-      },
+  () => {
+    assertThrows(
+      () => calculateRenderedHours("08:00:00", "09:00:00"),
       AppError,
       "Attendance duration is too short for the standard one-hour break.",
     );
   },
 );
 
+/*
+ * ---------------------------------------------------------
+ * CREATE ATTENDANCE
+ * ---------------------------------------------------------
+ */
+
 Deno.test(
   "createAttendance - creates pending attendance for active student's internship",
   async () => {
     const attendance = createAttendanceRecord();
 
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: {
           id: INTERNSHIP_ID,
@@ -154,26 +166,22 @@ Deno.test(
       },
     ]);
 
-    try {
-      const result = await attendanceService.createAttendance(STUDENT_ID, {
-        internship_id: INTERNSHIP_ID,
-        attendance_date: "2026-08-12",
-        time_in: "08:00:00",
-        time_out: "17:00:00",
-      });
+    const result = await service.createAttendance(STUDENT_ID, {
+      internship_id: INTERNSHIP_ID,
+      attendance_date: "2026-08-12",
+      time_in: "08:00:00",
+      time_out: "17:00:00",
+    });
 
-      assertEquals(result, attendance);
-      assertEquals(result.validation_status, "pending");
-      assertEquals(result.validated_by, null);
-      assertEquals(result.validated_at, null);
-    } finally {
-      restore();
-    }
+    assertEquals(result, attendance);
+    assertEquals(result.validation_status, "pending");
+    assertEquals(result.validated_by, null);
+    assertEquals(result.validated_at, null);
   },
 );
 
 Deno.test("createAttendance - rejects missing internship", async () => {
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: null,
       error: {
@@ -182,27 +190,23 @@ Deno.test("createAttendance - rejects missing internship", async () => {
     },
   ]);
 
-  try {
-    await assertRejects(
-      () =>
-        attendanceService.createAttendance(STUDENT_ID, {
-          internship_id: INTERNSHIP_ID,
-          attendance_date: "2026-08-12",
-          time_in: "08:00:00",
-          time_out: "17:00:00",
-        }),
-      AppError,
-      "Internship not found.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () =>
+      service.createAttendance(STUDENT_ID, {
+        internship_id: INTERNSHIP_ID,
+        attendance_date: "2026-08-12",
+        time_in: "08:00:00",
+        time_out: "17:00:00",
+      }),
+    AppError,
+    "Internship not found.",
+  );
 });
 
 Deno.test(
   "createAttendance - rejects attendance for another student's internship",
   async () => {
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: {
           id: INTERNSHIP_ID,
@@ -212,26 +216,22 @@ Deno.test(
       },
     ]);
 
-    try {
-      await assertRejects(
-        () =>
-          attendanceService.createAttendance(STUDENT_ID, {
-            internship_id: INTERNSHIP_ID,
-            attendance_date: "2026-08-12",
-            time_in: "08:00:00",
-            time_out: "17:00:00",
-          }),
-        AppError,
-        "You can only record attendance for your own internship.",
-      );
-    } finally {
-      restore();
-    }
+    await assertThrowsAsync(
+      () =>
+        service.createAttendance(STUDENT_ID, {
+          internship_id: INTERNSHIP_ID,
+          attendance_date: "2026-08-12",
+          time_in: "08:00:00",
+          time_out: "17:00:00",
+        }),
+      AppError,
+      "You can only record attendance for your own internship.",
+    );
   },
 );
 
 Deno.test("createAttendance - rejects inactive internship", async () => {
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: {
         id: INTERNSHIP_ID,
@@ -241,27 +241,23 @@ Deno.test("createAttendance - rejects inactive internship", async () => {
     },
   ]);
 
-  try {
-    await assertRejects(
-      () =>
-        attendanceService.createAttendance(STUDENT_ID, {
-          internship_id: INTERNSHIP_ID,
-          attendance_date: "2026-08-12",
-          time_in: "08:00:00",
-          time_out: "17:00:00",
-        }),
-      AppError,
-      "Attendance can only be recorded for an active internship.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () =>
+      service.createAttendance(STUDENT_ID, {
+        internship_id: INTERNSHIP_ID,
+        attendance_date: "2026-08-12",
+        time_in: "08:00:00",
+        time_out: "17:00:00",
+      }),
+    AppError,
+    "Attendance can only be recorded for an active internship.",
+  );
 });
 
 Deno.test("createAttendance - rejects duplicate attendance date", async () => {
   const existing = createAttendanceRecord();
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: {
         id: INTERNSHIP_ID,
@@ -276,27 +272,23 @@ Deno.test("createAttendance - rejects duplicate attendance date", async () => {
     },
   ]);
 
-  try {
-    await assertRejects(
-      () =>
-        attendanceService.createAttendance(STUDENT_ID, {
-          internship_id: INTERNSHIP_ID,
-          attendance_date: "2026-08-12",
-          time_in: "08:00:00",
-          time_out: "17:00:00",
-        }),
-      AppError,
-      "Attendance for this date already exists.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () =>
+      service.createAttendance(STUDENT_ID, {
+        internship_id: INTERNSHIP_ID,
+        attendance_date: "2026-08-12",
+        time_in: "08:00:00",
+        time_out: "17:00:00",
+      }),
+    AppError,
+    "Attendance for this date already exists.",
+  );
 });
 
 Deno.test(
   "createAttendance - rejects duplicate-check database failure",
   async () => {
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: {
           id: INTERNSHIP_ID,
@@ -312,26 +304,22 @@ Deno.test(
       },
     ]);
 
-    try {
-      await assertRejects(
-        () =>
-          attendanceService.createAttendance(STUDENT_ID, {
-            internship_id: INTERNSHIP_ID,
-            attendance_date: "2026-08-12",
-            time_in: "08:00:00",
-            time_out: "17:00:00",
-          }),
-        AppError,
-        "Failed to check existing attendance.",
-      );
-    } finally {
-      restore();
-    }
+    await assertThrowsAsync(
+      () =>
+        service.createAttendance(STUDENT_ID, {
+          internship_id: INTERNSHIP_ID,
+          attendance_date: "2026-08-12",
+          time_in: "08:00:00",
+          time_out: "17:00:00",
+        }),
+      AppError,
+      "Failed to check existing attendance.",
+    );
   },
 );
 
 Deno.test("createAttendance - rejects database insert failure", async () => {
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: {
         id: INTERNSHIP_ID,
@@ -350,43 +338,41 @@ Deno.test("createAttendance - rejects database insert failure", async () => {
     },
   ]);
 
-  try {
-    await assertRejects(
-      () =>
-        attendanceService.createAttendance(STUDENT_ID, {
-          internship_id: INTERNSHIP_ID,
-          attendance_date: "2026-08-12",
-          time_in: "08:00:00",
-          time_out: "17:00:00",
-        }),
-      AppError,
-      "Failed to create attendance record.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () =>
+      service.createAttendance(STUDENT_ID, {
+        internship_id: INTERNSHIP_ID,
+        attendance_date: "2026-08-12",
+        time_in: "08:00:00",
+        time_out: "17:00:00",
+      }),
+    AppError,
+    "Failed to create attendance record.",
+  );
 });
+
+/*
+ * ---------------------------------------------------------
+ * RETRIEVAL
+ * ---------------------------------------------------------
+ */
 
 Deno.test("getAttendanceById - returns attendance record", async () => {
   const attendance = createAttendanceRecord();
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: attendance,
     },
   ]);
 
-  try {
-    const result = await attendanceService.getAttendanceById(ATTENDANCE_ID);
+  const result = await service.getAttendanceById(ATTENDANCE_ID);
 
-    assertEquals(result, attendance);
-  } finally {
-    restore();
-  }
+  assertEquals(result, attendance);
 });
 
 Deno.test("getAttendanceById - throws when record does not exist", async () => {
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: null,
       error: {
@@ -395,15 +381,11 @@ Deno.test("getAttendanceById - throws when record does not exist", async () => {
     },
   ]);
 
-  try {
-    await assertRejects(
-      () => attendanceService.getAttendanceById(ATTENDANCE_ID),
-      AppError,
-      "Attendance record not found.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () => service.getAttendanceById(ATTENDANCE_ID),
+    AppError,
+    "Attendance record not found.",
+  );
 });
 
 Deno.test(
@@ -419,7 +401,7 @@ Deno.test(
       }),
     ];
 
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: records.map((record) => ({
           ...record,
@@ -430,37 +412,29 @@ Deno.test(
       },
     ]);
 
-    try {
-      const result = await attendanceService.getMyAttendance(STUDENT_ID);
+    const result = await service.getMyAttendance(STUDENT_ID);
 
-      assertEquals(result, records);
-    } finally {
-      restore();
-    }
+    assertEquals(result, records);
   },
 );
 
 Deno.test(
   "getMyAttendance - returns empty array when no records exist",
   async () => {
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: [],
       },
     ]);
 
-    try {
-      const result = await attendanceService.getMyAttendance(STUDENT_ID);
+    const result = await service.getMyAttendance(STUDENT_ID);
 
-      assertEquals(result, []);
-    } finally {
-      restore();
-    }
+    assertEquals(result, []);
   },
 );
 
 Deno.test("getMyAttendance - rejects database failure", async () => {
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: null,
       error: {
@@ -469,15 +443,11 @@ Deno.test("getMyAttendance - rejects database failure", async () => {
     },
   ]);
 
-  try {
-    await assertRejects(
-      () => attendanceService.getMyAttendance(STUDENT_ID),
-      AppError,
-      "Failed to retrieve attendance records.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () => service.getMyAttendance(STUDENT_ID),
+    AppError,
+    "Failed to retrieve attendance records.",
+  );
 });
 
 Deno.test(
@@ -490,40 +460,38 @@ Deno.test(
       }),
     ];
 
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: records,
       },
     ]);
 
-    try {
-      const result = await attendanceService.getAttendanceByInternship(INTERNSHIP_ID);
+    const result = await service.getAttendanceByInternship(INTERNSHIP_ID);
 
-      assertEquals(result, records);
-    } finally {
-      restore();
-    }
+    assertEquals(result, records);
   },
 );
 
 Deno.test(
   "getAttendanceByInternship - returns empty array when no records exist",
   async () => {
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: [],
       },
     ]);
 
-    try {
-      const result = await attendanceService.getAttendanceByInternship(INTERNSHIP_ID);
+    const result = await service.getAttendanceByInternship(INTERNSHIP_ID);
 
-      assertEquals(result, []);
-    } finally {
-      restore();
-    }
+    assertEquals(result, []);
   },
 );
+
+/*
+ * ---------------------------------------------------------
+ * VALIDATION
+ * ---------------------------------------------------------
+ */
 
 Deno.test("validateAttendance - validates pending attendance", async () => {
   const pending = createAttendanceRecord();
@@ -534,7 +502,7 @@ Deno.test("validateAttendance - validates pending attendance", async () => {
     validated_at: "2026-08-12T10:00:00.000Z",
   });
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: pending,
     },
@@ -550,20 +518,16 @@ Deno.test("validateAttendance - validates pending attendance", async () => {
     },
   ]);
 
-  try {
-    const result = await attendanceService.validateAttendance(
-      ATTENDANCE_ID,
-      COORDINATOR_ID,
-      "validated",
-    );
+  const result = await service.validateAttendance(
+    ATTENDANCE_ID,
+    COORDINATOR_ID,
+    "validated",
+  );
 
-    assertEquals(result, validated);
-    assertEquals(result.validation_status, "validated");
-    assertEquals(result.validated_by, COORDINATOR_ID);
-    assertEquals(result.validated_at !== null, true);
-  } finally {
-    restore();
-  }
+  assertEquals(result, validated);
+  assertEquals(result.validation_status, "validated");
+  assertEquals(result.validated_by, COORDINATOR_ID);
+  assertEquals(result.validated_at !== null, true);
 });
 
 Deno.test("validateAttendance - rejects pending attendance", async () => {
@@ -575,7 +539,7 @@ Deno.test("validateAttendance - rejects pending attendance", async () => {
     validated_at: "2026-08-12T10:00:00.000Z",
   });
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: pending,
     },
@@ -591,20 +555,16 @@ Deno.test("validateAttendance - rejects pending attendance", async () => {
     },
   ]);
 
-  try {
-    const result = await attendanceService.validateAttendance(
-      ATTENDANCE_ID,
-      COORDINATOR_ID,
-      "rejected",
-    );
+  const result = await service.validateAttendance(
+    ATTENDANCE_ID,
+    COORDINATOR_ID,
+    "rejected",
+  );
 
-    assertEquals(result, rejected);
-    assertEquals(result.validation_status, "rejected");
-    assertEquals(result.validated_by, COORDINATOR_ID);
-    assertEquals(result.validated_at !== null, true);
-  } finally {
-    restore();
-  }
+  assertEquals(result, rejected);
+  assertEquals(result.validation_status, "rejected");
+  assertEquals(result.validated_by, COORDINATOR_ID);
+  assertEquals(result.validated_at !== null, true);
 });
 
 Deno.test(
@@ -614,26 +574,17 @@ Deno.test(
       validation_status: "validated",
     });
 
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: attendance,
       },
     ]);
 
-    try {
-      await assertRejects(
-        () =>
-          attendanceService.validateAttendance(
-            ATTENDANCE_ID,
-            COORDINATOR_ID,
-            "rejected",
-          ),
-        AppError,
-        "Only pending attendance records can be validated.",
-      );
-    } finally {
-      restore();
-    }
+    await assertThrowsAsync(
+      () => service.validateAttendance(ATTENDANCE_ID, COORDINATOR_ID, "rejected"),
+      AppError,
+      "Only pending attendance records can be validated.",
+    );
   },
 );
 
@@ -644,33 +595,24 @@ Deno.test(
       validation_status: "rejected",
     });
 
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: attendance,
       },
     ]);
 
-    try {
-      await assertRejects(
-        () =>
-          attendanceService.validateAttendance(
-            ATTENDANCE_ID,
-            COORDINATOR_ID,
-            "validated",
-          ),
-        AppError,
-        "Only pending attendance records can be validated.",
-      );
-    } finally {
-      restore();
-    }
+    await assertThrowsAsync(
+      () => service.validateAttendance(ATTENDANCE_ID, COORDINATOR_ID, "validated"),
+      AppError,
+      "Only pending attendance records can be validated.",
+    );
   },
 );
 
 Deno.test("validateAttendance - rejects inactive coordinator", async () => {
   const pending = createAttendanceRecord();
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: pending,
     },
@@ -683,26 +625,17 @@ Deno.test("validateAttendance - rejects inactive coordinator", async () => {
     },
   ]);
 
-  try {
-    await assertRejects(
-      () =>
-        attendanceService.validateAttendance(
-          ATTENDANCE_ID,
-          COORDINATOR_ID,
-          "validated",
-        ),
-      AppError,
-      "Only an active internship coordinator can validate attendance.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () => service.validateAttendance(ATTENDANCE_ID, COORDINATOR_ID, "validated"),
+    AppError,
+    "Only an active internship coordinator can validate attendance.",
+  );
 });
 
 Deno.test("validateAttendance - rejects non-coordinator", async () => {
   const pending = createAttendanceRecord();
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: pending,
     },
@@ -715,26 +648,17 @@ Deno.test("validateAttendance - rejects non-coordinator", async () => {
     },
   ]);
 
-  try {
-    await assertRejects(
-      () =>
-        attendanceService.validateAttendance(
-          ATTENDANCE_ID,
-          COORDINATOR_ID,
-          "validated",
-        ),
-      AppError,
-      "Only an active internship coordinator can validate attendance.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () => service.validateAttendance(ATTENDANCE_ID, COORDINATOR_ID, "validated"),
+    AppError,
+    "Only an active internship coordinator can validate attendance.",
+  );
 });
 
 Deno.test("validateAttendance - rejects missing coordinator", async () => {
   const pending = createAttendanceRecord();
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: pending,
     },
@@ -746,21 +670,18 @@ Deno.test("validateAttendance - rejects missing coordinator", async () => {
     },
   ]);
 
-  try {
-    await assertRejects(
-      () =>
-        attendanceService.validateAttendance(
-          ATTENDANCE_ID,
-          COORDINATOR_ID,
-          "validated",
-        ),
-      AppError,
-      "Only an active internship coordinator can validate attendance.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () => service.validateAttendance(ATTENDANCE_ID, COORDINATOR_ID, "validated"),
+    AppError,
+    "Only an active internship coordinator can validate attendance.",
+  );
 });
+
+/*
+ * ---------------------------------------------------------
+ * RENDERED HOURS
+ * ---------------------------------------------------------
+ */
 
 Deno.test("getRenderedHours - counts only validated attendance", async () => {
   const records = [
@@ -783,19 +704,15 @@ Deno.test("getRenderedHours - counts only validated attendance", async () => {
     }),
   ];
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: records,
     },
   ]);
 
-  try {
-    const result = await attendanceService.getRenderedHours(INTERNSHIP_ID);
+  const result = await service.getRenderedHours(INTERNSHIP_ID);
 
-    assertEquals(result, 8);
-  } finally {
-    restore();
-  }
+  assertEquals(result, 8);
 });
 
 Deno.test(
@@ -811,21 +728,23 @@ Deno.test(
       }),
     ];
 
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: records,
       },
     ]);
 
-    try {
-      const result = await attendanceService.getRenderedHours(INTERNSHIP_ID);
+    const result = await service.getRenderedHours(INTERNSHIP_ID);
 
-      assertEquals(result, 0);
-    } finally {
-      restore();
-    }
+    assertEquals(result, 0);
   },
 );
+
+/*
+ * ---------------------------------------------------------
+ * UPDATE
+ * ---------------------------------------------------------
+ */
 
 Deno.test(
   "updateAttendance - updates pending attendance owned by student",
@@ -838,7 +757,7 @@ Deno.test(
       time_out: "18:00:00",
     });
 
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: pending,
       },
@@ -857,21 +776,13 @@ Deno.test(
       },
     ]);
 
-    try {
-      const result = await attendanceService.updateAttendance(
-        ATTENDANCE_ID,
-        STUDENT_ID,
-        {
-          attendance_date: "2026-08-13",
-          time_in: "09:00:00",
-          time_out: "18:00:00",
-        },
-      );
+    const result = await service.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
+      attendance_date: "2026-08-13",
+      time_in: "09:00:00",
+      time_out: "18:00:00",
+    });
 
-      assertEquals(result, updated);
-    } finally {
-      restore();
-    }
+    assertEquals(result, updated);
   },
 );
 
@@ -884,7 +795,7 @@ Deno.test(
       time_in: "09:00:00",
     });
 
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: pending,
       },
@@ -903,19 +814,11 @@ Deno.test(
       },
     ]);
 
-    try {
-      const result = await attendanceService.updateAttendance(
-        ATTENDANCE_ID,
-        STUDENT_ID,
-        {
-          time_in: "09:00:00",
-        },
-      );
+    const result = await service.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
+      time_in: "09:00:00",
+    });
 
-      assertEquals(result, updated);
-    } finally {
-      restore();
-    }
+    assertEquals(result, updated);
   },
 );
 
@@ -924,24 +827,20 @@ Deno.test("updateAttendance - rejects validated attendance", async () => {
     validation_status: "validated",
   });
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: attendance,
     },
   ]);
 
-  try {
-    await assertRejects(
-      () =>
-        attendanceService.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
-          time_in: "09:00:00",
-        }),
-      AppError,
-      "Only pending attendance records can be updated.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () =>
+      service.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
+        time_in: "09:00:00",
+      }),
+    AppError,
+    "Only pending attendance records can be updated.",
+  );
 });
 
 Deno.test("updateAttendance - rejects rejected attendance", async () => {
@@ -949,24 +848,20 @@ Deno.test("updateAttendance - rejects rejected attendance", async () => {
     validation_status: "rejected",
   });
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: attendance,
     },
   ]);
 
-  try {
-    await assertRejects(
-      () =>
-        attendanceService.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
-          time_in: "09:00:00",
-        }),
-      AppError,
-      "Only pending attendance records can be updated.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () =>
+      service.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
+        time_in: "09:00:00",
+      }),
+    AppError,
+    "Only pending attendance records can be updated.",
+  );
 });
 
 Deno.test(
@@ -974,7 +869,7 @@ Deno.test(
   async () => {
     const pending = createAttendanceRecord();
 
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: pending,
       },
@@ -987,25 +882,21 @@ Deno.test(
       },
     ]);
 
-    try {
-      await assertRejects(
-        () =>
-          attendanceService.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
-            time_in: "09:00:00",
-          }),
-        AppError,
-        "You can only update your own attendance.",
-      );
-    } finally {
-      restore();
-    }
+    await assertThrowsAsync(
+      () =>
+        service.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
+          time_in: "09:00:00",
+        }),
+      AppError,
+      "You can only update your own attendance.",
+    );
   },
 );
 
 Deno.test("updateAttendance - rejects inactive internship", async () => {
   const pending = createAttendanceRecord();
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: pending,
     },
@@ -1018,24 +909,20 @@ Deno.test("updateAttendance - rejects inactive internship", async () => {
     },
   ]);
 
-  try {
-    await assertRejects(
-      () =>
-        attendanceService.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
-          time_in: "09:00:00",
-        }),
-      AppError,
-      "Attendance can only be updated for an active internship.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () =>
+      service.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
+        time_in: "09:00:00",
+      }),
+    AppError,
+    "Attendance can only be updated for an active internship.",
+  );
 });
 
 Deno.test("updateAttendance - rejects duplicate attendance date", async () => {
   const pending = createAttendanceRecord();
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: pending,
     },
@@ -1053,18 +940,14 @@ Deno.test("updateAttendance - rejects duplicate attendance date", async () => {
     },
   ]);
 
-  try {
-    await assertRejects(
-      () =>
-        attendanceService.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
-          attendance_date: "2026-08-13",
-        }),
-      AppError,
-      "Attendance for this date already exists.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () =>
+      service.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
+        attendance_date: "2026-08-13",
+      }),
+    AppError,
+    "Attendance for this date already exists.",
+  );
 });
 
 Deno.test(
@@ -1072,7 +955,7 @@ Deno.test(
   async () => {
     const pending = createAttendanceRecord();
 
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: pending,
       },
@@ -1085,18 +968,14 @@ Deno.test(
       },
     ]);
 
-    try {
-      await assertRejects(
-        () =>
-          attendanceService.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
-            time_in: "18:00:00",
-          }),
-        AppError,
-        "Time-out must be later than time-in.",
-      );
-    } finally {
-      restore();
-    }
+    await assertThrowsAsync(
+      () =>
+        service.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
+          time_in: "18:00:00",
+        }),
+      AppError,
+      "Time-out must be later than time-in.",
+    );
   },
 );
 
@@ -1105,7 +984,7 @@ Deno.test(
   async () => {
     const pending = createAttendanceRecord();
 
-    const restore = mockFromSequence([
+    const service = createMockAttendanceService([
       {
         data: pending,
       },
@@ -1124,25 +1003,21 @@ Deno.test(
       },
     ]);
 
-    try {
-      await assertRejects(
-        () =>
-          attendanceService.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
-            attendance_date: "2026-08-13",
-          }),
-        AppError,
-        "Failed to check existing attendance.",
-      );
-    } finally {
-      restore();
-    }
+    await assertThrowsAsync(
+      () =>
+        service.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
+          attendance_date: "2026-08-13",
+        }),
+      AppError,
+      "Failed to check existing attendance.",
+    );
   },
 );
 
 Deno.test("updateAttendance - rejects update database failure", async () => {
   const pending = createAttendanceRecord();
 
-  const restore = mockFromSequence([
+  const service = createMockAttendanceService([
     {
       data: pending,
     },
@@ -1164,16 +1039,49 @@ Deno.test("updateAttendance - rejects update database failure", async () => {
     },
   ]);
 
-  try {
-    await assertRejects(
-      () =>
-        attendanceService.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
-          time_in: "09:00:00",
-        }),
-      AppError,
-      "Failed to update attendance.",
-    );
-  } finally {
-    restore();
-  }
+  await assertThrowsAsync(
+    () =>
+      service.updateAttendance(ATTENDANCE_ID, STUDENT_ID, {
+        time_in: "09:00:00",
+      }),
+    AppError,
+    "Failed to update attendance.",
+  );
 });
+
+/*
+ * ---------------------------------------------------------
+ * TEST HELPER
+ * ---------------------------------------------------------
+ *
+ * Deno's assertThrows is synchronous, while service methods
+ * return promises. Keep the async exception assertion local
+ * to this test file so the service tests remain dependency-free.
+ */
+async function assertThrowsAsync(
+  fn: () => Promise<unknown>,
+  ErrorClass: new (...args: any[]) => Error,
+  message?: string,
+): Promise<void> {
+  try {
+    await fn();
+  } catch (error) {
+    if (!(error instanceof ErrorClass)) {
+      throw new Error(
+        `Expected ${ErrorClass.name}, but received ${
+          error instanceof Error ? error.constructor.name : typeof error
+        }.`,
+      );
+    }
+
+    if (message !== undefined) {
+      assertEquals((error as Error).message, message);
+    }
+
+    return;
+  }
+
+  throw new Error(
+    `Expected ${ErrorClass.name} to be thrown, but no error was thrown.`,
+  );
+}
