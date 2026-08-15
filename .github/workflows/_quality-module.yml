@@ -72,7 +72,6 @@ jobs:
       # ============================================================
       # START TRACE
       # ============================================================
-
       - name: Initialize CI Traceability
         run: |
           echo "START_TIME=$(date +%s)" >> "$GITHUB_ENV"

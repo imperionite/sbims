@@ -28,14 +28,12 @@ jobs:
   # ============================================================
   # QUALITY VERIFICATION
   # ============================================================
-
   quality:
     name: SBIMS Pre-Deployment Quality Verification
     uses: ./.github/workflows/_quality-module.yml
     with:
       module: deployment-verification
     secrets: inherit
-
 
   # ============================================================
   # DEPLOY TO DENO DEPLOY
@@ -52,7 +50,6 @@ jobs:
       health: ${{ steps.health-step.outputs.health }}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v5
 
@@ -124,7 +121,6 @@ jobs:
 
           done
 
-
   # ============================================================
   # DEPLOY TO CLOUDFLARE WORKERS
   # ============================================================
@@ -140,7 +136,6 @@ jobs:
       health: ${{ steps.health-step.outputs.health }}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v5
 
@@ -219,7 +214,6 @@ jobs:
 
           done
 
-
   # ============================================================
   # DEPLOYMENT REPORT
   # ============================================================
@@ -233,7 +227,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Generate Deployment Report
         run: |
           echo ""
