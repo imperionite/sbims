@@ -12,7 +12,7 @@
 ### ============================================================
 
 ### Performance Ping
-GET {{denoDev}}/ping
+GET {{deno}}/ping
 
 
 ### Performance Compute - Default Work
@@ -36,7 +36,7 @@ GET {{deno}}/compute?work=10000
 ### ============================================================
 
 ### Performance Ping
-GET {{cfDev}}/ping
+GET {{cf}}/ping
 
 
 ### Performance Compute - Default Work
