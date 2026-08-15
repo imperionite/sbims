@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "../../lib/supabase.ts";
+import type { SupabaseClients } from "../../lib/supabase.ts";
 import { AppError } from "../../errors/app-error.ts";
 
 import type {
@@ -39,8 +39,9 @@ const STATUS_TRANSITIONS: Record<InternshipStatus, InternshipStatus[]> = {
 };
 
 export class InternshipService {
+  constructor(private readonly clients: SupabaseClients) {}
   async listInternships() {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("internships")
       .select(INTERNSHIP_SELECT)
       .order("created_at", {
@@ -55,7 +56,7 @@ export class InternshipService {
   }
 
   async getInternship(id: string) {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("internships")
       .select(INTERNSHIP_SELECT)
       .eq("id", id)
@@ -73,7 +74,7 @@ export class InternshipService {
   }
 
   async getMyInternship(studentId: string) {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("internships")
       .select(INTERNSHIP_SELECT)
       .eq("student_id", studentId)
@@ -91,7 +92,7 @@ export class InternshipService {
   }
 
   async createInternship(request: CreateInternshipRequest) {
-    const { data: student, error: studentError } = await supabaseAdmin
+    const { data: student, error: studentError } = await this.clients.supabaseAdmin
       .from("student_profiles")
       .select(
         `
@@ -118,7 +119,7 @@ export class InternshipService {
       throw new AppError(400, "The selected student account is inactive.");
     }
 
-    const { data: hte, error: hteError } = await supabaseAdmin
+    const { data: hte, error: hteError } = await this.clients.supabaseAdmin
       .from("hte_profiles")
       .select(
         `
@@ -141,7 +142,7 @@ export class InternshipService {
       throw new AppError(400, "The selected HTE is inactive.");
     }
 
-    const { data: existingInternship, error: existingError } = await supabaseAdmin
+    const { data: existingInternship, error: existingError } = await this.clients.supabaseAdmin
       .from("internships")
       .select("id")
       .eq("student_id", request.studentId)
@@ -161,7 +162,7 @@ export class InternshipService {
       );
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("internships")
       .insert({
         student_id: request.studentId,
@@ -194,7 +195,7 @@ export class InternshipService {
     }
 
     if (request.hteId !== undefined) {
-      const { data: hte, error: hteError } = await supabaseAdmin
+      const { data: hte, error: hteError } = await this.clients.supabaseAdmin
         .from("hte_profiles")
         .select("id, is_active")
         .eq("id", request.hteId)
@@ -213,7 +214,7 @@ export class InternshipService {
       }
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("internships")
       .update(updateData)
       .eq("id", id)
@@ -232,7 +233,7 @@ export class InternshipService {
   }
 
   async updateStatus(id: string, status: InternshipStatus) {
-    const { data: internship, error: findError } = await supabaseAdmin
+    const { data: internship, error: findError } = await this.clients.supabaseAdmin
       .from("internships")
       .select("id, status")
       .eq("id", id)
@@ -256,7 +257,7 @@ export class InternshipService {
       );
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("internships")
       .update({
         status,
@@ -274,7 +275,7 @@ export class InternshipService {
 
   async assignFacultyAdviser(id: string, facultyAdviserId: string | null) {
     if (facultyAdviserId !== null) {
-      const { data: adviser, error: adviserError } = await supabaseAdmin
+      const { data: adviser, error: adviserError } = await this.clients.supabaseAdmin
         .from("profiles")
         .select("id, role, is_active")
         .eq("id", facultyAdviserId)
@@ -300,7 +301,7 @@ export class InternshipService {
       }
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("internships")
       .update({
         faculty_adviser_id: facultyAdviserId,
@@ -320,5 +321,3 @@ export class InternshipService {
     return data;
   }
 }
-
-export const internshipService = new InternshipService();

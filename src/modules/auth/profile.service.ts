@@ -1,7 +1,12 @@
-import { supabaseAdmin } from "../../lib/supabase.ts";
+import type { SupabaseClients } from "../../lib/supabase.ts";
 
-export async function getUserRole(userId: string) {
-  const { data, error } = await supabaseAdmin
+import type { AuthRole } from "./auth.types.ts";
+
+export async function getUserRole(
+  supabase: SupabaseClients,
+  userId: string,
+): Promise<AuthRole | null> {
+  const { data, error } = await supabase.supabaseAdmin
     .from("profiles")
     .select("role")
     .eq("id", userId)
@@ -11,5 +16,5 @@ export async function getUserRole(userId: string) {
     return null;
   }
 
-  return data.role;
+  return data.role as AuthRole;
 }

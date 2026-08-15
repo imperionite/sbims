@@ -1,5 +1,4 @@
-import { loadEnv } from "../../config/env.ts";
-import { supabaseAdmin, supabaseClient } from "../../lib/supabase.ts";
+import type { SupabaseClients } from "../../lib/supabase.ts";
 
 import { AppError } from "../../errors/app-error.ts";
 
@@ -17,10 +16,15 @@ import { logger } from "../../shared/logger.ts";
 
 const SUCCESS_MESSAGE = "If the email is registered, a password reset link has been sent.";
 
-const env = loadEnv();
-
 export class AuthService {
+  constructor(
+    private readonly supabase: SupabaseClients,
+    private readonly frontendUrl: string,
+  ) {}
+
   async login(request: LoginRequest): Promise<LoginResponse> {
+    const { supabaseClient, supabaseAdmin } = this.supabase;
+
     const { data, error } = await supabaseClient.auth.signInWithPassword({
       email: request.email,
       password: request.password,
@@ -79,7 +83,7 @@ export class AuthService {
     const profile = await this.getProfile(session.user.id);
 
     if (!profile.is_active) {
-      const { error: signOutError } = await supabaseAdmin.auth.admin.signOut(
+      const { error: signOutError } = await this.supabase.supabaseAdmin.auth.admin.signOut(
         session.user.id,
         "global",
       );
@@ -98,18 +102,15 @@ export class AuthService {
   }
 
   async changePassword(userId: string, request: ChangePasswordRequest) {
-    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
-      userId,
-      {
-        password: request.newPassword,
-      },
-    );
+    const { data, error } = await this.supabase.supabaseAdmin.auth.admin.updateUserById(userId, {
+      password: request.newPassword,
+    });
 
     if (error || !data.user) {
       throw new AppError(400, error?.message ?? "Unable to update password.");
     }
 
-    const { error: profileError } = await supabaseAdmin
+    const { error: profileError } = await this.supabase.supabaseAdmin
       .from("profiles")
       .update({
         must_change_password: false,
@@ -129,7 +130,7 @@ export class AuthService {
   }
 
   async forgotPassword(request: ForgotPasswordRequest) {
-    const { data: profile } = await supabaseAdmin
+    const { data: profile } = await this.supabase.supabaseAdmin
       .from("profiles")
       .select("id, must_change_password")
       .eq("email", request.email.toLowerCase())
@@ -150,10 +151,10 @@ export class AuthService {
       );
     }
 
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(
+    const { error } = await this.supabase.supabaseClient.auth.resetPasswordForEmail(
       request.email,
       {
-        redirectTo: `${env.FRONTEND_URL}/reset-password`,
+        redirectTo: `${this.frontendUrl}/reset-password`,
       },
     );
 
@@ -169,7 +170,7 @@ export class AuthService {
   }
 
   async completePasswordReset(request: CompletePasswordResetRequest) {
-    const { error } = await supabaseAdmin
+    const { error } = await this.supabase.supabaseAdmin
       .from("profiles")
       .update({
         must_change_password: false,
@@ -189,7 +190,7 @@ export class AuthService {
   }
 
   private async refreshSession(refreshToken: string) {
-    const { data, error } = await supabaseClient.auth.refreshSession({
+    const { data, error } = await this.supabase.supabaseClient.auth.refreshSession({
       refresh_token: refreshToken,
     });
 
@@ -224,7 +225,7 @@ export class AuthService {
   }
 
   private async getProfile(userId: string): Promise<Profile> {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.supabase.supabaseAdmin
       .from("profiles")
       .select("*")
       .eq("id", userId)
@@ -247,5 +248,3 @@ export class AuthService {
     return this.mapProfile(profile);
   }
 }
-
-export const authService = new AuthService();

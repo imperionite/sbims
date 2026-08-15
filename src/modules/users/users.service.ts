@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "../../lib/supabase.ts";
+import type { SupabaseClients } from "../../lib/supabase.ts";
 
 import { AppError } from "../../errors/app-error.ts";
 
@@ -10,8 +10,9 @@ import type {
 } from "./users.types.ts";
 
 export class UserService {
+  constructor(private readonly clients: SupabaseClients) {}
   async listUsers() {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("profiles")
       .select(
         `
@@ -38,7 +39,7 @@ export class UserService {
   }
 
   async getUser(id: string) {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("profiles")
       .select(
         `
@@ -68,7 +69,7 @@ export class UserService {
   }
 
   async createUser(request: CreateUserRequest) {
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+    const { data, error } = await this.clients.supabaseAdmin.auth.admin.createUser({
       email: request.email,
       password: request.password,
       email_confirm: true,
@@ -85,7 +86,7 @@ export class UserService {
 
     const userId = data.user.id;
 
-    const { error: profileError } = await supabaseAdmin
+    const { error: profileError } = await this.clients.supabaseAdmin
       .from("profiles")
       .insert({
         id: userId,
@@ -101,7 +102,7 @@ export class UserService {
 
     if (profileError) {
       // Prevent orphaned auth users.
-      await supabaseAdmin.auth.admin.deleteUser(userId);
+      await this.clients.supabaseAdmin.auth.admin.deleteUser(userId);
 
       throw new AppError(500, profileError.message);
     }
@@ -113,7 +114,7 @@ export class UserService {
   }
 
   async updateUser(id: string, request: UpdateUserRequest) {
-    const { error } = await supabaseAdmin
+    const { error } = await this.clients.supabaseAdmin
       .from("profiles")
       .update({
         first_name: request.firstName,
@@ -133,7 +134,7 @@ export class UserService {
   }
 
   async updateUserRole(id: string, request: UpdateUserRoleRequest) {
-    const { error } = await supabaseAdmin
+    const { error } = await this.clients.supabaseAdmin
       .from("profiles")
       .update({
         role: request.role,
@@ -150,7 +151,7 @@ export class UserService {
   }
 
   async updateStatus(id: string, request: UpdateUserStatusRequest) {
-    const { error } = await supabaseAdmin
+    const { error } = await this.clients.supabaseAdmin
       .from("profiles")
       .update({
         is_active: request.isActive,
@@ -168,7 +169,7 @@ export class UserService {
     // every protected request, providing a second layer of
     // protection even if an access token remains valid.
     if (!request.isActive) {
-      const { error: signOutError } = await supabaseAdmin.auth.admin.signOut(
+      const { error: signOutError } = await this.clients.supabaseAdmin.auth.admin.signOut(
         id,
         "global",
       );
@@ -188,5 +189,3 @@ export class UserService {
     };
   }
 }
-
-export const userService = new UserService();

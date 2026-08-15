@@ -1,7 +1,25 @@
-import { supabaseAdmin } from "../../src/lib/supabase.ts";
+import type { User } from "@supabase/supabase-js";
+
+import { getDenoEnv } from "../../src/config/runtime.ts";
+import { loadEnv } from "../../src/config/env.ts";
+import { createSupabaseClients } from "../../src/lib/supabase.ts";
+
 import { TEST_USERS } from "../fixtures/test-users.ts";
 
-async function findAuthUser(email: string) {
+const env = loadEnv(getDenoEnv());
+
+const { supabaseAdmin } = createSupabaseClients(env);
+
+type TestUser = {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  newPassword?: string;
+};
+
+async function findAuthUser(email: string): Promise<User | undefined> {
   const { data, error } = await supabaseAdmin.auth.admin.listUsers();
 
   if (error) {
@@ -13,8 +31,7 @@ async function findAuthUser(email: string) {
   );
 }
 
-// deno-lint-ignore no-explicit-any
-async function ensureAuthUser(user: any) {
+async function ensureAuthUser(user: TestUser): Promise<User> {
   let authUser = await findAuthUser(user.email);
 
   if (!authUser) {
@@ -35,13 +52,16 @@ async function ensureAuthUser(user: any) {
 }
 
 async function upsertProfile(
-  // deno-lint-ignore no-explicit-any
-  user: any,
-  // deno-lint-ignore no-explicit-any
-  authUser: any,
+  user: TestUser,
+  authUser: User,
   mustChangePassword: boolean,
-) {
-  // If it's a first login user, update their auth password explicitly
+): Promise<void> {
+  /*
+   * Keep the first-login password deterministic.
+   *
+   * This is important because the same test users
+   * are reused between test runs.
+   */
   if (mustChangePassword) {
     const { error: passwordError } = await supabaseAdmin.auth.admin.updateUserById(authUser.id, {
       password: user.password,
@@ -74,21 +94,22 @@ async function upsertProfile(
   }
 }
 
-export async function setupTestUsers() {
-  const standardUsers = [
+export async function setupTestUsers(): Promise<void> {
+  const standardUsers: TestUser[] = [
     TEST_USERS.admin,
     TEST_USERS.student,
     TEST_USERS.coordinator,
   ];
 
-  // Setup standard users
   for (const userConfig of standardUsers) {
     const authUser = await ensureAuthUser(userConfig);
+
     await upsertProfile(userConfig, authUser, false);
   }
 
-  // Setup first-login user separately due to password/flag requirements
-  const firstLoginConfig = TEST_USERS.firstLogin;
+  const firstLoginConfig: TestUser = TEST_USERS.firstLogin;
+
   const firstLoginAuthUser = await ensureAuthUser(firstLoginConfig);
+
   await upsertProfile(firstLoginConfig, firstLoginAuthUser, true);
 }

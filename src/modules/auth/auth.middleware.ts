@@ -1,10 +1,20 @@
 import type { Context, Next } from "hono";
-
-import { supabaseAdmin, supabaseClient } from "../../lib/supabase.ts";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { AppError } from "../../errors/app-error.ts";
+import type { AppVariables } from "../../types/context.ts";
 
-export async function requireAuth(c: Context, next: Next) {
+export async function requireAuth(
+  c: Context<{
+    Variables: AppVariables & { user?: { id: string; email?: string | null } };
+    // allow setting a 'user' key on the context bindings
+    Bindings: {
+      // supabase binding provides both the regular client and an admin client
+      supabase: { supabaseClient: SupabaseClient; supabaseAdmin: SupabaseClient };
+    };
+  }>,
+  next: Next,
+) {
   const authorization = c.req.header("Authorization");
 
   if (!authorization) {
@@ -16,6 +26,8 @@ export async function requireAuth(c: Context, next: Next) {
   if (!token) {
     throw new AppError(401, "Invalid authorization header.");
   }
+
+  const { supabaseClient, supabaseAdmin } = c.get("supabase");
 
   const { data, error } = await supabaseClient.auth.getUser(token);
 

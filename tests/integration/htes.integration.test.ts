@@ -1,9 +1,16 @@
 import { assertEquals, assertExists } from "@std/assert";
 
-import { app } from "../../src/app.ts";
+import { createApp } from "../../src/app.ts";
 
 import { setupTestUsers } from "../helpers/test-user.setup.ts";
 import { TEST_USERS } from "../fixtures/test-users.ts";
+
+import { loadEnv } from "../../src/config/env.ts";
+import { getDenoEnv } from "../../src/config/runtime.ts";
+
+const env = loadEnv(getDenoEnv());
+
+const app = createApp(env);
 
 async function login(
   email: string = TEST_USERS.admin.email,

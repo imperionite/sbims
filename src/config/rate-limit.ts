@@ -1,31 +1,22 @@
 export const rateLimitConfig = {
   /**
-   * Login protection
+   * Login protection.
    *
-   * Goal:
-   * Prevent password guessing attacks.
-   *
-   * Normal user:
-   * - Few attempts per minute.
-   *
-   * Load testing:
-   * Disable globally.
-   * 5 attempts per minute per IP
+   * Prevents password guessing attacks.
    */
   login: {
     name: "login",
     windowMs: 60_000,
-    maxRequests: 5,
+    maxRequests: 7,
   },
 
   /**
-   * Forgot password
+   * Forgot-password protection.
    *
-   * Protects:
-   * - Email abuse
-   * - Reset email flooding
-   * - Enumeration attempts
-   * 3 attempts per minute per IP
+   * Helps prevent:
+   * - email abuse
+   * - reset-email flooding
+   * - enumeration attempts
    */
   forgotPassword: {
     name: "forgot-password",
@@ -34,17 +25,17 @@ export const rateLimitConfig = {
   },
 
   /**
-   * Reset password
+   * Password reset completion.
    *
-   * Requires valid token,
-   * therefore slightly relaxed.
-   * 10 attempts per minute per IP
+   * Requires a valid reset token, so this
+   * can be slightly more relaxed.
    */
   completePasswordReset: {
     name: "reset-password-complete",
     windowMs: 60_000,
     maxRequests: 10,
   },
+
   /**
    * Authenticated password change.
    */
@@ -64,11 +55,11 @@ export const rateLimitConfig = {
   },
 
   /**
-   * Logout is low risk.
+   * Logout.
    */
   logout: {
     name: "logout",
     windowMs: 60_000,
     maxRequests: 30,
   },
-};
+} as const;

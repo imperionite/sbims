@@ -1,9 +1,11 @@
 import { assertEquals } from "@std/assert";
 import { Hono } from "hono";
 
-import { requireRole } from "../../../src/modules/auth/role.middleware.ts";
-import { supabaseAdmin } from "../../../src/lib/supabase.ts";
+import type { SupabaseClients } from "../../../src/lib/supabase.ts";
+import type { AppVariables } from "../../../src/types/context.ts";
+
 import { AuthRole } from "../../../src/modules/auth/auth.types.ts";
+import { requireRole } from "../../../src/modules/auth/role.middleware.ts";
 
 const testUserId = "11111111-1111-1111-1111-111111111111";
 
@@ -13,31 +15,72 @@ type TestUser = {
 };
 
 type MockRoleOptions = {
-  role?: string | null;
-  error?: unknown;
-  capturedUserId?: { value: string | null };
+  role?: AuthRole | null;
+  profileError?: unknown;
+  capturedUserId?: {
+    value: string | null;
+  };
 };
 
+function createMockSupabase({
+  role = null,
+  profileError = null,
+  capturedUserId,
+}: MockRoleOptions = {}): SupabaseClients {
+  const query = {
+    select() {
+      return query;
+    },
+
+    eq(column: string, value: string) {
+      if (column === "id" && capturedUserId) {
+        capturedUserId.value = value;
+      }
+
+      return query;
+    },
+
+    single() {
+      return Promise.resolve({
+        data: role ? { role } : null,
+        error: profileError,
+      });
+    },
+  };
+
+  return {
+    supabaseClient: {} as SupabaseClients["supabaseClient"],
+
+    supabaseAdmin: {
+      from() {
+        return query;
+      },
+    } as unknown as SupabaseClients["supabaseAdmin"],
+
+    createAuthenticatedClient: () => ({}) as SupabaseClients["supabaseClient"],
+
+    createPublicClient: () => ({}) as SupabaseClients["supabaseClient"],
+  };
+}
+
 function createApp(
-  user: TestUser = {
+  supabase: SupabaseClients,
+  user: TestUser | null = {
     id: testUserId,
-    email: "[test@sbims.com](mailto:test@sbims.com)",
+    email: "test@sbims.com",
   },
 ) {
   const app = new Hono<{
-    Variables: {
-      user: TestUser;
-      userRole: string;
-    };
+    Variables: AppVariables;
   }>();
 
-  app.onError((err, c) => {
-    if ("status" in err) {
+  app.onError((error, c) => {
+    if ("status" in error) {
       return c.json(
         {
-          message: err.message,
+          message: error.message,
         },
-        err.status as 400 | 401 | 403 | 404 | 500,
+        error.status as 400 | 401 | 403 | 404 | 500,
       );
     }
 
@@ -50,194 +93,174 @@ function createApp(
   });
 
   app.use("*", async (c, next) => {
-    c.set("user", user);
+    c.set("supabase", supabase);
+
+    if (user !== null) {
+      c.set("user", user);
+    }
+
     await next();
   });
 
   return app;
 }
 
-function mockSupabaseRole({
-  role = null,
-  error = null,
-  capturedUserId,
-}: MockRoleOptions = {}) {
-  return (() => ({
-    select() {
-      return this;
-    },
-
-    eq(column: string, value: string) {
-      if (column === "id" && capturedUserId) {
-        capturedUserId.value = value;
-      }
-
-      return this;
-    },
-
-    single() {
-      return Promise.resolve({
-        data: role ? { role } : null,
-        error,
-      });
-    },
-  })) as unknown as typeof supabaseAdmin.from;
-}
-
 async function requestWithRole(
-  actualRole: string | null,
+  actualRole: AuthRole | null,
   requiredRole: AuthRole = "administrator",
-  error: unknown = null,
+  options: {
+    user?: TestUser | null;
+    profileError?: unknown;
+  } = {},
 ) {
-  const originalFrom = supabaseAdmin.from;
-
   const capturedUserId = {
     value: null as string | null,
   };
 
-  supabaseAdmin.from = mockSupabaseRole({
+  const supabase = createMockSupabase({
     role: actualRole,
-    error,
+    profileError: options.profileError,
     capturedUserId,
   });
 
-  try {
-    const app = createApp();
+  const app = createApp(
+    supabase,
+    options.user === undefined
+      ? {
+        id: testUserId,
+        email: "test@sbims.com",
+      }
+      : options.user,
+  );
 
-    let nextCalled = false;
+  let handlerCalled = false;
 
-    // deno-lint-ignore require-await
-    app.get("/", requireRole(requiredRole), async (c) => {
-      nextCalled = true;
+  app.get("/", requireRole(requiredRole), (c) => {
+    handlerCalled = true;
 
-      return c.json({
-        success: true,
-      });
+    return c.json({
+      success: true,
+    });
+  });
+
+  const response = await app.request("/");
+
+  return {
+    response,
+    handlerCalled,
+    queriedUserId: capturedUserId.value,
+  };
+}
+
+Deno.test(
+  "requireRole rejects request without authenticated user",
+  async () => {
+    const result = await requestWithRole("administrator", "administrator", {
+      user: null,
     });
 
-    const response = await app.request("/");
-
-    return {
-      response,
-      nextCalled,
-      queriedUserId: capturedUserId.value,
-    };
-  } finally {
-    supabaseAdmin.from = originalFrom;
-  }
-}
+    assertEquals(result.response.status, 401);
+    assertEquals(result.handlerCalled, false);
+    assertEquals(result.queriedUserId, null);
+  },
+);
 
 Deno.test("requireRole allows user with matching role", async () => {
   const result = await requestWithRole("administrator");
 
   assertEquals(result.response.status, 200);
-  assertEquals(result.nextCalled, true);
+  assertEquals(result.handlerCalled, true);
 });
 
 Deno.test("requireRole rejects user with different role", async () => {
   const result = await requestWithRole("student");
 
   assertEquals(result.response.status, 403);
-  assertEquals(result.nextCalled, false);
+  assertEquals(result.handlerCalled, false);
 });
 
 Deno.test("requireRole rejects user when profile does not exist", async () => {
-  const result = await requestWithRole(null, "administrator", null);
+  const result = await requestWithRole(null);
 
   assertEquals(result.response.status, 404);
-  assertEquals(result.nextCalled, false);
+  assertEquals(result.handlerCalled, false);
 });
 
-Deno.test("requireRole queries the authenticated user's id", async () => {
-  const result = await requestWithRole("administrator");
+Deno.test(
+  "requireRole uses the authenticated user's id for role lookup",
+  async () => {
+    const user = {
+      id: "22222222-2222-2222-2222-222222222222",
+      email: "another@sbims.com",
+    };
 
-  assertEquals(result.queriedUserId, testUserId);
-});
+    const result = await requestWithRole("administrator", "administrator", {
+      user,
+    });
 
-Deno.test("requireRole supports different required roles", async () => {
+    assertEquals(result.response.status, 200);
+    assertEquals(result.queriedUserId, user.id);
+  },
+);
+
+Deno.test("requireRole allows every defined authentication role", async () => {
   const roles: AuthRole[] = [
     "administrator",
     "internship_coordinator",
     "faculty_adviser",
     "student",
+    "hte_supervisor",
   ];
 
   for (const role of roles) {
     const result = await requestWithRole(role, role);
 
     assertEquals(result.response.status, 200);
-    assertEquals(result.nextCalled, true);
+    assertEquals(result.handlerCalled, true);
   }
 });
 
 Deno.test(
-  "requireRole rejects the same user when role does not match",
+  "requireRole rejects the authenticated user when role does not match",
   async () => {
     const result = await requestWithRole("student", "faculty_adviser");
 
     assertEquals(result.response.status, 403);
-    assertEquals(result.nextCalled, false);
+    assertEquals(result.handlerCalled, false);
     assertEquals(result.queriedUserId, testUserId);
   },
 );
 
 Deno.test(
-  "requireRole does not execute protected handler when unauthorized",
+  "requireRole sets the authenticated user's role in context",
   async () => {
-    const originalFrom = supabaseAdmin.from;
-
-    supabaseAdmin.from = mockSupabaseRole({
-      role: "student",
+    const supabase = createMockSupabase({
+      role: "administrator",
     });
 
-    try {
-      const app = createApp();
-
-      let protectedHandlerCalled = false;
-
-      app.get("/", requireRole("administrator"), (c) => {
-        protectedHandlerCalled = true;
-
-        return c.json({
-          success: true,
-        });
-      });
-
-      const response = await app.request("/");
-
-      assertEquals(response.status, 403);
-      assertEquals(protectedHandlerCalled, false);
-    } finally {
-      supabaseAdmin.from = originalFrom;
-    }
-  },
-);
-
-Deno.test("requireRole allows protected handler when authorized", async () => {
-  const originalFrom = supabaseAdmin.from;
-
-  supabaseAdmin.from = mockSupabaseRole({
-    role: "administrator",
-  });
-
-  try {
-    const app = createApp();
-
-    let protectedHandlerCalled = false;
+    const app = createApp(supabase);
 
     app.get("/", requireRole("administrator"), (c) => {
-      protectedHandlerCalled = true;
-
       return c.json({
-        success: true,
+        role: c.get("userRole"),
       });
     });
 
     const response = await app.request("/");
 
     assertEquals(response.status, 200);
-    assertEquals(protectedHandlerCalled, true);
-  } finally {
-    supabaseAdmin.from = originalFrom;
-  }
-});
+    assertEquals(await response.json(), {
+      role: "administrator",
+    });
+  },
+);
+
+Deno.test(
+  "requireRole does not execute protected handler when unauthorized",
+  async () => {
+    const result = await requestWithRole("student", "administrator");
+
+    assertEquals(result.response.status, 403);
+    assertEquals(result.handlerCalled, false);
+  },
+);

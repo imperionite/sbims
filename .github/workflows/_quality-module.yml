@@ -20,6 +20,12 @@ on:
         default: ""
         type: string
 
+      smoke_task:
+        description: "External smoke-test task. Optional for pipelines without smoke tests."
+        required: false
+        default: ""
+        type: string
+
     secrets:
       SUPABASE_URL:
         required: true
@@ -29,6 +35,12 @@ on:
 
       SUPABASE_SECRET_KEY:
         required: true
+
+      UPSTASH_REDIS_REST_URL:
+        required: false
+
+      UPSTASH_REDIS_REST_TOKEN:
+        required: false
 
 permissions:
   contents: read
@@ -62,14 +74,12 @@ jobs:
       # ============================================
       # CHECKOUT
       # ============================================
-
       - name: Checkout Repository
         uses: actions/checkout@v5
 
       # ============================================
       # DENO SETUP
       # ============================================
-
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
@@ -92,7 +102,6 @@ jobs:
       # ============================================
       # FORMAT
       # ============================================
-
       - name: Format Check
         run: |
           START=$(date +%s)
@@ -106,7 +115,6 @@ jobs:
       # ============================================
       # LINT
       # ============================================
-
       - name: Lint Check
         run: |
           START=$(date +%s)
@@ -120,7 +128,6 @@ jobs:
       # ============================================
       # TYPE CHECK
       # ============================================
-
       - name: Type Check
         run: |
           START=$(date +%s)
@@ -134,7 +141,6 @@ jobs:
       # ============================================
       # UNIT TESTS
       # ============================================
-
       - name: Unit Tests (${{ inputs.module }})
         if: ${{ inputs.unit_task != '' }}
         run: |
@@ -149,7 +155,6 @@ jobs:
       # ============================================
       # INTEGRATION TESTS
       # ============================================
-
       - name: Integration Tests (${{ inputs.module }})
         if: ${{ inputs.integration_task != '' }}
         run: |
@@ -162,9 +167,26 @@ jobs:
           echo "INTEGRATION_TIME=$((END-START))s" >> "$GITHUB_ENV"
 
       # ============================================
+      # EXTERNAL SMOKE TESTS
+      # ============================================
+      - name: Smoke Tests (${{ inputs.module }})
+        if: ${{ inputs.smoke_task != '' }}
+        env:
+          RATE_LIMIT_ENABLED: true
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+        run: |
+          START=$(date +%s)
+
+          deno task "${{ inputs.smoke_task }}"
+
+          END=$(date +%s)
+
+          echo "SMOKE_TIME=$((END-START))s" >> "$GITHUB_ENV"
+
+      # ============================================
       # FINAL REPORT
       # ============================================
-
       - name: SBIMS Quality Gate Report
         if: always()
         run: |
@@ -219,6 +241,12 @@ jobs:
             echo "Integration Tests     NOT RUN"
           fi
 
+          if [ -n "${SMOKE_TIME:-}" ]; then
+            echo "Smoke Tests           ${SMOKE_TIME}"
+          else
+            echo "Smoke Tests           NOT RUN"
+          fi
+
           echo ""
           echo "----------------------------------------------------------------------"
           echo "Total CI Duration : ${TOTAL}s"
@@ -237,7 +265,9 @@ jobs:
             echo "Quality Gate Passed"
             echo "Module : ${{ inputs.module }}"
 
-            if [ -z "${UNIT_TIME:-}" ] && [ -z "${INTEGRATION_TIME:-}" ]; then
+            if [ -z "${UNIT_TIME:-}" ] && \
+               [ -z "${INTEGRATION_TIME:-}" ] && \
+               [ -z "${SMOKE_TIME:-}" ]; then
               echo "Tests  : Not configured"
             else
               echo "Tests  : Configured"

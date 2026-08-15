@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "../../lib/supabase.ts";
+import type { SupabaseClients } from "../../lib/supabase.ts";
 import { AppError } from "../../errors/app-error.ts";
 
 import type {
@@ -38,7 +38,8 @@ function calculateRenderedHours(timeIn: string, timeOut: string): number {
   return renderedMinutes / 60;
 }
 
-class AttendanceService {
+export class AttendanceService {
+  constructor(private readonly clients: SupabaseClients) {}
   /**
    * POST /attendance
    *
@@ -56,7 +57,7 @@ class AttendanceService {
 
     // Verify that the internship belongs to the authenticated student
     // and is currently active.
-    const { data: internship, error: internshipError } = await supabaseAdmin
+    const { data: internship, error: internshipError } = await this.clients.supabaseAdmin
       .from("internships")
       .select("id, student_id, status")
       .eq("id", internship_id)
@@ -81,7 +82,7 @@ class AttendanceService {
     }
 
     // Enforce one attendance record per internship per day.
-    const { data: existingAttendance, error: existingError } = await supabaseAdmin
+    const { data: existingAttendance, error: existingError } = await this.clients.supabaseAdmin
       .from("attendance_records")
       .select("id")
       .eq("internship_id", internship_id)
@@ -99,7 +100,7 @@ class AttendanceService {
     }
 
     // Create the attendance record.
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("attendance_records")
       .insert({
         internship_id,
@@ -132,7 +133,7 @@ class AttendanceService {
    * Retrieves a single attendance record.
    */
   async getAttendanceById(attendanceId: string): Promise<AttendanceRecord> {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("attendance_records")
       .select("*")
       .eq("id", attendanceId)
@@ -151,7 +152,7 @@ class AttendanceService {
    * Student retrieves their own attendance.
    */
   async getMyAttendance(userId: string): Promise<AttendanceRecord[]> {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("attendance_records")
       .select(
         `
@@ -172,11 +173,17 @@ class AttendanceService {
       throw new AppError(500, "Failed to retrieve attendance records.");
     }
 
-    return (data ?? []).map((record) => {
-      const { internships: _, ...attendance } = record;
+    return (data ?? []).map(
+      (
+        record: AttendanceRecord & {
+          internships?: unknown;
+        },
+      ) => {
+        const { internships: _, ...attendance } = record;
 
-      return attendance as AttendanceRecord;
-    });
+        return attendance;
+      },
+    );
   }
 
   /**
@@ -187,7 +194,7 @@ class AttendanceService {
   async getAttendanceByInternship(
     internshipId: string,
   ): Promise<AttendanceRecord[]> {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("attendance_records")
       .select("*")
       .eq("internship_id", internshipId)
@@ -227,7 +234,7 @@ class AttendanceService {
 
     // Verify that the authenticated validator is
     // an active internship coordinator.
-    const { data: coordinator, error: coordinatorError } = await supabaseAdmin
+    const { data: coordinator, error: coordinatorError } = await this.clients.supabaseAdmin
       .from("profiles")
       .select("id, role, is_active")
       .eq("id", coordinatorId)
@@ -245,7 +252,7 @@ class AttendanceService {
       );
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("attendance_records")
       .update({
         validation_status: status,
@@ -302,7 +309,7 @@ class AttendanceService {
 
     // Verify that the attendance belongs to the
     // authenticated student's internship.
-    const { data: internship, error: internshipError } = await supabaseAdmin
+    const { data: internship, error: internshipError } = await this.clients.supabaseAdmin
       .from("internships")
       .select("id, student_id, status")
       .eq("id", attendance.internship_id)
@@ -334,7 +341,7 @@ class AttendanceService {
 
     // Prevent changing the date to one that already
     // has another attendance record.
-    const { data: duplicate, error: duplicateError } = await supabaseAdmin
+    const { data: duplicate, error: duplicateError } = await this.clients.supabaseAdmin
       .from("attendance_records")
       .select("id")
       .eq("internship_id", attendance.internship_id)
@@ -352,7 +359,7 @@ class AttendanceService {
       throw new AppError(409, "Attendance for this date already exists.");
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("attendance_records")
       .update({
         attendance_date: attendanceDate,
@@ -372,7 +379,5 @@ class AttendanceService {
     return data as AttendanceRecord;
   }
 }
-
-export const attendanceService = new AttendanceService();
 
 export { calculateRenderedHours };

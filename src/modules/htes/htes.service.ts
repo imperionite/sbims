@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "../../lib/supabase.ts";
+import type { SupabaseClients } from "../../lib/supabase.ts";
 import { AppError } from "../../errors/app-error.ts";
 
 import type { CreateHTERequest, UpdateHTERequest, UpdateHTEStatusRequest } from "./htes.types.ts";
@@ -17,8 +17,9 @@ const HTE_SELECT = `
 `;
 
 export class HteService {
+  constructor(private readonly clients: SupabaseClients) {}
   async listHtes() {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("hte_profiles")
       .select(HTE_SELECT)
       .order("created_at", {
@@ -33,7 +34,7 @@ export class HteService {
   }
 
   async getHte(id: string) {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("hte_profiles")
       .select(HTE_SELECT)
       .eq("id", id)
@@ -51,7 +52,7 @@ export class HteService {
   }
 
   async createHte(request: CreateHTERequest) {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("hte_profiles")
       .insert({
         company_name: request.companyName,
@@ -100,7 +101,7 @@ export class HteService {
       throw new AppError(400, "At least one HTE profile field is required.");
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("hte_profiles")
       .update(updateData)
       .eq("id", id)
@@ -119,7 +120,7 @@ export class HteService {
   }
 
   async updateStatus(id: string, request: UpdateHTEStatusRequest) {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("hte_profiles")
       .update({
         is_active: request.isActive,
@@ -141,7 +142,7 @@ export class HteService {
 
   async assignSupervisor(id: string, supervisorId: string | null) {
     if (supervisorId !== null) {
-      const { data: supervisor, error: supervisorError } = await supabaseAdmin
+      const { data: supervisor, error: supervisorError } = await this.clients.supabaseAdmin
         .from("profiles")
         .select("id, role, is_active")
         .eq("id", supervisorId)
@@ -167,7 +168,7 @@ export class HteService {
       }
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("hte_profiles")
       .update({
         supervisor_id: supervisorId,
@@ -187,5 +188,3 @@ export class HteService {
     return data;
   }
 }
-
-export const hteService = new HteService();

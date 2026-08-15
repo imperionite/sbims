@@ -1,10 +1,12 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 
+import type { AppVariables } from "../../types/context.ts";
+
 import { AppError } from "../../errors/app-error.ts";
+
 import { requireAuth } from "../auth/auth.middleware.ts";
 import { requireRole } from "../auth/role.middleware.ts";
-import type { AuthRole } from "../auth/auth.types.ts";
 
 import {
   attendanceValidationSchema,
@@ -12,20 +14,10 @@ import {
   updateAttendanceSchema,
 } from "./attendance.schema.ts";
 
-import { attendanceService } from "./attendance.service.ts";
-
-type AttendanceUser = {
-  id: string;
-  email?: string;
-};
-
-type AttendanceVariables = {
-  user: AttendanceUser;
-  userRole: AuthRole;
-};
+import { AttendanceService } from "./attendance.service.ts";
 
 const attendance = new Hono<{
-  Variables: AttendanceVariables;
+  Variables: AppVariables;
 }>();
 
 attendance.use("*", requireAuth);
@@ -41,14 +33,12 @@ attendance.post(
   requireRole("student"),
   zValidator("json", createAttendanceSchema),
   async (c) => {
-    const user = c.get("user");
+    const attendanceService = new AttendanceService(c.get("supabase"));
 
+    const user = c.get("user");
     const body = c.req.valid("json");
 
-    const result = await attendanceService.createAttendance(
-      user.id,
-      body,
-    );
+    const result = await attendanceService.createAttendance(user.id, body);
 
     return c.json(
       {
@@ -65,22 +55,18 @@ attendance.post(
  *
  * Student retrieves their own attendance.
  */
-attendance.get(
-  "/me",
-  requireRole("student"),
-  async (c) => {
-    const user = c.get("user");
+attendance.get("/me", requireRole("student"), async (c) => {
+  const attendanceService = new AttendanceService(c.get("supabase"));
 
-    const result = await attendanceService.getMyAttendance(
-      user.id,
-    );
+  const user = c.get("user");
 
-    return c.json({
-      success: true,
-      data: result,
-    });
-  },
-);
+  const result = await attendanceService.getMyAttendance(user.id);
+
+  return c.json({
+    success: true,
+    data: result,
+  });
+});
 
 /**
  * GET /attendance/internship/:internshipId
@@ -90,23 +76,17 @@ attendance.get(
  */
 attendance.get(
   "/internship/:internshipId",
-  requireRole(
-    "student",
-    "internship_coordinator",
-  ),
+  requireRole("student", "internship_coordinator"),
   async (c) => {
+    const attendanceService = new AttendanceService(c.get("supabase"));
+
     const internshipId = c.req.param("internshipId");
 
     if (!internshipId) {
-      throw new AppError(
-        400,
-        "Internship ID is required.",
-      );
+      throw new AppError(400, "Internship ID is required.");
     }
 
-    const result = await attendanceService.getAttendanceByInternship(
-      internshipId,
-    );
+    const result = await attendanceService.getAttendanceByInternship(internshipId);
 
     return c.json({
       success: true,
@@ -123,23 +103,17 @@ attendance.get(
  */
 attendance.get(
   "/internship/:internshipId/rendered-hours",
-  requireRole(
-    "student",
-    "internship_coordinator",
-  ),
+  requireRole("student", "internship_coordinator"),
   async (c) => {
+    const attendanceService = new AttendanceService(c.get("supabase"));
+
     const internshipId = c.req.param("internshipId");
 
     if (!internshipId) {
-      throw new AppError(
-        400,
-        "Internship ID is required.",
-      );
+      throw new AppError(400, "Internship ID is required.");
     }
 
-    const totalHours = await attendanceService.getRenderedHours(
-      internshipId,
-    );
+    const totalHours = await attendanceService.getRenderedHours(internshipId);
 
     return c.json({
       success: true,
@@ -159,23 +133,17 @@ attendance.get(
  */
 attendance.get(
   "/:id",
-  requireRole(
-    "student",
-    "internship_coordinator",
-  ),
+  requireRole("student", "internship_coordinator"),
   async (c) => {
+    const attendanceService = new AttendanceService(c.get("supabase"));
+
     const id = c.req.param("id");
 
     if (!id) {
-      throw new AppError(
-        400,
-        "Attendance ID is required.",
-      );
+      throw new AppError(400, "Attendance ID is required.");
     }
 
-    const result = await attendanceService.getAttendanceById(
-      id,
-    );
+    const result = await attendanceService.getAttendanceById(id);
 
     return c.json({
       success: true,
@@ -193,29 +161,20 @@ attendance.get(
 attendance.patch(
   "/:id",
   requireRole("student"),
-  zValidator(
-    "json",
-    updateAttendanceSchema,
-  ),
+  zValidator("json", updateAttendanceSchema),
   async (c) => {
-    const user = c.get("user");
+    const attendanceService = new AttendanceService(c.get("supabase"));
 
+    const user = c.get("user");
     const id = c.req.param("id");
 
     if (!id) {
-      throw new AppError(
-        400,
-        "Attendance ID is required.",
-      );
+      throw new AppError(400, "Attendance ID is required.");
     }
 
     const body = c.req.valid("json");
 
-    const result = await attendanceService.updateAttendance(
-      id,
-      user.id,
-      body,
-    );
+    const result = await attendanceService.updateAttendance(id, user.id, body);
 
     return c.json({
       success: true,
@@ -232,23 +191,16 @@ attendance.patch(
  */
 attendance.patch(
   "/:id/validation",
-  requireRole(
-    "internship_coordinator",
-  ),
-  zValidator(
-    "json",
-    attendanceValidationSchema,
-  ),
+  requireRole("internship_coordinator"),
+  zValidator("json", attendanceValidationSchema),
   async (c) => {
-    const user = c.get("user");
+    const attendanceService = new AttendanceService(c.get("supabase"));
 
+    const user = c.get("user");
     const id = c.req.param("id");
 
     if (!id) {
-      throw new AppError(
-        400,
-        "Attendance ID is required.",
-      );
+      throw new AppError(400, "Attendance ID is required.");
     }
 
     const body = c.req.valid("json");

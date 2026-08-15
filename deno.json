@@ -3,6 +3,7 @@
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.19",
     "@std/testing": "jsr:@std/testing@^1.0.20",
+    "@upstash/redis": "npm:@upstash/redis@^1.38.2",
     "hono": "npm:hono@^4.12.32",
     "@hono/zod-validator": "npm:@hono/zod-validator@^0.4.3",
     "zod": "npm:zod@^3.25.0",
@@ -28,6 +29,9 @@
     "test:unit:students": "deno test --env-file=.env.test tests/unit/students/students.service.test.ts --allow-read --allow-env --allow-net",
     "test:unit:internships": "deno test --env-file=.env.test tests/unit/internships/internships.service.test.ts --allow-read --allow-env --allow-net",
     "test:unit:attendance": "deno test --env-file=.env.test tests/unit/attendance/attendance.service.test.ts --allow-read --allow-env --allow-net",
+    "test:unit:infrastructure:rate-limit": "deno test --env-file=.env.test tests/unit/infrastructure/noop-rate-limit.store.test.ts --allow-read --allow-env --allow-net",
+    "test:unit:middleware:rate-limit": "deno test --env-file=.env.test tests/unit/middleware/rate-limit.middleware.test.ts --allow-read --allow-env --allow-net",
+    "test:smoke:upstash": "deno test --env-file=.env tests/smoke/upstash-redis.smoke.test.ts --allow-read --allow-env --allow-net",
     "test:integration": "deno test --env-file=.env.test tests/integration --allow-read --allow-env --allow-net",
     "test:integration:auth": "deno test --env-file=.env.test tests/integration/auth.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:users": "deno test --env-file=.env.test tests/integration/users.integration.test.ts --allow-read --allow-env --allow-net",

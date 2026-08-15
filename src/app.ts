@@ -1,49 +1,64 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { logger as honologger } from "hono/logger";
-import { loadEnv } from "./config/env.ts";
-import { logger as appLogger } from "./shared/logger.ts";
+import { logger as honoLogger } from "hono/logger";
 
-import api from "./routes/index.ts";
+import type { AppConfig } from "./config/env.ts";
+import { createSupabaseClients } from "./lib/supabase.ts";
+
+import { createApiRoutes } from "./routes/index.ts";
+import { createRateLimitStore } from "./infrastructure/rate-limit/create-rate-limit.store.ts";
 
 import { AppError } from "./errors/app-error.ts";
-
 import { failure } from "./shared/response.ts";
+import { logger as appLogger } from "./shared/logger.ts";
 
-export const app = new Hono();
+import type { AppVariables } from "./types/context.ts";
 
-const env = loadEnv();
+export function createApp(env: AppConfig) {
+  const app = new Hono<{
+    Variables: AppVariables;
+  }>();
 
-app.use("*", honologger());
+  const supabase = createSupabaseClients(env);
+  const rateLimitStore = createRateLimitStore(env);
 
-app.use(
-  "*",
-  cors({
-    origin: env.ALLOWED_ORIGINS,
+  app.use("*", async (c, next) => {
+    c.set("supabase", supabase);
+    await next();
+  });
 
-    credentials: true,
-  }),
-);
+  app.use("*", honoLogger());
 
-app.route("/api/v1", api);
-
-app.notFound((c) => {
-  return c.json(
-    failure("Endpoint not found", [
-      {
-        path: c.req.path,
-      },
-    ]),
-    404,
+  app.use(
+    "*",
+    cors({
+      origin: env.ALLOWED_ORIGINS,
+      credentials: true,
+    }),
   );
-});
 
-app.onError((error, c) => {
-  if (error instanceof AppError) {
-    return c.json(failure(error.message), error.status);
-  }
+  app.route("/api/v1", createApiRoutes(env.FRONTEND_URL, rateLimitStore));
 
-  appLogger.error("Unhandled application error", error);
+  app.notFound((c) => {
+    return c.json(
+      failure("Endpoint not found", [
+        {
+          path: c.req.path,
+        },
+      ]),
+      404,
+    );
+  });
 
-  return c.json(failure("Internal server error"), 500);
-});
+  app.onError((error, c) => {
+    if (error instanceof AppError) {
+      return c.json(failure(error.message), error.status);
+    }
+
+    appLogger.error("Unhandled application error", error);
+
+    return c.json(failure("Internal server error"), 500);
+  });
+
+  return app;
+}

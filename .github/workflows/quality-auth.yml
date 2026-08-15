@@ -15,5 +15,6 @@ jobs:
       module: auth
       unit_task: test:unit:auth
       integration_task: test:integration:auth
+      smoke_task: test:smoke:upstash
 
     secrets: inherit

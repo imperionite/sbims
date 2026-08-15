@@ -19,6 +19,7 @@
     "npm:@supabase/realtime-js@2.112.2": "2.112.2",
     "npm:@supabase/storage-js@2.112.2": "2.112.2",
     "npm:@supabase/supabase-js@^2.49.0": "2.111.0",
+    "npm:@upstash/redis@^1.38.2": "1.38.2",
     "npm:hono-rate-limiter@*": "0.5.3_hono@4.12.32",
     "npm:hono@^4.12.32": "4.12.32",
     "npm:zod@^3.25.0": "3.25.76"
@@ -158,6 +159,12 @@
         "@supabase/storage-js@2.111.0"
       ]
     },
+    "@upstash/redis@1.38.2": {
+      "integrity": "sha512-RZ+JaRCVIS+ZTGnjOnDMr+/0aqDxsBb5rV6aW+Pys4SGELwr5lwE3UbLHRCHqMQ5Ulxj0b/CFBHfbmE175Otog==",
+      "dependencies": [
+        "uncrypto"
+      ]
+    },
     "hono-rate-limiter@0.5.3_hono@4.12.32": {
       "integrity": "sha512-M0DxbVMpPELEzLi0AJg1XyBHLGJXz7GySjsPoK+gc5YeeBsdGDGe+2RvVuCAv8ydINiwlbxqYMNxUEyYfRji/A==",
       "dependencies": [
@@ -173,6 +180,9 @@
     "tslib@2.8.1": {
       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="
     },
+    "uncrypto@0.1.3": {
+      "integrity": "sha512-Ql87qFHB3s/De2ClA9e0gsnS6zXG27SkTiSJwjCc9MebbfapQfuPzumMIUMi38ezPZVNFcHI9sUIepeQfw8J8Q=="
+    },
     "zod@3.25.76": {
       "integrity": "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="
     }
@@ -184,6 +194,7 @@
       "jsr:@std/testing@^1.0.20",
       "npm:@hono/zod-validator@~0.4.3",
       "npm:@supabase/supabase-js@^2.49.0",
+      "npm:@upstash/redis@^1.38.2",
       "npm:hono-rate-limiter@*",
       "npm:hono@^4.12.32",
       "npm:zod@^3.25.0"
