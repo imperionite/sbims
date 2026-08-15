@@ -1,0 +1,14 @@
+ENVIRONMENT=development
+
+SUPABASE_URL=supabase_url
+SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
+SUPABASE_SECRET_KEY=supabase_secret_key
+
+UPSTASH_REDIS_REST_URL=upstash_url
+UPSTASH_REDIS_REST_TOKEN=upstash_token
+
+ALLOWED_ORIGINS=http://localhost:5173
+FRONTEND_URL=http://localhost:5173
+
+RATE_LIMIT_ENABLED=true
+PORT=8787

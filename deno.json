@@ -52,7 +52,8 @@
     }
   },
   "exclude": [
-    "k6/"
+    "k6/",
+    "worker-configuration.d.ts"
   ],
   "compilerOptions": {
     "strict": true
