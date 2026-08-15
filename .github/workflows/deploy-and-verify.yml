@@ -21,19 +21,21 @@ env:
   DENO_APP: "sbims-dev"
   DENO_HEALTH_URL: "https://sbims-dev.imperionite.deno.net/api/v1/health"
 
-  CLOUDFLARE_HEALTH_URL: "https://sbims.lr-aimperial.workers.dev/api/v1/health"
+  CLOUDFLARE_HEALTH_URL: "https://YOUR-WORKER-NAME.workers.dev/api/v1/health"
 
 jobs:
 
   # ============================================================
   # QUALITY VERIFICATION
   # ============================================================
+
   quality:
     name: SBIMS Pre-Deployment Quality Verification
     uses: ./.github/workflows/_quality-module.yml
     with:
       module: deployment-verification
     secrets: inherit
+
 
   # ============================================================
   # DEPLOY TO DENO DEPLOY
@@ -57,7 +59,6 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ env.DENO_VERSION }}
-          cache: true
 
       - id: deno-step
         name: Deploy to Deno Deploy
@@ -92,14 +93,13 @@ jobs:
           MAX_ATTEMPTS=12
           ATTEMPT=1
 
-          echo "Checking Deno deployment health..."
+          echo "Checking deployment health..."
           echo "Health URL: ${DENO_HEALTH_URL}"
 
           while [ "$ATTEMPT" -le "$MAX_ATTEMPTS" ]; do
 
             STATUS=$(curl \
               --silent \
-              --show-error \
               --output /dev/null \
               --write-out "%{http_code}" \
               "$DENO_HEALTH_URL")
@@ -123,11 +123,12 @@ jobs:
 
           done
 
+
   # ============================================================
   # DEPLOY TO CLOUDFLARE WORKERS
   # ============================================================
 
-  deploy-cloudflare:
+    deploy-cloudflare:
     name: Deploy SBIMS to Cloudflare Workers
     needs: quality
     runs-on: ubuntu-latest
@@ -168,7 +169,7 @@ jobs:
             exit 1
           fi
 
-          echo "Deploying SBIMS to Cloudflare Workers..."
+          echo "Deploying ${GITHUB_SHA} to Cloudflare Workers..."
 
           npx wrangler deploy
 
@@ -182,6 +183,8 @@ jobs:
 
       - id: health-step
         name: Verify Cloudflare Deployment Health
+        env:
+          CLOUDFLARE_HEALTH_URL: ${{ env.CLOUDFLARE_HEALTH_URL }}
         run: |
           MAX_ATTEMPTS=12
           ATTEMPT=1
@@ -193,7 +196,6 @@ jobs:
 
             STATUS=$(curl \
               --silent \
-              --show-error \
               --output /dev/null \
               --write-out "%{http_code}" \
               "$CLOUDFLARE_HEALTH_URL")
@@ -214,8 +216,8 @@ jobs:
 
             ATTEMPT=$((ATTEMPT + 1))
             sleep 5
-
           done
+
 
   # ============================================================
   # DEPLOYMENT REPORT
@@ -273,8 +275,7 @@ jobs:
 
           if [ "$DENO_RESULT" = "success" ] && [ "$CLOUDFLARE_RESULT" = "success" ]; then
             echo " STATUS : PASS - Both deployments and health checks succeeded."
-            exit 0
+          else
+            echo " STATUS : FAIL - One or more deployments failed."
+            exit 1
           fi
-
-          echo " STATUS : FAIL - One or more deployments failed."
-          exit 1
