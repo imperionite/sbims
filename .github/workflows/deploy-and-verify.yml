@@ -52,6 +52,7 @@ jobs:
       health: ${{ steps.health-step.outputs.health }}
 
     steps:
+
       - name: Checkout Repository
         uses: actions/checkout@v5
 
@@ -128,7 +129,7 @@ jobs:
   # DEPLOY TO CLOUDFLARE WORKERS
   # ============================================================
 
-    deploy-cloudflare:
+  deploy-cloudflare:
     name: Deploy SBIMS to Cloudflare Workers
     needs: quality
     runs-on: ubuntu-latest
@@ -139,6 +140,7 @@ jobs:
       health: ${{ steps.health-step.outputs.health }}
 
     steps:
+
       - name: Checkout Repository
         uses: actions/checkout@v5
 
@@ -183,8 +185,6 @@ jobs:
 
       - id: health-step
         name: Verify Cloudflare Deployment Health
-        env:
-          CLOUDFLARE_HEALTH_URL: ${{ env.CLOUDFLARE_HEALTH_URL }}
         run: |
           MAX_ATTEMPTS=12
           ATTEMPT=1
@@ -216,6 +216,7 @@ jobs:
 
             ATTEMPT=$((ATTEMPT + 1))
             sleep 5
+
           done
 
 
@@ -232,6 +233,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Generate Deployment Report
         run: |
           echo ""
