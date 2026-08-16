@@ -1,0 +1,431 @@
+###############################################################
+# FR-08 EVALUATION MANAGEMENT
+# Manual REST Client Tests
+###############################################################
+
+
+###############################################################
+# VARIABLES
+###############################################################
+
+@apiUrl=http://localhost:8000/api/v1
+
+### Internship ID
+### Replace after creating the test internship.
+
+@internshipId=00000000-0000-0000-0000-000000000000
+
+### Evaluation ID
+### Replace after creating an evaluation.
+
+@evaluationId=00000000-0000-0000-0000-000000000000
+
+### Student ID
+### Use the ID of the student account being tested.
+
+@studentId=00000000-0000-0000-0000-000000000000
+
+### HTE ID
+### Replace after creating the test HTE.
+
+@hteId=00000000-0000-0000-0000-000000000000
+
+### Second HTE ID
+### Optional. Used for authorization testing.
+
+@hteId2=00000000-0000-0000-0000-000000000000
+
+
+###############################################################
+# SEED USERS
+###############################################################
+
+@admin=adminsbims1@grr.la
+@coordinator=coordinatorsbims1@grr.la
+@student=studentsbims1@grr.la
+@faculty=facultysbims1@grr.la
+
+### HTE Supervisor accounts
+
+@hteSupervisor=sbims-test-hte-supervisor@maildrop.cc
+@otherHteSupervisor=sbims-test-hte-supervisor-2@maildrop.cc
+
+### Shared test password
+
+@password=TestPassword2026!
+
+
+###############################################################
+# AUTHENTICATION
+###############################################################
+
+### Login as Administrator
+
+# @name adminLogin
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{admin}}",
+  "password": "{{password}}"
+}
+
+
+### Login as Internship Coordinator
+
+# @name coordinatorLogin
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{coordinator}}",
+  "password": "{{password}}"
+}
+
+
+### Login as Student
+
+# @name studentLogin
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{student}}",
+  "password": "{{password}}"
+}
+
+
+### Login as HTE Supervisor
+
+# @name hteSupervisorLogin
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{hteSupervisor}}",
+  "password": "{{password}}"
+}
+
+
+### Login as Other HTE Supervisor
+
+# @name otherHteSupervisorLogin
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{otherHteSupervisor}}",
+  "password": "{{password}}"
+}
+
+
+###############################################################
+# HTE SUPERVISOR - CREATE
+###############################################################
+
+### 1. Create Evaluation
+### Expected: 201 Created
+### Access: HTE Supervisor
+###
+### IMPORTANT:
+### internshipId must belong to an HTE assigned to
+### the authenticated HTE Supervisor.
+
+# @name createEvaluation
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "evaluation_type": "hte_supervisor",
+  "responses": {
+    "criterion_1": 5,
+    "criterion_2": 4,
+    "criterion_3": 5
+  },
+  "comments": "Good performance during the internship."
+}
+
+
+###############################################################
+# HTE SUPERVISOR - RETRIEVE
+###############################################################
+
+### 2. Get My Evaluations
+### Expected: 200 OK
+### Access: HTE Supervisor
+
+GET {{apiUrl}}/evaluations/me
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+
+
+### 3. Get Evaluations for Internship
+### Expected: 200 OK
+### Access: HTE Supervisor
+
+GET {{apiUrl}}/evaluations/internship/{{internshipId}}
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+
+
+### 4. Get Specific Evaluation
+### Expected: 200 OK
+### Access: HTE Supervisor
+
+GET {{apiUrl}}/evaluations/{{evaluationId}}
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+
+
+###############################################################
+# HTE SUPERVISOR - UPDATE
+###############################################################
+
+### 5. Update Draft Evaluation
+### Expected: 200 OK
+### Access: HTE Supervisor
+### Only the evaluator who owns the evaluation can update it.
+
+PATCH {{apiUrl}}/evaluations/{{evaluationId}}
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "responses": {
+    "criterion_1": 5,
+    "criterion_2": 5,
+    "criterion_3": 4
+  },
+  "comments": "Updated evaluation comments."
+}
+
+
+###############################################################
+# HTE SUPERVISOR - SUBMIT
+###############################################################
+
+### 6. Submit Evaluation
+### Expected: 200 OK
+### Status changes: draft -> submitted
+
+POST {{apiUrl}}/evaluations/{{evaluationId}}/submit
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+
+
+### 7. Try to Submit Again
+### Expected: 400 Bad Request
+### Already-submitted evaluations cannot be submitted again.
+
+POST {{apiUrl}}/evaluations/{{evaluationId}}/submit
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+
+
+### 8. Try to Modify Submitted Evaluation
+### Expected: 400 Bad Request
+### Submitted evaluations cannot be modified.
+
+PATCH {{apiUrl}}/evaluations/{{evaluationId}}
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "comments": "Attempted modification after submission."
+}
+
+
+###############################################################
+# STUDENT
+###############################################################
+
+### 9. Student Retrieves Submitted Evaluation
+### Expected: 200 OK
+### The evaluation must already be submitted.
+
+GET {{apiUrl}}/evaluations/{{evaluationId}}
+Authorization: Bearer {{studentLogin.response.body.$.data.accessToken}}
+
+
+### 10. Student Retrieves Internship Evaluations
+### Expected: 200 OK
+### The evaluation must already be submitted.
+
+GET {{apiUrl}}/evaluations/internship/{{internshipId}}
+Authorization: Bearer {{studentLogin.response.body.$.data.accessToken}}
+
+
+### 11. Student Attempts to Create Evaluation
+### Expected: 403 Forbidden
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{studentLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "responses": {
+    "criterion_1": 5
+  }
+}
+
+
+### 12. Student Attempts to Modify Evaluation
+### Expected: 403 Forbidden
+
+PATCH {{apiUrl}}/evaluations/{{evaluationId}}
+Authorization: Bearer {{studentLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "comments": "Student attempting to modify evaluation."
+}
+
+
+### 13. Student Attempts to Submit Evaluation
+### Expected: 403 Forbidden
+
+POST {{apiUrl}}/evaluations/{{evaluationId}}/submit
+Authorization: Bearer {{studentLogin.response.body.$.data.accessToken}}
+
+
+###############################################################
+# HTE SUPERVISOR AUTHORIZATION
+###############################################################
+
+### 14. Other HTE Supervisor Attempts to View Evaluation
+### Expected: 403 Forbidden
+###
+### This proves that role alone is insufficient.
+### The HTE Supervisor must be assigned to the HTE
+### associated with the internship.
+
+GET {{apiUrl}}/evaluations/{{evaluationId}}
+Authorization: Bearer {{otherHteSupervisorLogin.response.body.$.data.accessToken}}
+
+
+### 15. Other HTE Supervisor Attempts to View Internship Evaluations
+### Expected: 403 Forbidden
+
+GET {{apiUrl}}/evaluations/internship/{{internshipId}}
+Authorization: Bearer {{otherHteSupervisorLogin.response.body.$.data.accessToken}}
+
+
+### 16. Other HTE Supervisor Attempts to Create Evaluation
+### Expected: 403 Forbidden
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{otherHteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "responses": {
+    "criterion_1": 5,
+    "criterion_2": 4
+  }
+}
+
+
+###############################################################
+# VALIDATION TESTS
+###############################################################
+
+### 17. Invalid Rating - Too High
+### Expected: 400 Bad Request
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "responses": {
+    "criterion_1": 6
+  }
+}
+
+
+### 18. Invalid Rating - Too Low
+### Expected: 400 Bad Request
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "responses": {
+    "criterion_1": 0
+  }
+}
+
+
+### 19. Invalid Rating - Decimal
+### Expected: 400 Bad Request
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "responses": {
+    "criterion_1": 4.5
+  }
+}
+
+
+### 20. Empty Responses
+### Expected: 400 Bad Request
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "responses": {}
+}
+
+
+### 21. Invalid Internship ID
+### Expected: 400 Bad Request
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "not-a-uuid",
+  "responses": {
+    "criterion_1": 5
+  }
+}
+
+
+###############################################################
+# AUTHENTICATION TESTS
+###############################################################
+
+### 22. Unauthenticated Create Evaluation
+### Expected: 401 Unauthorized
+
+POST {{apiUrl}}/evaluations
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "responses": {
+    "criterion_1": 5
+  }
+}
+
+
+### 23. Unauthenticated Get Evaluation
+### Expected: 401 Unauthorized
+
+GET {{apiUrl}}/evaluations/{{evaluationId}}
