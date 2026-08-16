@@ -14,10 +14,9 @@
     "npm:@hono/zod-validator@~0.4.3": "0.4.3_hono@4.13.2_zod@3.25.76",
     "npm:@supabase/supabase-js@^2.49.0": "2.112.3",
     "npm:@upstash/redis@^1.38.2": "1.38.2",
-    "npm:hono-rate-limiter@*": "0.5.3_hono@4.13.2",
-    "npm:hono-rate-limiter@latest": "0.5.3_hono@4.13.2",
+    "npm:hono-rate-limiter@~0.5.3": "0.5.3_hono@4.13.2",
     "npm:hono@^4.12.32": "4.13.2",
-    "npm:wrangler@4": "4.123.0",
+    "npm:wrangler@^4.123.0": "4.123.0",
     "npm:zod@^3.25.0": "3.25.76"
   },
   "jsr": {
@@ -703,7 +702,7 @@
       "npm:@hono/zod-validator@~0.4.3",
       "npm:@supabase/supabase-js@^2.49.0",
       "npm:@upstash/redis@^1.38.2",
-      "npm:hono-rate-limiter@*",
+      "npm:hono-rate-limiter@~0.5.3",
       "npm:hono@^4.12.32",
       "npm:zod@^3.25.0"
     ],
@@ -712,9 +711,9 @@
         "npm:@hono/zod-validator@~0.4.3",
         "npm:@supabase/supabase-js@^2.49.0",
         "npm:@upstash/redis@^1.38.2",
-        "npm:hono-rate-limiter@latest",
+        "npm:hono-rate-limiter@~0.5.3",
         "npm:hono@^4.12.32",
-        "npm:wrangler@4",
+        "npm:wrangler@^4.123.0",
         "npm:zod@^3.25.0"
       ]
     }

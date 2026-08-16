@@ -18,7 +18,7 @@ env:
   DENO_VERSION: "2.9.4"
 
   DENO_ORG: "imperionite"
-  DENO_APP: "sbims-dev"
+  DENO_APP: "sbims"
   DENO_HEALTH_URL: "https://sbims.imperionite.deno.net/api/v1/health"
 
   CLOUDFLARE_HEALTH_URL: "https://sbims.lr-aimperial.workers.dev/api/v1/health"
@@ -43,6 +43,7 @@ jobs:
     name: Deploy SBIMS to Deno Deploy
     needs: quality
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     outputs:
       status: ${{ steps.deno-step.outputs.status }}
@@ -51,12 +52,17 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ env.DENO_VERSION }}
+
+      - name: Verify Deno CLI
+        run: |
+          deno --version
+          deno deploy --help
 
       - id: deno-step
         name: Deploy to Deno Deploy
@@ -71,6 +77,8 @@ jobs:
           fi
 
           echo "Deploying ${DENO_APP} to Deno Deploy..."
+          echo "Organization: ${DENO_ORG}"
+          echo "Application: ${DENO_APP}"
 
           deno deploy \
             --org "${DENO_ORG}" \
@@ -98,8 +106,11 @@ jobs:
 
             STATUS=$(curl \
               --silent \
+              --show-error \
               --output /dev/null \
               --write-out "%{http_code}" \
+              --connect-timeout 10 \
+              --max-time 30 \
               "$DENO_HEALTH_URL")
 
             echo "Health check attempt ${ATTEMPT}/${MAX_ATTEMPTS}: HTTP ${STATUS}"
@@ -129,6 +140,7 @@ jobs:
     name: Deploy SBIMS to Cloudflare Workers
     needs: quality
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     outputs:
       status: ${{ steps.cloudflare-step.outputs.status }}
@@ -137,7 +149,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -147,6 +159,38 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
+
+      # --------------------------------------------------------
+      # Generate Cloudflare Worker Type Definitions
+      # --------------------------------------------------------
+
+      - name: Generate Cloudflare Worker Types
+        run: npm run cf:types
+
+      # --------------------------------------------------------
+      # Validate Worker Without Deploying
+      # --------------------------------------------------------
+
+      - name: Validate Cloudflare Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN GitHub secret is missing."
+            exit 1
+          fi
+
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID GitHub secret is missing."
+            exit 1
+          fi
+
+          npm run cf:dry-run
+
+      # --------------------------------------------------------
+      # Deploy Worker
+      # --------------------------------------------------------
 
       - id: cloudflare-step
         name: Deploy to Cloudflare Workers
@@ -168,7 +212,7 @@ jobs:
 
           echo "Deploying ${GITHUB_SHA} to Cloudflare Workers..."
 
-          npx wrangler deploy
+          npm run cf:deploy
 
           END=$(date +%s)
           DURATION=$((END - START))
@@ -177,6 +221,10 @@ jobs:
           echo "time=${DURATION}s" >> "$GITHUB_OUTPUT"
 
           echo "Cloudflare Workers deployment completed successfully in ${DURATION}s."
+
+      # --------------------------------------------------------
+      # Verify Worker Health
+      # --------------------------------------------------------
 
       - id: health-step
         name: Verify Cloudflare Deployment Health
@@ -191,8 +239,11 @@ jobs:
 
             STATUS=$(curl \
               --silent \
+              --show-error \
               --output /dev/null \
               --write-out "%{http_code}" \
+              --connect-timeout 10 \
+              --max-time 30 \
               "$CLOUDFLARE_HEALTH_URL")
 
             echo "Health check attempt ${ATTEMPT}/${MAX_ATTEMPTS}: HTTP ${STATUS}"
@@ -225,20 +276,29 @@ jobs:
       - deploy-cloudflare
     if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Generate Deployment Report
+        env:
+          DENO_RESULT: ${{ needs.deploy-deno.result }}
+          DENO_TIME: ${{ needs.deploy-deno.outputs.time }}
+          DENO_HEALTH: ${{ needs.deploy-deno.outputs.health }}
+
+          CLOUDFLARE_RESULT: ${{ needs.deploy-cloudflare.result }}
+          CLOUDFLARE_TIME: ${{ needs.deploy-cloudflare.outputs.time }}
+          CLOUDFLARE_HEALTH: ${{ needs.deploy-cloudflare.outputs.health }}
         run: |
           echo ""
           echo "======================================================================"
           echo "                    SBIMS DEPLOYMENT REPORT"
           echo "======================================================================"
 
-          echo "Repository   : ${{ github.repository }}"
-          echo "Branch       : ${{ github.ref_name }}"
-          echo "Commit       : ${{ github.sha }}"
-          echo "Actor        : ${{ github.actor }}"
-          echo "Run ID       : ${{ github.run_id }}"
+          echo "Repository   : ${GITHUB_REPOSITORY}"
+          echo "Branch       : ${GITHUB_REF_NAME}"
+          echo "Commit       : ${GITHUB_SHA}"
+          echo "Actor        : ${GITHUB_ACTOR}"
+          echo "Run ID       : ${GITHUB_RUN_ID}"
 
           echo ""
           echo "----------------------------------------------------------------------"
@@ -247,26 +307,23 @@ jobs:
 
           echo "Organization : ${DENO_ORG}"
           echo "Application  : ${DENO_APP}"
-          echo "Status       : ${{ needs.deploy-deno.result == 'success' && 'SUCCESS' || 'FAILED' }}"
-          echo "Deploy Time  : ${{ needs.deploy-deno.outputs.time || 'N/A' }}"
+          echo "Status       : $([ "$DENO_RESULT" = "success" ] && echo "SUCCESS" || echo "FAILED")"
+          echo "Deploy Time  : ${DENO_TIME:-N/A}"
           echo "Health URL   : ${DENO_HEALTH_URL}"
-          echo "Health Check : ${{ needs.deploy-deno.outputs.health || 'FAILED' }}"
+          echo "Health Check : ${DENO_HEALTH:-FAILED}"
 
           echo ""
           echo "----------------------------------------------------------------------"
           echo " TARGET: CLOUDFLARE WORKERS"
           echo "----------------------------------------------------------------------"
 
-          echo "Status       : ${{ needs.deploy-cloudflare.result == 'success' && 'SUCCESS' || 'FAILED' }}"
-          echo "Deploy Time  : ${{ needs.deploy-cloudflare.outputs.time || 'N/A' }}"
+          echo "Status       : $([ "$CLOUDFLARE_RESULT" = "success" ] && echo "SUCCESS" || echo "FAILED")"
+          echo "Deploy Time  : ${CLOUDFLARE_TIME:-N/A}"
           echo "Health URL   : ${CLOUDFLARE_HEALTH_URL}"
-          echo "Health Check : ${{ needs.deploy-cloudflare.outputs.health || 'FAILED' }}"
+          echo "Health Check : ${CLOUDFLARE_HEALTH:-FAILED}"
 
           echo ""
           echo "======================================================================"
-
-          DENO_RESULT="${{ needs.deploy-deno.result }}"
-          CLOUDFLARE_RESULT="${{ needs.deploy-cloudflare.result }}"
 
           if [ "$DENO_RESULT" = "success" ] && [ "$CLOUDFLARE_RESULT" = "success" ]; then
             echo " STATUS : PASS - Both deployments and health checks succeeded."
