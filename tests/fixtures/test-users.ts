@@ -23,6 +23,22 @@ export const TEST_USERS = {
     role: "internship_coordinator",
   },
 
+  hteSupervisor: {
+    email: "sbims-test-hte-supervisor@maildrop.cc",
+    password: "TestPassword2026!",
+    firstName: "Test",
+    lastName: "HTE Supervisor",
+    role: "hte_supervisor",
+  },
+
+  otherHteSupervisor: {
+    email: "sbims-test-hte-supervisor-2@maildrop.cc",
+    password: "TestPassword2026!",
+    firstName: "Test",
+    lastName: "Other HTE Supervisor",
+    role: "hte_supervisor",
+  },
+
   firstLogin: {
     email: "sbims-test-first-login@maildrop.cc",
     password: "TestPassword2026!",

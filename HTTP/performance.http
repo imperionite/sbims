@@ -36,11 +36,11 @@ GET {{deno}}/compute?work=10000
 ### ============================================================
 
 ### Performance Ping
-GET {{cfDev}}/ping
+GET {{cf}}/ping
 
 
 ### Performance Compute - Default Work
-GET {{cfDev}}/compute
+GET {{cf}}/compute
 
 
 ### Performance Compute - work=1000

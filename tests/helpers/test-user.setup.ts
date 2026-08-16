@@ -99,6 +99,8 @@ export async function setupTestUsers(): Promise<void> {
     TEST_USERS.admin,
     TEST_USERS.student,
     TEST_USERS.coordinator,
+    TEST_USERS.hteSupervisor,
+    TEST_USERS.otherHteSupervisor,
   ];
 
   for (const userConfig of standardUsers) {
