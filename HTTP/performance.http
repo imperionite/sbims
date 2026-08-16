@@ -1,6 +1,6 @@
 ### Configuration
 
-@deno=https://sbims-dev.imperionite.deno.net/api/v1/performance
+@deno=https://sbims.imperionite.deno.net/api/v1/performance
 @cf=https://sbims.lr-aimperial.workers.dev/api/v1/performance
 
 @denoDev=http://localhost:8000/api/v1/performance
@@ -36,7 +36,7 @@ GET {{deno}}/compute?work=10000
 ### ============================================================
 
 ### Performance Ping
-GET {{cf}}/ping
+GET {{cfDev}}/ping
 
 
 ### Performance Compute - Default Work

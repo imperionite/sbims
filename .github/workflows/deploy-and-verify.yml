@@ -19,7 +19,7 @@ env:
 
   DENO_ORG: "imperionite"
   DENO_APP: "sbims-dev"
-  DENO_HEALTH_URL: "https://sbims-dev.imperionite.deno.net/api/v1/health"
+  DENO_HEALTH_URL: "https://sbims.imperionite.deno.net/api/v1/health"
 
   CLOUDFLARE_HEALTH_URL: "https://sbims.lr-aimperial.workers.dev/api/v1/health"
 
