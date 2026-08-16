@@ -26,7 +26,6 @@ jobs:
   # ============================================================
   # QUALITY VERIFICATION
   # ============================================================
-
   quality:
     name: SBIMS Pre-Deployment Quality Verification
     uses: ./.github/workflows/_quality-module.yml
@@ -54,7 +53,6 @@ jobs:
       # --------------------------------------------------------
       # Checkout
       # --------------------------------------------------------
-
       - name: Checkout Repository
         uses: actions/checkout@v6
 
@@ -165,7 +163,6 @@ jobs:
     timeout-minutes: 5
 
     steps:
-
       - name: Generate Deployment Report
         env:
           DENO_RESULT: ${{ needs.deploy-deno.result }}
