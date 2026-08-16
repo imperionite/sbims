@@ -10,7 +10,7 @@
     "zod": "npm:zod@^3.25.0",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@^2.49.0",
     "@std/testing/mock": "jsr:@std/testing@^1.0.0/mock",
-    "hono-rate-limiter": "npm:hono-rate-limiter"
+    "hono-rate-limiter": "npm:hono-rate-limiter@^0.5.3"
   },
   "tasks": {
     "dev": "deno serve --watch --env-file=.env --allow-env --allow-read --allow-net src/main.ts",
@@ -65,6 +65,7 @@
       "entrypoint": "src/main.ts"
     },
     "org": "imperionite",
-    "app": "sbims-dev"
-  }
+    "app": "sbims"
+  },
+  "allowScripts": ["npm:workerd"]
 }

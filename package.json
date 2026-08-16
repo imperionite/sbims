@@ -13,10 +13,10 @@
     "@supabase/supabase-js": "^2.49.0",
     "@upstash/redis": "^1.38.2",
     "hono": "^4.12.32",
-    "hono-rate-limiter": "latest",
+    "hono-rate-limiter": "^0.5.3",
     "zod": "^3.25.0"
   },
   "devDependencies": {
-    "wrangler": "^4.0.0"
+    "wrangler": "^4.123.0"
   }
 }

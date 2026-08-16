@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
 
-  "name": "sbims-dev",
+  "name": "sbims",
 
   "main": "./src/worker.ts",
 
