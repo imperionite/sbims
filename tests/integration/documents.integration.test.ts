@@ -106,7 +106,7 @@ async function getTestUserId(email: string): Promise<string> {
   }
 
   const user = data.users.find(
-    (item) => item.email?.toLowerCase() === email.toLowerCase(),
+    (item: { email?: string | null }) => item.email?.toLowerCase() === email.toLowerCase(),
   );
 
   if (!user) {
