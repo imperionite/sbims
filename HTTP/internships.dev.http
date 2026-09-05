@@ -77,26 +77,11 @@
 # VARIABLES
 
 ###############################################################
-
 @apiUrl=http://localhost:8000/api/v1
-
-### Internship ID
-
-### Replace after creating an internship.
-
-@internshipId=7abb4299-13bb-4f38-b059-a9d9f00db8bd
-
-### Student Profile ID
-
-### Replace after creating/retrieving the test student profile.
-
-@studentId=70100cc3-d070-42e0-9b62-8b465517948e
-
-### HTE Profile ID
-
-### Replace after creating the test HTE.
-
-@hteId=4a33b101-ead7-4349-9b88-9662710b29ed
+@internshipId=dcd18ec7-6355-4da4-82ee-bbcbcdb72fb7
+@studentId=bcfb4652-2a62-4383-a986-33e838ed3631
+@hteId=38253f4d-41d8-4cb5-a658-6d012f1ce60e
+@facultyAdviserId=cd315baa-c628-4ff9-9f71-9caae86ed096
 
 ###############################################################
 
@@ -132,9 +117,9 @@
 
 ### Paste a valid internship coordinator access token here.
 
-@coordinatorAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwNDEzODhhNC00MTU0LTQ2NzctYjQ0MS0xZTEwNjIxNjMxN2IiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4NjA2MzIwLCJpYXQiOjE3ODg2MDI3MjAsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4NjAyNzIwfV0sInNlc3Npb25faWQiOiIwMmNkMTgwZC03MmIzLTQxODktYTM4NS04NjQwNTZhNmYzNTEiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.m8mcoSwW-C7330St9b4bAzuFE75005L2x-eQQL9SokHePSOiu0_ij4erjDUZbGv7QEOTGbL2rUD7xGjnboJ6oA
+@coordinatorAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwMTUwMWQzMS1hNThiLTQwMzQtOGI1Yy1iMGI2ZjllY2UzNzgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4NjIyMTQxLCJpYXQiOjE3ODg2MTg1NDEsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4NjE4NTQxfV0sInNlc3Npb25faWQiOiI2N2I5NDMyOC0zYTcxLTQ5OGItODZhOC1mNDVjNjU4NWMxMWEiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.nor61OJ2H4FzOwuNZO3-pNZxF1-KMcJUCVR5CtSeDjkIXHeX6DvYOtK_RiOso2UWWtAT94YUC9N75v3_ncrnhg
 ### Paste a valid student access token here.
-@studentAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3MDEwMGNjMy1kMDcwLTQyZTAtOWI2Mi04YjQ2NTUxNzk0OGUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4NjA2MjY1LCJpYXQiOjE3ODg2MDI2NjUsImVtYWlsIjoic3R1ZGVudHNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmFmYWVsIEpvYXF1aW4iLCJsYXN0X25hbWUiOiJEaW1hbGFudGEiLCJtaWRkbGVfbmFtZSI6IkJvbmRvYyIsInJvbGUiOiJzdHVkZW50Iiwic3VmZml4IjoiSUlJIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODg2MDI2NjV9XSwic2Vzc2lvbl9pZCI6IjUzYmQ1Mzc1LWFmZGYtNDNmYi05MjczLThlN2U2NzZjMWI1MSIsImlzX2Fub255bW91cyI6ZmFsc2V9.VtmYmC3CHnbTUvIBvCAodymw4hrd0o4Iq5EEy7629C8DmIcWBG0bAhQDaAISlXl4w3Lz8vKBNFnC1oskLGLyhQ
+@studentAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJiY2ZiNDY1Mi0yYTYyLTQzODMtYTk4Ni0zM2U4MzhlZDM2MzEiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4NjE2ODIyLCJpYXQiOjE3ODg2MTMyMjIsImVtYWlsIjoic3R1ZGVudHNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmFmYWVsIEpvYXF1aW4iLCJsYXN0X25hbWUiOiJEaW1hbGFudGEiLCJtaWRkbGVfbmFtZSI6IkJvbmRvYyIsInJvbGUiOiJzdHVkZW50Iiwic3VmZml4IjoiSUlJIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODg2MTMyMjJ9XSwic2Vzc2lvbl9pZCI6IjcyYjVlYmZiLTVjMzItNDA4NS04OTJjLWZhMTMxNTNiZjQyZSIsImlzX2Fub255bW91cyI6ZmFsc2V9.SWQAqYTKcij3OPnLf0WnT0ThoxTJE15V-I62MGQaA6ApSxVsRGgw1S_99j3asET3M2Zj-4N5srqe0lJnQfsqVw
 ### Paste a valid faculty adviser access token here.
 @facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
 
@@ -314,7 +299,8 @@ Content-Type: application/json
 
 {
 "studentId": "{{studentId}}",
-"hteId": "{{hteId}}"
+"hteId": "{{hteId}}",
+"required_hours": 550
 }
 
 ###
@@ -349,7 +335,8 @@ Content-Type: application/json
 
 {
 "studentId": "{{studentId}}",
-"hteId": "{{hteId}}"
+"hteId": "{{hteId}}",
+"requiredHours": 425
 }
 
 ###
@@ -426,14 +413,14 @@ Authorization: Bearer {{studentAccessToken}}
 
 ###############################################################
 
-### FR-05 - Administrator Activate Internship
+### FR-05 - Internship Coordinator Activate Internship
 
 PATCH {{apiUrl}}/internships/{{internshipId}}/status
 Authorization: Bearer {{coordinatorAccessToken}}
 Content-Type: application/json
 
 {
-"status": "pending"
+"status": "active"
 }
 
 ###
@@ -923,3 +910,17 @@ Content-Type: application/json
 
 ### Insufficient permissions.
 
+###############################################################
+
+## Assign Faculty Adviser to Internship
+
+###############################################################
+
+### Internship Coordinator Assign Faculty Adviser to Internship
+PATCH {{apiUrl}}/internships/{{internshipId}}/adviser
+Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{
+    "facultyAdviserId": "{{facultyAdviserId}}"
+}
