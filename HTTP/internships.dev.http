@@ -84,19 +84,19 @@
 
 ### Replace after creating an internship.
 
-@internshipId=00000000-0000-0000-0000-000000000000
+@internshipId=7abb4299-13bb-4f38-b059-a9d9f00db8bd
 
 ### Student Profile ID
 
 ### Replace after creating/retrieving the test student profile.
 
-@studentId=00000000-0000-0000-0000-000000000000
+@studentId=70100cc3-d070-42e0-9b62-8b465517948e
 
 ### HTE Profile ID
 
 ### Replace after creating the test HTE.
 
-@hteId=00000000-0000-0000-0000-000000000000
+@hteId=4a33b101-ead7-4349-9b88-9662710b29ed
 
 ###############################################################
 
@@ -104,11 +104,11 @@
 
 ###############################################################
 
-@admin=[adminsbims1@grr.la](mailto:adminsbims1@grr.la)
-@coordinator=[coordinatorsbims1@grr.la](mailto:coordinatorsbims1@grr.la)
-@faculty=[facultysbims1@grr.la](mailto:facultysbims1@grr.la)
-@student=[studentsbims1@grr.la](mailto:studentsbims1@grr.la)
-@hte=[htesbims1@grr.la](mailto:htesbims1@grr.la)
+@admin=adminsbims1@grr.la
+@coordinator=coordinatorsbims1@grr.la
+@faculty=facultysbims1@grr.la
+@student=studentsbims1@grr.la
+@hte=htesbims1@grr.la
 
 ###############################################################
 
@@ -132,14 +132,10 @@
 
 ### Paste a valid internship coordinator access token here.
 
-@coordinatorAccessToken=PASTE_COORDINATOR_ACCESS_TOKEN_HERE
-
+@coordinatorAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwNDEzODhhNC00MTU0LTQ2NzctYjQ0MS0xZTEwNjIxNjMxN2IiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4NjA2MzIwLCJpYXQiOjE3ODg2MDI3MjAsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4NjAyNzIwfV0sInNlc3Npb25faWQiOiIwMmNkMTgwZC03MmIzLTQxODktYTM4NS04NjQwNTZhNmYzNTEiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.m8mcoSwW-C7330St9b4bAzuFE75005L2x-eQQL9SokHePSOiu0_ij4erjDUZbGv7QEOTGbL2rUD7xGjnboJ6oA
 ### Paste a valid student access token here.
-
-@studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
-
+@studentAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3MDEwMGNjMy1kMDcwLTQyZTAtOWI2Mi04YjQ2NTUxNzk0OGUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4NjA2MjY1LCJpYXQiOjE3ODg2MDI2NjUsImVtYWlsIjoic3R1ZGVudHNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmFmYWVsIEpvYXF1aW4iLCJsYXN0X25hbWUiOiJEaW1hbGFudGEiLCJtaWRkbGVfbmFtZSI6IkJvbmRvYyIsInJvbGUiOiJzdHVkZW50Iiwic3VmZml4IjoiSUlJIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODg2MDI2NjV9XSwic2Vzc2lvbl9pZCI6IjUzYmQ1Mzc1LWFmZGYtNDNmYi05MjczLThlN2U2NzZjMWI1MSIsImlzX2Fub255bW91cyI6ZmFsc2V9.VtmYmC3CHnbTUvIBvCAodymw4hrd0o4Iq5EEy7629C8DmIcWBG0bAhQDaAISlXl4w3Lz8vKBNFnC1oskLGLyhQ
 ### Paste a valid faculty adviser access token here.
-
 @facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
 
 ###############################################################
@@ -266,100 +262,6 @@ Content-Type: application/json
 "password": "{{newPassword}}"
 }
 
-###
-
-### Expected:
-
-### HTTP 200
-
-### data.accessToken is returned
-
-###
-
-### Copy the accessToken from the response and assign it to:
-
-### @facultyAccessToken
-
-###############################################################
-
-# TEST STUDENT PROFILE
-
-###############################################################
-
-### FR-03 - Administrator Create Test Student Profile
-
-POST {{apiUrl}}/students
-Authorization: Bearer {{adminAccessToken}}
-Content-Type: application/json
-
-{
-"studentNumber": "REST-FR05-001",
-"program": "BSIT",
-"yearLevel": 4,
-"section": "A",
-"contactNumber": "09171234567",
-"address": "Test Address, Bulacan",
-"emergencyContactName": "Test Emergency Contact",
-"emergencyContactNumber": "09179876543"
-}
-
-###
-
-### Expected:
-
-### HTTP 201
-
-### success = true
-
-### data.id exists
-
-### data.student_number = "REST-FR05-001"
-
-###
-
-### Copy the returned data.id and assign it to:
-
-### @studentId
-
-###############################################################
-
-# TEST HTE PROFILE
-
-###############################################################
-
-### FR-04 - Administrator Create Test HTE
-
-POST {{apiUrl}}/htes
-Authorization: Bearer {{adminAccessToken}}
-Content-Type: application/json
-
-{
-"companyName": "REST Client FR05 Test HTE",
-"address": "Test Address, Bulacan",
-"contactPerson": "Test Contact Person",
-"contactEmail": "[fr05-test@example.com](mailto:fr05-test@example.com)",
-"contactNumber": "09171234567"
-}
-
-###
-
-### Expected:
-
-### HTTP 201
-
-### success = true
-
-### data.id exists
-
-### data.company_name = "REST Client FR05 Test HTE"
-
-### data.is_active = true
-
-###
-
-### Copy the returned data.id and assign it to:
-
-### @hteId
 
 ###############################################################
 
@@ -385,7 +287,6 @@ Authorization: Bearer {{adminAccessToken}}
 ###############################################################
 
 ### FR-05 - Internship Coordinator List Internships
-
 GET {{apiUrl}}/internships
 Authorization: Bearer {{coordinatorAccessToken}}
 
@@ -474,7 +375,7 @@ Content-Type: application/json
 ### FR-05 - Administrator Retrieve Internship
 
 GET {{apiUrl}}/internships/{{internshipId}}
-Authorization: Bearer {{adminAccessToken}}
+Authorization: Bearer {{coordinatorAccessToken}}
 
 ###
 
@@ -528,11 +429,11 @@ Authorization: Bearer {{studentAccessToken}}
 ### FR-05 - Administrator Activate Internship
 
 PATCH {{apiUrl}}/internships/{{internshipId}}/status
-Authorization: Bearer {{adminAccessToken}}
+Authorization: Bearer {{coordinatorAccessToken}}
 Content-Type: application/json
 
 {
-"status": "active"
+"status": "pending"
 }
 
 ###

@@ -37,7 +37,7 @@
 
 ### HTE ID
 ### Replace after creating an HTE.
-@hteId=00000000-0000-0000-0000-000000000000
+@hteId=4a33b101-ead7-4349-9b88-9662710b29ed
 
 
 ###############################################################
@@ -68,10 +68,10 @@
 @adminAccessToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
 
 ### Paste a valid internship coordinator access token here.
-@coordinatorAccessToken=PASTE_COORDINATOR_ACCESS_TOKEN_HERE
+@coordinatorAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwNDEzODhhNC00MTU0LTQ2NzctYjQ0MS0xZTEwNjIxNjMxN2IiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4NTk1Nzk1LCJpYXQiOjE3ODg1OTIxOTUsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4NTkyMTk1fV0sInNlc3Npb25faWQiOiI2MmE1NWNiMi0zMzcxLTRjMWMtOWFlMi1jODhkNjY4NmUwYzIiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.Kdv0pd-abbo4BIST49uJvJuHCoGtjf5AcidngXk9dxqgYBBAJrDRBLcB7l6HF2bcvpa-a2DSIPlZDzuRhclwQQ
 
 ### Paste a valid student access token here.
-@studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
+@studentAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3MDEwMGNjMy1kMDcwLTQyZTAtOWI2Mi04YjQ2NTUxNzk0OGUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4NTk1ODQzLCJpYXQiOjE3ODg1OTIyNDMsImVtYWlsIjoic3R1ZGVudHNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmFmYWVsIEpvYXF1aW4iLCJsYXN0X25hbWUiOiJEaW1hbGFudGEiLCJtaWRkbGVfbmFtZSI6IkJvbmRvYyIsInJvbGUiOiJzdHVkZW50Iiwic3VmZml4IjoiSUlJIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODg1OTIyNDN9XSwic2Vzc2lvbl9pZCI6ImNjMGI5YmRkLTkyNDQtNDQ2MC1iMWIxLThmZTkwZGYwOTAzNSIsImlzX2Fub255bW91cyI6ZmFsc2V9.BuOldBKJ1UkaUCgxh11iZDGmiLM6o6sSKvfB4Ii77u7xhTkGab3MsoeCled6PVKgRGr3wj5TSlGIjrLN4tQ34g
 
 ### Paste a valid faculty adviser access token here.
 @facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
@@ -145,7 +145,7 @@ Content-Type: application/json
 ### FR-04 - Administrator List HTE Profiles
 
 GET {{apiUrl}}/htes
-Authorization: Bearer {{adminAccessToken}}
+Authorization: Bearer {{coordinatorAccessToken}}
 
 ###
 
@@ -216,11 +216,11 @@ Authorization: Bearer {{coordinatorAccessToken}}
 Content-Type: application/json
 
 {
-  "companyName": "Coordinator Test HTE",
-  "address": "Coordinator Test Address",
-  "contactPerson": "Coordinator Contact",
-  "contactEmail": "coordinator@example.com",
-  "contactNumber": "09181234567"
+  "companyName": "ABC Industries",
+  "address": "Test Address, Taguig City",
+  "contactPerson": "Test ABC",
+  "contactEmail": "contact@abc-example.com",
+  "contactNumber": "09171234567"
 }
 
 ###
@@ -238,7 +238,7 @@ Content-Type: application/json
 ### FR-04 - Retrieve HTE Profile
 
 GET {{apiUrl}}/htes/{{hteId}}
-Authorization: Bearer {{adminAccessToken}}
+Authorization: Bearer {{coordinatorAccessToken}}
 
 ###
 
@@ -255,12 +255,12 @@ Authorization: Bearer {{adminAccessToken}}
 ### FR-04 - Update HTE Profile
 
 PATCH {{apiUrl}}/htes/{{hteId}}
-Authorization: Bearer {{adminAccessToken}}
+Authorization: Bearer {{coordinatorAccessToken}}
 Content-Type: application/json
 
 {
-  "companyName": "Updated REST Client HTE",
-  "contactPerson": "Updated Contact Person"
+  "companyName": "ABC Industries Inc.",
+  "contactPerson": "George Smith"
 }
 
 ###
