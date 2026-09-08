@@ -72,7 +72,7 @@
 @studentToken=PASTE_STUDENT_TOKEN
 
 @facultyToken=PASTE_FACULTY_ACCESS_TOKEN
-@coordinatorToken=PASTE_COORDINATOR_ACCESS_TOKEN
+@coordinatorToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwMTUwMWQzMS1hNThiLTQwMzQtOGI1Yy1iMGI2ZjllY2UzNzgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4ODc1MzI0LCJpYXQiOjE3ODg4NzE3MjQsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4ODcxNzI0fV0sInNlc3Npb25faWQiOiJiMzQ3NzU3MC02YTdhLTQ4NjYtYjdiMS00MzYyZTNkOThlYTYiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.kZ618IUMTYBx4C7RSXZGKWO8OWZSakpKCAiuESOCPyFoLxJM1dgqERHwgkckJ7jbb9Ghobf9-hO3f0PTws9W_Q
 ###############################################################
 ### Student Info
 @studentNumber=20260001
@@ -123,7 +123,7 @@ Content-Type: application/json
 ### - accessToken returned
 
 ### - user.id returned
-
+### Student Login
 POST {{apiUrl}}/auth/login
 Content-Type: application/json
 
@@ -132,12 +132,22 @@ Content-Type: application/json
 "password": "{{newPassword}}"
 }
 
-####
+### Faculty Adviser Login
 POST {{apiUrl}}/auth/login
 Content-Type: application/json
 
 {
 "email": "{{faculty}}",
+"password": "{{newPassword}}"
+}
+
+
+### Administrator Login
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+"email": "{{admin}}",
 "password": "{{newPassword}}"
 }
 
