@@ -1,23 +1,7 @@
-import { loadEnv } from "../../src/config/env.ts";
-import { getDenoEnv } from "../../src/config/runtime.ts";
-import { createSupabaseClients } from "../../src/lib/supabase.ts";
+import { createSeedAdminClient, getSeedPassword, normalizeEmail } from "./_shared/seed-utils.ts";
 
-const runtimeEnv = getDenoEnv();
-const env = loadEnv(runtimeEnv);
-
-if (env.ENVIRONMENT === "production") {
-  throw new Error("Cannot seed production database");
-}
-
-const seedPassword = runtimeEnv.SEED_USER_PASSWORD;
-if (!seedPassword) {
-  throw new Error("SEED_USER_PASSWORD is required when seeding users.");
-}
-if (seedPassword.length < 8) {
-  throw new Error("SEED_USER_PASSWORD must be at least 8 characters long.");
-}
-
-const { supabaseAdmin } = createSupabaseClients(env);
+const supabaseAdmin = createSeedAdminClient();
+const seedPassword = getSeedPassword();
 
 type UserRole =
   | "administrator"
@@ -27,27 +11,36 @@ type UserRole =
   | "hte_supervisor";
 
 interface SeedUser {
+  seedKey: string;
   email: string;
-  password: string;
   firstName: string;
   middleName?: string;
   lastName: string;
   suffix?: string | null;
   role: UserRole;
-  /**
-   * Applies only when the Auth user/profile is created for the first time.
-   * Existing users retain their current password state.
-   */
   mustChangePassword: boolean;
 }
 
-const seedUsers: SeedUser[] = [
+interface ProfileRow {
+  id: string;
+  email: string;
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
+  suffix: string | null;
+  role: UserRole;
+  is_active: boolean;
+  must_change_password: boolean;
+  last_password_changed_at: string | null;
+}
+
+const seedUsers: readonly SeedUser[] = [
   // =====================================================
   // Administrator
   // =====================================================
   {
+    seedKey: "administrator-01",
     email: "adminsbims1@grr.la",
-    password: seedPassword,
     firstName: "Isaac",
     middleName: "Maradona",
     lastName: "Clarke",
@@ -59,8 +52,8 @@ const seedUsers: SeedUser[] = [
   // Internship Coordinators
   // =====================================================
   {
+    seedKey: "internship-coordinator-01",
     email: "coordinatorsbims1@grr.la",
-    password: seedPassword,
     firstName: "Elise",
     middleName: "Manansala",
     lastName: "Quijano",
@@ -69,8 +62,8 @@ const seedUsers: SeedUser[] = [
     mustChangePassword: false,
   },
   {
+    seedKey: "internship-coordinator-02",
     email: "coordinatorsbims2@grr.la",
-    password: seedPassword,
     firstName: "Gabriel",
     middleName: "Santos",
     lastName: "Villanueva",
@@ -82,8 +75,8 @@ const seedUsers: SeedUser[] = [
   // Faculty Advisers
   // =====================================================
   {
+    seedKey: "faculty-adviser-01",
     email: "facultysbims1@grr.la",
-    password: seedPassword,
     firstName: "Nathaniel Andres",
     middleName: "Sarmiento",
     lastName: "Nacpil",
@@ -92,8 +85,8 @@ const seedUsers: SeedUser[] = [
     mustChangePassword: false,
   },
   {
+    seedKey: "faculty-adviser-02",
     email: "facultysbims2@grr.la",
-    password: seedPassword,
     firstName: "Camille",
     middleName: "Reyes",
     lastName: "Mendoza",
@@ -102,8 +95,8 @@ const seedUsers: SeedUser[] = [
     mustChangePassword: true,
   },
   {
+    seedKey: "faculty-adviser-03",
     email: "facultysbims3@grr.la",
-    password: seedPassword,
     firstName: "Adrian Miguel",
     middleName: "Torres",
     lastName: "Santiago",
@@ -115,8 +108,8 @@ const seedUsers: SeedUser[] = [
   // Students
   // =====================================================
   {
+    seedKey: "student-01",
     email: "studentsbims1@grr.la",
-    password: seedPassword,
     firstName: "Rafael Joaquin",
     middleName: "Bondoc",
     lastName: "Dimalanta",
@@ -125,8 +118,8 @@ const seedUsers: SeedUser[] = [
     mustChangePassword: false,
   },
   {
+    seedKey: "student-02",
     email: "studentsbims2@grr.la",
-    password: seedPassword,
     firstName: "Sofia",
     middleName: "Luna",
     lastName: "Cabrera",
@@ -135,8 +128,8 @@ const seedUsers: SeedUser[] = [
     mustChangePassword: true,
   },
   {
+    seedKey: "student-03",
     email: "studentsbims3@grr.la",
-    password: seedPassword,
     firstName: "Daniel",
     middleName: "Jose",
     lastName: "Navarro",
@@ -145,8 +138,8 @@ const seedUsers: SeedUser[] = [
     mustChangePassword: false,
   },
   {
+    seedKey: "student-04",
     email: "studentsbims4@grr.la",
-    password: seedPassword,
     firstName: "Mikaela",
     middleName: "Diaz",
     lastName: "Flores",
@@ -155,8 +148,8 @@ const seedUsers: SeedUser[] = [
     mustChangePassword: false,
   },
   {
+    seedKey: "student-05",
     email: "studentsbims5@grr.la",
-    password: seedPassword,
     firstName: "Lucas",
     middleName: "David",
     lastName: "Pascual",
@@ -165,8 +158,8 @@ const seedUsers: SeedUser[] = [
     mustChangePassword: false,
   },
   {
+    seedKey: "student-06",
     email: "studentsbims6@grr.la",
-    password: seedPassword,
     firstName: "Bea Bianca",
     middleName: "Sánchez",
     lastName: "Mallari",
@@ -178,8 +171,8 @@ const seedUsers: SeedUser[] = [
   // HTE Supervisors
   // =====================================================
   {
+    seedKey: "hte-supervisor-01",
     email: "htesbims1@grr.la",
-    password: seedPassword,
     firstName: "Roberto Luis",
     middleName: "Fernandez",
     lastName: "Valderama",
@@ -188,8 +181,8 @@ const seedUsers: SeedUser[] = [
     mustChangePassword: false,
   },
   {
+    seedKey: "hte-supervisor-02",
     email: "htesbims2@grr.la",
-    password: seedPassword,
     firstName: "Patricia Anne",
     middleName: "Ramirez",
     lastName: "Dominguez",
@@ -198,8 +191,8 @@ const seedUsers: SeedUser[] = [
     mustChangePassword: true,
   },
   {
+    seedKey: "hte-supervisor-03",
     email: "htesbims3@grr.la",
-    password: seedPassword,
     firstName: "Marco Luis",
     middleName: "Corpuz",
     lastName: "Bautista",
@@ -208,8 +201,8 @@ const seedUsers: SeedUser[] = [
     mustChangePassword: false,
   },
   {
+    seedKey: "hte-supervisor-04",
     email: "htesbims4@grr.la",
-    password: seedPassword,
     firstName: "Elena",
     middleName: "Santos",
     lastName: "Fajardo",
@@ -220,21 +213,32 @@ const seedUsers: SeedUser[] = [
 ];
 
 async function findUserByEmail(email: string) {
-  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedEmail = normalizeEmail(email);
   const { data, error } = await supabaseAdmin.auth.admin.listUsers();
   if (error) {
     throw new Error(`Unable to list Auth users: ${error.message}`);
   }
   return data.users.find(
-    (user) => user.email?.trim().toLowerCase() === normalizedEmail,
+    (user) => normalizeEmail(user.email ?? "") === normalizedEmail,
   );
 }
 
-async function findProfileById(id: string) {
+async function findProfileById(id: string): Promise<ProfileRow | null> {
   const { data, error } = await supabaseAdmin
     .from("profiles")
     .select(
-      "id, email, first_name, middle_name, last_name, suffix, role, is_active, must_change_password, last_password_changed_at",
+      [
+        "id",
+        "email",
+        "first_name",
+        "middle_name",
+        "last_name",
+        "suffix",
+        "role",
+        "is_active",
+        "must_change_password",
+        "last_password_changed_at",
+      ].join(", "),
     )
     .eq("id", id)
     .maybeSingle();
@@ -242,15 +246,16 @@ async function findProfileById(id: string) {
   if (error) {
     throw new Error(`Unable to load profile ${id}: ${error.message}`);
   }
-  return data;
+  return data as ProfileRow | null;
 }
 
 async function createAuthUser(user: SeedUser): Promise<string> {
   const { data, error } = await supabaseAdmin.auth.admin.createUser({
-    email: user.email,
-    password: user.password,
+    email: normalizeEmail(user.email),
+    password: seedPassword,
     email_confirm: true,
     user_metadata: {
+      seed_key: user.seedKey,
       first_name: user.firstName,
       middle_name: user.middleName ?? null,
       last_name: user.lastName,
@@ -269,24 +274,24 @@ async function createAuthUser(user: SeedUser): Promise<string> {
 
 async function createProfile(userId: string, user: SeedUser): Promise<void> {
   const now = new Date().toISOString();
-  const { error } = await supabaseAdmin
-    .from("profiles")
-    .insert({
-      id: userId,
-      email: user.email,
-      first_name: user.firstName,
-      middle_name: user.middleName ?? null,
-      last_name: user.lastName,
-      suffix: user.suffix ?? null,
-      role: user.role,
-      is_active: true,
-      must_change_password: user.mustChangePassword,
-      last_password_changed_at: user.mustChangePassword ? null : now,
-      created_by: null,
-    });
+  const { error } = await supabaseAdmin.from("profiles").insert({
+    id: userId,
+    email: normalizeEmail(user.email),
+    first_name: user.firstName,
+    middle_name: user.middleName ?? null,
+    last_name: user.lastName,
+    suffix: user.suffix ?? null,
+    role: user.role,
+    is_active: true,
+    must_change_password: user.mustChangePassword,
+    last_password_changed_at: user.mustChangePassword ? null : now,
+    created_by: null,
+  });
 
   if (error) {
-    throw new Error(`Unable to create profile for ${user.email}: ${error.message}`);
+    throw new Error(
+      `Unable to create profile for ${user.email}: ${error.message}`,
+    );
   }
 }
 
@@ -304,7 +309,7 @@ async function reconcileExistingProfile(
   const { error } = await supabaseAdmin
     .from("profiles")
     .update({
-      email: user.email,
+      email: normalizeEmail(user.email),
       first_name: user.firstName,
       middle_name: user.middleName ?? null,
       last_name: user.lastName,
@@ -314,34 +319,31 @@ async function reconcileExistingProfile(
     .eq("id", userId);
 
   if (error) {
-    throw new Error(`Unable to reconcile profile for ${user.email}: ${error.message}`);
+    throw new Error(
+      `Unable to reconcile profile for ${user.email}: ${error.message}`,
+    );
   }
 
   console.log(
     `  Existing state preserved: ` +
       `is_active=${existingProfile.is_active}, ` +
       `must_change_password=${existingProfile.must_change_password}, ` +
-      `last_password_changed_at=${existingProfile.last_password_changed_at ?? "null"}`,
+      `last_password_changed_at=` +
+      `${existingProfile.last_password_changed_at ?? "null"}`,
   );
 }
 
 async function createSeedUser(user: SeedUser): Promise<void> {
-  const normalizedEmail = user.email.trim().toLowerCase();
+  const normalizedEmail = normalizeEmail(user.email);
   console.log(`\nProcessing ${normalizedEmail}`);
 
   const existingAuthUser = await findUserByEmail(normalizedEmail);
   if (!existingAuthUser) {
     console.log("  Auth user does not exist; creating");
-    const userId = await createAuthUser({
-      ...user,
-      email: normalizedEmail,
-    });
+    const userId = await createAuthUser(user);
 
     try {
-      await createProfile(userId, {
-        ...user,
-        email: normalizedEmail,
-      });
+      await createProfile(userId, user);
     } catch (error) {
       console.error(
         `  Profile creation failed; rolling back Auth user ${userId}`,
@@ -352,7 +354,8 @@ async function createSeedUser(user: SeedUser): Promise<void> {
       if (deleteError) {
         throw new Error(
           `${error instanceof Error ? error.message : String(error)} ` +
-            `Additionally failed to roll back Auth user: ${deleteError.message}`,
+            `Additionally failed to roll back Auth user: ` +
+            `${deleteError.message}`,
         );
       }
 
@@ -361,28 +364,56 @@ async function createSeedUser(user: SeedUser): Promise<void> {
 
     console.log(
       `  ✓ Created ${normalizedEmail} ` +
-        `(role=${user.role}, ` +
+        `(seed_key=${user.seedKey}, ` +
+        `role=${user.role}, ` +
         `must_change_password=${user.mustChangePassword})`,
     );
+
     return;
   }
 
   console.log(`  Auth user already exists: ${existingAuthUser.id}`);
-  await reconcileExistingProfile(existingAuthUser.id, {
-    ...user,
-    email: normalizedEmail,
-  });
+
+  const existingMetadata = existingAuthUser.user_metadata ?? {};
+  if (existingMetadata.seed_key !== user.seedKey) {
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(
+      existingAuthUser.id,
+      {
+        user_metadata: {
+          ...existingMetadata,
+          seed_key: user.seedKey,
+        },
+      },
+    );
+
+    if (error) {
+      throw new Error(
+        `Unable to update seed metadata for ${normalizedEmail}: ` +
+          error.message,
+      );
+    }
+  }
+
+  await reconcileExistingProfile(existingAuthUser.id, user);
   console.log(`  ✓ Reconciled ${normalizedEmail}`);
 }
 
 function validateSeedUsers(): void {
   const seenEmails = new Set<string>();
+  const seenSeedKeys = new Set<string>();
+
   for (const user of seedUsers) {
-    const email = user.email.trim().toLowerCase();
+    const email = normalizeEmail(user.email);
     if (seenEmails.has(email)) {
       throw new Error(`Duplicate seed user email: ${email}`);
     }
+
+    if (seenSeedKeys.has(user.seedKey)) {
+      throw new Error(`Duplicate seed user key: ${user.seedKey}`);
+    }
+
     seenEmails.add(email);
+    seenSeedKeys.add(user.seedKey);
   }
 
   const roles: UserRole[] = [
@@ -407,14 +438,15 @@ function validateSeedUsers(): void {
             `${usersRequiringPasswordChange.length}.`,
         );
       }
-    } else {
-      if (usersRequiringPasswordChange.length !== 1) {
-        throw new Error(
-          `Expected exactly one ${role} seed user with ` +
-            `mustChangePassword=true, found ` +
-            `${usersRequiringPasswordChange.length}.`,
-        );
-      }
+      continue;
+    }
+
+    if (usersRequiringPasswordChange.length !== 1) {
+      throw new Error(
+        `Expected exactly one ${role} seed user with ` +
+          `mustChangePassword=true, found ` +
+          `${usersRequiringPasswordChange.length}.`,
+      );
     }
   }
 }
@@ -453,4 +485,6 @@ async function seed(): Promise<void> {
   }
 }
 
-await seed();
+if (import.meta.main) {
+  await seed();
+}
