@@ -10,7 +10,6 @@
     "jsr:@std/path@^1.1.5": "1.1.6",
     "jsr:@std/path@^1.1.6": "1.1.6",
     "jsr:@std/testing@^1.0.20": "1.0.20",
-    "npm:@hono/zod-validator@~0.4.3": "0.4.3_hono@4.13.7_zod@3.25.76",
     "npm:@hono/zod-validator@~0.9.1": "0.9.1_hono@4.13.7_zod@3.25.76",
     "npm:@supabase/supabase-js@^2.116.0": "2.116.0",
     "npm:@upstash/redis@^1.38.4": "1.38.4",
@@ -239,13 +238,6 @@
       "integrity": "sha512-bm4Mowrv+GXMlpWX++EcXw/iLyd1o3+bJkC2DkWXYVvgZCqD/bSj9ctZeAMC3cIxgjRVR2Dufaiu4YPxr5gW1A==",
       "os": ["win32"],
       "cpu": ["x64"]
-    },
-    "@hono/zod-validator@0.4.3_hono@4.13.7_zod@3.25.76": {
-      "integrity": "sha512-xIgMYXDyJ4Hj6ekm9T9Y27s080Nl9NXHcJkOvkXPhubOLj8hZkOL8pDnnXfvCf5xEE8Q4oMFenQUZZREUY2gqQ==",
-      "dependencies": [
-        "hono",
-        "zod"
-      ]
     },
     "@hono/zod-validator@0.9.1_hono@4.13.7_zod@3.25.76": {
       "integrity": "sha512-iiv6w0qrIc0arfvCtUqBWsvl4fXjzaTcQcCJTTtCnkawF9HHGE+KjEl0ox3gQJ6rKZEgE3mLExlQCF72M+mNuw==",
@@ -714,7 +706,7 @@
     ],
     "packageJson": {
       "dependencies": [
-        "npm:@hono/zod-validator@~0.4.3",
+        "npm:@hono/zod-validator@~0.9.1",
         "npm:@supabase/supabase-js@^2.116.0",
         "npm:@upstash/redis@^1.38.4",
         "npm:hono-rate-limiter@~0.5.4",
