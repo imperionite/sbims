@@ -23,6 +23,8 @@ interface StudentRow {
 interface InternshipRow {
   id: string;
   student_id: string;
+  start_date: string | null;
+  end_date: string | null;
   status: "pending" | "active" | "completed";
 }
 
@@ -44,139 +46,107 @@ interface AttendanceRow {
   validated_at: string | null;
 }
 
-const seedAttendance: readonly SeedAttendance[] = [
-  // =====================================================
-  // Internship 01 - Student 01
-  // =====================================================
-  {
-    seedKey: "attendance-01",
-    studentEmail: "studentsbims1@grr.la",
-    attendanceDate: "2026-08-03",
-    timeIn: "08:00:00",
-    timeOut: "17:00:00",
-    validationStatus: "validated",
-    validatedByEmail: "coordinatorsbims1@grr.la",
-    validatedAt: "2026-08-03T17:30:00+08:00",
-  },
-  {
-    seedKey: "attendance-02",
-    studentEmail: "studentsbims1@grr.la",
-    attendanceDate: "2026-08-04",
-    timeIn: "08:00:00",
-    timeOut: "17:00:00",
-    validationStatus: "validated",
-    validatedByEmail: "coordinatorsbims1@grr.la",
-    validatedAt: "2026-08-04T17:30:00+08:00",
-  },
-  {
-    seedKey: "attendance-03",
-    studentEmail: "studentsbims1@grr.la",
-    attendanceDate: "2026-08-05",
-    timeIn: "08:15:00",
-    timeOut: "17:15:00",
-    validationStatus: "validated",
-    validatedByEmail: "coordinatorsbims1@grr.la",
-    validatedAt: "2026-08-05T17:45:00+08:00",
-  },
-  {
-    seedKey: "attendance-04",
-    studentEmail: "studentsbims1@grr.la",
-    attendanceDate: "2026-08-06",
-    timeIn: "08:00:00",
-    timeOut: "17:00:00",
-    validationStatus: "rejected",
-    validatedByEmail: "coordinatorsbims1@grr.la",
-    validatedAt: "2026-08-06T17:30:00+08:00",
-  },
-  {
-    seedKey: "attendance-05",
-    studentEmail: "studentsbims1@grr.la",
-    attendanceDate: "2026-08-07",
-    timeIn: "08:00:00",
-    timeOut: "17:00:00",
-    validationStatus: "pending",
-    validatedByEmail: null,
-    validatedAt: null,
-  },
+const FIRST_SEMESTER_START = "2026-08-17";
+const FIRST_SEMESTER_CURRENT_SEED_END = "2026-09-12";
+const SUMMER_OJT_START = "2026-06-01";
+const SUMMER_OJT_END = "2026-08-07";
 
-  // =====================================================
-  // Internship 02 - Student 03
-  // =====================================================
-  {
-    seedKey: "attendance-06",
-    studentEmail: "studentsbims3@grr.la",
-    attendanceDate: "2026-08-03",
-    timeIn: "08:00:00",
-    timeOut: "17:00:00",
-    validationStatus: "validated",
-    validatedByEmail: "coordinatorsbims1@grr.la",
-    validatedAt: "2026-08-03T17:30:00+08:00",
-  },
-  {
-    seedKey: "attendance-07",
-    studentEmail: "studentsbims3@grr.la",
-    attendanceDate: "2026-08-04",
-    timeIn: "08:00:00",
-    timeOut: "17:00:00",
-    validationStatus: "validated",
-    validatedByEmail: "coordinatorsbims1@grr.la",
-    validatedAt: "2026-08-04T17:30:00+08:00",
-  },
-  {
-    seedKey: "attendance-08",
-    studentEmail: "studentsbims3@grr.la",
-    attendanceDate: "2026-08-05",
-    timeIn: "08:00:00",
-    timeOut: "17:00:00",
-    validationStatus: "validated",
-    validatedByEmail: "coordinatorsbims1@grr.la",
-    validatedAt: "2026-08-05T17:30:00+08:00",
-  },
-  {
-    seedKey: "attendance-09",
-    studentEmail: "studentsbims3@grr.la",
-    attendanceDate: "2026-08-06",
-    timeIn: "08:00:00",
-    timeOut: "17:00:00",
-    validationStatus: "pending",
-    validatedByEmail: null,
-    validatedAt: null,
-  },
+function toDate(value: string): Date {
+  return new Date(`${value}T00:00:00Z`);
+}
 
-  // =====================================================
-  // Internship 03 - Student 04
-  // =====================================================
-  {
-    seedKey: "attendance-10",
-    studentEmail: "studentsbims4@grr.la",
-    attendanceDate: "2026-08-03",
-    timeIn: "09:00:00",
-    timeOut: "18:00:00",
-    validationStatus: "validated",
-    validatedByEmail: "coordinatorsbims1@grr.la",
-    validatedAt: "2026-08-03T18:30:00+08:00",
-  },
-  {
-    seedKey: "attendance-11",
-    studentEmail: "studentsbims4@grr.la",
-    attendanceDate: "2026-08-04",
-    timeIn: "09:00:00",
-    timeOut: "18:00:00",
-    validationStatus: "validated",
-    validatedByEmail: "coordinatorsbims1@grr.la",
-    validatedAt: "2026-08-04T18:30:00+08:00",
-  },
-  {
-    seedKey: "attendance-12",
-    studentEmail: "studentsbims4@grr.la",
-    attendanceDate: "2026-08-05",
-    timeIn: "09:00:00",
-    timeOut: "18:00:00",
-    validationStatus: "pending",
-    validatedByEmail: null,
-    validatedAt: null,
-  },
-];
+function toDateString(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+function getWorkingDatesInclusive(startDate: string, endDate: string): string[] {
+  const dates: string[] = [];
+  const cursor = toDate(startDate);
+  const end = toDate(endDate);
+
+  while (cursor <= end) {
+    const day = cursor.getUTCDay();
+
+    if (day >= 1 && day <= 6) {
+      dates.push(toDateString(cursor));
+    }
+
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+
+  return dates;
+}
+
+function buildAttendanceSeed(): SeedAttendance[] {
+  const activeStudents = [
+    "studentsbims1@grr.la",
+    "studentsbims3@grr.la",
+    "studentsbims4@grr.la",
+    "studentsbims6@grr.la",
+    "studentsbims7@grr.la",
+    "studentsbims8@grr.la",
+    "studentsbims9@grr.la",
+    "studentsbims10@grr.la",
+    "studentsbims11@grr.la",
+    "studentsbims12@grr.la",
+  ] as const;
+
+  const currentPeriodDates = getWorkingDatesInclusive(
+    FIRST_SEMESTER_START,
+    FIRST_SEMESTER_CURRENT_SEED_END,
+  );
+
+  const records: SeedAttendance[] = [];
+
+  for (const studentEmail of activeStudents) {
+    currentPeriodDates.forEach((attendanceDate, index) => {
+      const isPending = index === currentPeriodDates.length - 2 ||
+        index === currentPeriodDates.length - 1;
+      const isRejected = index === currentPeriodDates.length - 3;
+      const validationStatus: AttendanceValidationStatus = isPending
+        ? "pending"
+        : isRejected
+        ? "rejected"
+        : "validated";
+
+      records.push({
+        seedKey: `attendance-${records.length + 1}`,
+        studentEmail,
+        attendanceDate,
+        timeIn: "08:00:00",
+        timeOut: "17:00:00",
+        validationStatus,
+        validatedByEmail: validationStatus === "pending" ? null : "coordinatorsbims1@grr.la",
+        validatedAt: validationStatus === "pending" ? null : `${attendanceDate}T17:30:00+08:00`,
+      });
+    });
+  }
+
+  // One completed historical Summer OJT record set with exactly 300
+  // validated rendered hours: 37 x 8 hours + 1 x 4 hours.
+  const summerDates = getWorkingDatesInclusive(SUMMER_OJT_START, SUMMER_OJT_END);
+  const completedDates = summerDates.slice(0, 38);
+  const completedStudentEmail = "studentsbims5@grr.la";
+
+  completedDates.forEach((attendanceDate, index) => {
+    const isFinalShortDay = index === completedDates.length - 1;
+
+    records.push({
+      seedKey: `attendance-${records.length + 1}`,
+      studentEmail: completedStudentEmail,
+      attendanceDate,
+      timeIn: "08:00:00",
+      timeOut: isFinalShortDay ? "13:00:00" : "17:00:00",
+      validationStatus: "validated",
+      validatedByEmail: "coordinatorsbims1@grr.la",
+      validatedAt: `${attendanceDate}T${isFinalShortDay ? "13:30" : "17:30"}:00+08:00`,
+    });
+  });
+
+  return records;
+}
+
+const seedAttendance = buildAttendanceSeed();
 
 const ATTENDANCE_SELECT = `
   id,
@@ -230,7 +200,7 @@ async function findInternshipByStudent(
 ): Promise<InternshipRow | null> {
   const { data, error } = await supabaseAdmin
     .from("internships")
-    .select("id, student_id, status")
+    .select("id, student_id, start_date, end_date, status")
     .eq("student_id", studentId)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -284,10 +254,16 @@ async function resolveInternship(
     );
   }
 
-  if (internship.status !== "active") {
+  if (internship.status !== "active" && internship.status !== "completed") {
     throw new Error(
       `Internship for ${normalizeEmail(studentEmail)} is ` +
-        `${internship.status} and cannot receive attendance records.`,
+        `${internship.status} and cannot receive seeded attendance records.`,
+    );
+  }
+
+  if (!internship.start_date || !internship.end_date) {
+    throw new Error(
+      `Internship for ${normalizeEmail(studentEmail)} has no valid internship period.`,
     );
   }
 
@@ -406,6 +382,13 @@ async function seedAttendanceRecord(
   const student = await resolveStudent(seed.studentEmail);
 
   const internship = await resolveInternship(student.id, student.email);
+
+  if (seed.attendanceDate < internship.start_date! || seed.attendanceDate > internship.end_date!) {
+    throw new Error(
+      `Attendance date ${seed.attendanceDate} for ${normalizeEmail(seed.studentEmail)} ` +
+        `is outside internship period ${internship.start_date}..${internship.end_date}.`,
+    );
+  }
 
   let validatedBy: CoordinatorRow | null = null;
 

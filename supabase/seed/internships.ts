@@ -9,6 +9,8 @@ interface SeedInternship {
   studentEmail: string;
   hteCompanyName: string;
   facultyAdviserEmail: string;
+  startDate: string;
+  endDate: string;
   requiredHours: number;
   status: InternshipStatus;
 }
@@ -38,6 +40,8 @@ interface InternshipRow {
   hte_id: string;
   faculty_adviser_id: string | null;
   required_hours: number | null;
+  start_date: string | null;
+  end_date: string | null;
   status: InternshipStatus;
 }
 
@@ -50,19 +54,14 @@ const PROGRAM_HOURS: Readonly<Record<string, number>> = {
 /*
  * Development-only synthetic internship assignments.
  *
- * The same degree program always receives the same required hours.
+ * Academic-period convention used by this seed:
+ * - First semester: August to December
+ * - Second semester: January to May
+ * - Summer OJT: optional June to August period
  *
- * Student 01 - CS      - active
- * Student 03 - CpE     - active
- * Student 04 - IT      - active
- * Student 05 - IT      - completed
- * Student 06 - CS      - pending
- *
- * This intentionally demonstrates:
- * - active internships
- * - a pending internship
- * - a completed historical internship
- * - multiple students from the same program sharing the same hours
+ * The database intentionally has no semester table. The seed stores only
+ * the actual internship start/end dates, while these comments/constants
+ * document the Philippine two-semester convention used for test data.
  */
 const seedInternships: readonly SeedInternship[] = [
   {
@@ -70,6 +69,8 @@ const seedInternships: readonly SeedInternship[] = [
     studentEmail: "studentsbims1@grr.la",
     hteCompanyName: "ABC Computing Solutions, Inc.",
     facultyAdviserEmail: "facultysbims1@grr.la",
+    startDate: "2026-08-17",
+    endDate: "2026-12-19",
     requiredHours: 300,
     status: "active",
   },
@@ -77,7 +78,9 @@ const seedInternships: readonly SeedInternship[] = [
     seedKey: "internship-02",
     studentEmail: "studentsbims3@grr.la",
     hteCompanyName: "DEF Engineering Corporation",
-    facultyAdviserEmail: "facultysbims2@grr.la",
+    facultyAdviserEmail: "facultysbims3@grr.la",
+    startDate: "2026-08-17",
+    endDate: "2026-12-19",
     requiredHours: 350,
     status: "active",
   },
@@ -85,25 +88,131 @@ const seedInternships: readonly SeedInternship[] = [
     seedKey: "internship-03",
     studentEmail: "studentsbims4@grr.la",
     hteCompanyName: "GHI Applied Technologies, Inc.",
-    facultyAdviserEmail: "facultysbims3@grr.la",
+    facultyAdviserEmail: "facultysbims1@grr.la",
+    startDate: "2026-08-17",
+    endDate: "2026-12-19",
     requiredHours: 300,
     status: "active",
   },
   {
     seedKey: "internship-04",
-    studentEmail: "studentsbims5@grr.la",
-    hteCompanyName: "ABC Computing Solutions, Inc.",
-    facultyAdviserEmail: "facultysbims1@grr.la",
+    studentEmail: "studentsbims6@grr.la",
+    hteCompanyName: "Jupiter Digital Systems, Inc.",
+    facultyAdviserEmail: "facultysbims3@grr.la",
+    startDate: "2026-08-17",
+    endDate: "2026-12-19",
     requiredHours: 300,
-    status: "completed",
+    status: "active",
   },
   {
     seedKey: "internship-05",
-    studentEmail: "studentsbims6@grr.la",
-    hteCompanyName: "GHI Applied Technologies, Inc.",
+    studentEmail: "studentsbims7@grr.la",
+    hteCompanyName: "Northstar Software Labs",
+    facultyAdviserEmail: "facultysbims1@grr.la",
+    startDate: "2026-08-17",
+    endDate: "2026-12-19",
+    requiredHours: 300,
+    status: "active",
+  },
+  {
+    seedKey: "internship-06",
+    studentEmail: "studentsbims8@grr.la",
+    hteCompanyName: "Manila Cloudworks Corporation",
     facultyAdviserEmail: "facultysbims3@grr.la",
+    startDate: "2026-08-17",
+    endDate: "2026-12-19",
+    requiredHours: 300,
+    status: "active",
+  },
+  {
+    seedKey: "internship-07",
+    studentEmail: "studentsbims9@grr.la",
+    hteCompanyName: "Cavite Technology Solutions",
+    facultyAdviserEmail: "facultysbims1@grr.la",
+    startDate: "2026-08-17",
+    endDate: "2026-12-19",
+    requiredHours: 350,
+    status: "active",
+  },
+  {
+    seedKey: "internship-08",
+    studentEmail: "studentsbims10@grr.la",
+    hteCompanyName: "Metro Data Services Philippines",
+    facultyAdviserEmail: "facultysbims3@grr.la",
+    startDate: "2026-08-17",
+    endDate: "2026-12-19",
+    requiredHours: 300,
+    status: "active",
+  },
+  {
+    seedKey: "internship-09",
+    studentEmail: "studentsbims11@grr.la",
+    hteCompanyName: "ABC Computing Solutions, Inc.",
+    facultyAdviserEmail: "facultysbims1@grr.la",
+    startDate: "2026-08-17",
+    endDate: "2026-12-19",
+    requiredHours: 300,
+    status: "active",
+  },
+  {
+    seedKey: "internship-10",
+    studentEmail: "studentsbims12@grr.la",
+    hteCompanyName: "DEF Engineering Corporation",
+    facultyAdviserEmail: "facultysbims3@grr.la",
+    startDate: "2026-08-17",
+    endDate: "2026-12-19",
+    requiredHours: 300,
+    status: "active",
+  },
+  {
+    seedKey: "internship-11",
+    studentEmail: "studentsbims13@grr.la",
+    hteCompanyName: "GHI Applied Technologies, Inc.",
+    facultyAdviserEmail: "facultysbims1@grr.la",
+    startDate: "2027-01-18",
+    endDate: "2027-05-22",
+    requiredHours: 350,
+    status: "pending",
+  },
+  {
+    seedKey: "internship-12",
+    studentEmail: "studentsbims14@grr.la",
+    hteCompanyName: "Jupiter Digital Systems, Inc.",
+    facultyAdviserEmail: "facultysbims3@grr.la",
+    startDate: "2027-01-18",
+    endDate: "2027-05-22",
     requiredHours: 300,
     status: "pending",
+  },
+  {
+    seedKey: "internship-13",
+    studentEmail: "studentsbims15@grr.la",
+    hteCompanyName: "Northstar Software Labs",
+    facultyAdviserEmail: "facultysbims1@grr.la",
+    startDate: "2027-01-18",
+    endDate: "2027-05-22",
+    requiredHours: 300,
+    status: "pending",
+  },
+  {
+    seedKey: "internship-14",
+    studentEmail: "studentsbims16@grr.la",
+    hteCompanyName: "Manila Cloudworks Corporation",
+    facultyAdviserEmail: "facultysbims3@grr.la",
+    startDate: "2027-01-18",
+    endDate: "2027-05-22",
+    requiredHours: 300,
+    status: "pending",
+  },
+  {
+    seedKey: "internship-15",
+    studentEmail: "studentsbims5@grr.la",
+    hteCompanyName: "ABC Computing Solutions, Inc.",
+    facultyAdviserEmail: "facultysbims1@grr.la",
+    startDate: "2026-06-01",
+    endDate: "2026-08-07",
+    requiredHours: 300,
+    status: "completed",
   },
 ];
 
@@ -113,6 +222,8 @@ const INTERNSHIP_SELECT = `
   hte_id,
   faculty_adviser_id,
   required_hours,
+  start_date,
+  end_date,
   status
 `;
 
@@ -263,6 +374,8 @@ async function createInternship(
       student_id: student.id,
       hte_id: hte.id,
       faculty_adviser_id: adviser.id,
+      start_date: seed.startDate,
+      end_date: seed.endDate,
       required_hours: seed.requiredHours,
       status: seed.status,
     })
@@ -301,6 +414,8 @@ async function reconcileInternship(
     .update({
       hte_id: hte.id,
       faculty_adviser_id: adviser.id,
+      start_date: seed.startDate,
+      end_date: seed.endDate,
       required_hours: seed.requiredHours,
     })
     .eq("id", existing.id);
@@ -349,27 +464,33 @@ async function seedInternship(seed: SeedInternship): Promise<void> {
    * A student may have multiple completed records, but only one
    * pending/active record.
    */
-  if (existing.status !== "completed" && seed.status !== "completed") {
-    await reconcileInternship(seed, existing, hte, adviser);
-    return;
-  }
-
-  /*
-   * If the existing record is completed and the seed wants another
-   * completed record, we can create historical data.
-   *
-   * For this initial seed set, however, we avoid creating duplicate
-   * completed records on every run.
-   */
   if (existing.status === "completed") {
-    console.log(`  Existing completed internship found: ${existing.id}`);
-    console.log("  Skipping duplicate historical record.");
+    if (seed.status === "completed") {
+      await reconcileInternship(seed, existing, hte, adviser);
+    } else {
+      console.log(`  Existing completed internship found: ${existing.id}`);
+      console.log("  Skipping new operational record for this seed run.");
+    }
     return;
   }
 
-  throw new Error(
-    `Student ${student.email} already has an operational ` +
-      `internship with status=${existing.status}.`,
+  if (seed.status === "completed") {
+    throw new Error(
+      `Student ${student.email} already has an operational ` +
+        `internship with status=${existing.status}; cannot create historical record ` +
+        `without a separate internship history seed.`,
+    );
+  }
+
+  await reconcileInternship(seed, existing, hte, adviser);
+  return;
+}
+
+function isValidDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return (
+    !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
   );
 }
 
@@ -387,6 +508,19 @@ function validateSeedInternships(): void {
     if (seenStudents.has(studentEmail)) {
       throw new Error(
         `Student ${studentEmail} appears in multiple internship seeds.`,
+      );
+    }
+
+    if (
+      !isValidDate(internship.startDate) ||
+      !isValidDate(internship.endDate)
+    ) {
+      throw new Error(`Invalid internship period for ${internship.seedKey}.`);
+    }
+
+    if (internship.startDate >= internship.endDate) {
+      throw new Error(
+        `Internship start date must be before end date for ${internship.seedKey}.`,
       );
     }
 
