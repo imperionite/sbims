@@ -393,8 +393,7 @@ Deno.test(
     });
 
     await assertRejects(
-      () =>
-        service.reviewDocument(DOCUMENT_ID, STUDENT_ID, "student", "approved"),
+      () => service.reviewDocument(DOCUMENT_ID, STUDENT_ID, "student", "approved"),
       AppError,
       "Only internship coordinators can review documents.",
     );
@@ -983,7 +982,7 @@ Deno.test("FR-09 faculty adviser cannot review documents", async () => {
       COORDINATOR_ID,
       "internship_coordinator",
       "approved",
-    ),
+    )
   );
 });
 
