@@ -45,23 +45,27 @@ interface InternshipRow {
   status: InternshipStatus;
 }
 
-const PROGRAM_HOURS: Readonly<Record<string, number>> = {
-  "Bachelor of Science in Computer Science": 300,
-  "Bachelor of Science in Computer Engineering": 350,
-  "Bachelor of Science in Information Technology": 300,
-};
+const DEMO_REQUIRED_HOURS = 150;
+const HISTORICAL_REQUIRED_HOURS = 300;
 
 /*
- * Development-only synthetic internship assignments.
+ * Development/demo dataset.
  *
- * Academic-period convention used by this seed:
- * - First semester: August to December
- * - Second semester: January to May
- * - Summer OJT: optional June to August period
+ * The API/database do not define 150 hours as a universal academic rule.
+ * This seed intentionally uses a smaller requirement so the complete
+ * evaluation workflow can be demonstrated quickly.
  *
- * The database intentionally has no semester table. The seed stores only
- * the actual internship start/end dates, while these comments/constants
- * document the Philippine two-semester convention used for test data.
+ * Three completed internships are evaluation-ready as of 2026-09-13:
+ * - end date: 2026-09-12
+ * - required hours: 150
+ * - attendance seed: exactly 150 validated rendered hours
+ *
+ * Seven active internships are deliberately near completion:
+ * - required hours: 150
+ * - attendance seed: 136 validated rendered hours
+ *
+ * Four pending internships have no attendance records.
+ * One historical Summer OJT remains at 300 hours.
  */
 const seedInternships: readonly SeedInternship[] = [
   {
@@ -70,9 +74,9 @@ const seedInternships: readonly SeedInternship[] = [
     hteCompanyName: "ABC Computing Solutions, Inc.",
     facultyAdviserEmail: "facultysbims1@grr.la",
     startDate: "2026-08-17",
-    endDate: "2026-12-19",
-    requiredHours: 300,
-    status: "active",
+    endDate: "2026-09-12",
+    requiredHours: DEMO_REQUIRED_HOURS,
+    status: "completed",
   },
   {
     seedKey: "internship-02",
@@ -80,9 +84,9 @@ const seedInternships: readonly SeedInternship[] = [
     hteCompanyName: "DEF Engineering Corporation",
     facultyAdviserEmail: "facultysbims3@grr.la",
     startDate: "2026-08-17",
-    endDate: "2026-12-19",
-    requiredHours: 350,
-    status: "active",
+    endDate: "2026-09-12",
+    requiredHours: DEMO_REQUIRED_HOURS,
+    status: "completed",
   },
   {
     seedKey: "internship-03",
@@ -90,9 +94,9 @@ const seedInternships: readonly SeedInternship[] = [
     hteCompanyName: "GHI Applied Technologies, Inc.",
     facultyAdviserEmail: "facultysbims1@grr.la",
     startDate: "2026-08-17",
-    endDate: "2026-12-19",
-    requiredHours: 300,
-    status: "active",
+    endDate: "2026-09-12",
+    requiredHours: DEMO_REQUIRED_HOURS,
+    status: "completed",
   },
   {
     seedKey: "internship-04",
@@ -101,7 +105,7 @@ const seedInternships: readonly SeedInternship[] = [
     facultyAdviserEmail: "facultysbims3@grr.la",
     startDate: "2026-08-17",
     endDate: "2026-12-19",
-    requiredHours: 300,
+    requiredHours: DEMO_REQUIRED_HOURS,
     status: "active",
   },
   {
@@ -111,7 +115,7 @@ const seedInternships: readonly SeedInternship[] = [
     facultyAdviserEmail: "facultysbims1@grr.la",
     startDate: "2026-08-17",
     endDate: "2026-12-19",
-    requiredHours: 300,
+    requiredHours: DEMO_REQUIRED_HOURS,
     status: "active",
   },
   {
@@ -121,7 +125,7 @@ const seedInternships: readonly SeedInternship[] = [
     facultyAdviserEmail: "facultysbims3@grr.la",
     startDate: "2026-08-17",
     endDate: "2026-12-19",
-    requiredHours: 300,
+    requiredHours: DEMO_REQUIRED_HOURS,
     status: "active",
   },
   {
@@ -131,7 +135,7 @@ const seedInternships: readonly SeedInternship[] = [
     facultyAdviserEmail: "facultysbims1@grr.la",
     startDate: "2026-08-17",
     endDate: "2026-12-19",
-    requiredHours: 350,
+    requiredHours: DEMO_REQUIRED_HOURS,
     status: "active",
   },
   {
@@ -141,7 +145,7 @@ const seedInternships: readonly SeedInternship[] = [
     facultyAdviserEmail: "facultysbims3@grr.la",
     startDate: "2026-08-17",
     endDate: "2026-12-19",
-    requiredHours: 300,
+    requiredHours: DEMO_REQUIRED_HOURS,
     status: "active",
   },
   {
@@ -151,7 +155,7 @@ const seedInternships: readonly SeedInternship[] = [
     facultyAdviserEmail: "facultysbims1@grr.la",
     startDate: "2026-08-17",
     endDate: "2026-12-19",
-    requiredHours: 300,
+    requiredHours: DEMO_REQUIRED_HOURS,
     status: "active",
   },
   {
@@ -161,7 +165,7 @@ const seedInternships: readonly SeedInternship[] = [
     facultyAdviserEmail: "facultysbims3@grr.la",
     startDate: "2026-08-17",
     endDate: "2026-12-19",
-    requiredHours: 300,
+    requiredHours: DEMO_REQUIRED_HOURS,
     status: "active",
   },
   {
@@ -171,7 +175,7 @@ const seedInternships: readonly SeedInternship[] = [
     facultyAdviserEmail: "facultysbims1@grr.la",
     startDate: "2027-01-18",
     endDate: "2027-05-22",
-    requiredHours: 350,
+    requiredHours: DEMO_REQUIRED_HOURS,
     status: "pending",
   },
   {
@@ -181,7 +185,7 @@ const seedInternships: readonly SeedInternship[] = [
     facultyAdviserEmail: "facultysbims3@grr.la",
     startDate: "2027-01-18",
     endDate: "2027-05-22",
-    requiredHours: 300,
+    requiredHours: DEMO_REQUIRED_HOURS,
     status: "pending",
   },
   {
@@ -191,7 +195,7 @@ const seedInternships: readonly SeedInternship[] = [
     facultyAdviserEmail: "facultysbims1@grr.la",
     startDate: "2027-01-18",
     endDate: "2027-05-22",
-    requiredHours: 300,
+    requiredHours: DEMO_REQUIRED_HOURS,
     status: "pending",
   },
   {
@@ -201,7 +205,7 @@ const seedInternships: readonly SeedInternship[] = [
     facultyAdviserEmail: "facultysbims3@grr.la",
     startDate: "2027-01-18",
     endDate: "2027-05-22",
-    requiredHours: 300,
+    requiredHours: DEMO_REQUIRED_HOURS,
     status: "pending",
   },
   {
@@ -211,7 +215,7 @@ const seedInternships: readonly SeedInternship[] = [
     facultyAdviserEmail: "facultysbims1@grr.la",
     startDate: "2026-06-01",
     endDate: "2026-08-07",
-    requiredHours: 300,
+    requiredHours: HISTORICAL_REQUIRED_HOURS,
     status: "completed",
   },
 ];
@@ -232,15 +236,7 @@ async function findStudentByEmail(email: string): Promise<StudentRow | null> {
 
   const { data, error } = await supabaseAdmin
     .from("student_profiles")
-    .select(
-      `
-      id,
-      program,
-      profiles!inner (
-        email
-      )
-    `,
-    )
+    .select(`id, program, profiles!inner(email)`)
     .eq("profiles.email", normalizedEmail)
     .maybeSingle();
 
@@ -248,15 +244,10 @@ async function findStudentByEmail(email: string): Promise<StudentRow | null> {
     throw seedError(`internships.find-student:${normalizedEmail}`, error);
   }
 
-  if (!data) {
-    return null;
-  }
+  if (!data) return null;
 
   const profile = Array.isArray(data.profiles) ? data.profiles[0] : data.profiles;
-
-  if (!profile) {
-    return null;
-  }
+  if (!profile) return null;
 
   return {
     id: data.id,
@@ -274,10 +265,7 @@ async function findHteByCompanyName(
     .eq("company_name", companyName)
     .maybeSingle();
 
-  if (error) {
-    throw seedError(`internships.find-hte:${companyName}`, error);
-  }
-
+  if (error) throw seedError(`internships.find-hte:${companyName}`, error);
   return data as HteRow | null;
 }
 
@@ -296,31 +284,23 @@ async function findFacultyAdviserByEmail(
   if (error) {
     throw seedError(`internships.find-adviser:${normalizedEmail}`, error);
   }
-
   return data as FacultyAdviserRow | null;
 }
 
 async function resolveStudent(email: string): Promise<StudentRow> {
   const student = await findStudentByEmail(email);
-
   if (!student) {
     throw new Error(`Student profile not found: ${normalizeEmail(email)}`);
   }
-
   return student;
 }
 
 async function resolveHte(companyName: string): Promise<HteRow> {
   const hte = await findHteByCompanyName(companyName);
-
-  if (!hte) {
-    throw new Error(`HTE not found: ${companyName}`);
-  }
-
+  if (!hte) throw new Error(`HTE not found: ${companyName}`);
   if (!hte.is_active) {
     throw new Error(`HTE ${companyName} is inactive and cannot be assigned.`);
   }
-
   return hte;
 }
 
@@ -328,19 +308,16 @@ async function resolveFacultyAdviser(
   email: string,
 ): Promise<FacultyAdviserRow> {
   const adviser = await findFacultyAdviserByEmail(email);
-
   if (!adviser) {
     throw new Error(
       `Faculty adviser profile not found: ${normalizeEmail(email)}`,
     );
   }
-
   if (!adviser.is_active) {
     throw new Error(
       `Faculty adviser ${normalizeEmail(email)} is inactive and cannot be assigned.`,
     );
   }
-
   return adviser;
 }
 
@@ -358,7 +335,6 @@ async function findExistingInternshipForStudent(
   if (error) {
     throw seedError(`internships.find-student-history:${studentId}`, error);
   }
-
   return data as InternshipRow | null;
 }
 
@@ -388,11 +364,7 @@ async function createInternship(
 
   console.log(
     `  ✓ Created internship ${data.id} ` +
-      `(student=${student.email}, ` +
-      `hte=${hte.company_name}, ` +
-      `adviser=${adviser.email}, ` +
-      `hours=${seed.requiredHours}, ` +
-      `status=${seed.status})`,
+      `(student=${student.email}, hours=${seed.requiredHours}, status=${seed.status})`,
   );
 }
 
@@ -402,56 +374,40 @@ async function reconcileInternship(
   hte: HteRow,
   adviser: FacultyAdviserRow,
 ): Promise<void> {
+  const updateData: Record<string, unknown> = {
+    hte_id: hte.id,
+    faculty_adviser_id: adviser.id,
+    start_date: seed.startDate,
+    end_date: seed.endDate,
+    required_hours: seed.requiredHours,
+  };
+
   /*
-   * Do not change lifecycle state during reconciliation.
-   *
-   * Status represents real internship history. A completed record
-   * must not be turned back into active simply because the seed says
-   * "active".
+   * This is a development seed, not an API lifecycle operation.
+   * If an older seed left one of the three demo interns active, the new
+   * dataset must reconcile it to completed so the evaluation seed can run.
    */
+  if (seed.status === "completed" && existing.status !== "completed") {
+    updateData.status = "completed";
+  }
+
   const { error } = await supabaseAdmin
     .from("internships")
-    .update({
-      hte_id: hte.id,
-      faculty_adviser_id: adviser.id,
-      start_date: seed.startDate,
-      end_date: seed.endDate,
-      required_hours: seed.requiredHours,
-    })
+    .update(updateData)
     .eq("id", existing.id);
 
-  if (error) {
-    throw seedError(`internships.reconcile:${seed.seedKey}`, error);
-  }
+  if (error) throw seedError(`internships.reconcile:${seed.seedKey}`, error);
 
   console.log(
     `  ✓ Reconciled internship ${existing.id} ` +
-      `(status preserved=${existing.status}, ` +
-      `hours=${seed.requiredHours})`,
+      `(status=${existing.status} -> ${seed.status}, hours=${seed.requiredHours})`,
   );
 }
 
 async function seedInternship(seed: SeedInternship): Promise<void> {
-  console.log(`\nProcessing ${seed.seedKey}`);
-
   const student = await resolveStudent(seed.studentEmail);
   const hte = await resolveHte(seed.hteCompanyName);
   const adviser = await resolveFacultyAdviser(seed.facultyAdviserEmail);
-
-  const expectedHours = PROGRAM_HOURS[student.program];
-
-  if (expectedHours === undefined) {
-    throw new Error(
-      `No internship hour mapping exists for program: ${student.program}`,
-    );
-  }
-
-  if (seed.requiredHours !== expectedHours) {
-    throw new Error(
-      `Invalid required hours for ${student.program}: ` +
-        `expected ${expectedHours}, received ${seed.requiredHours}.`,
-    );
-  }
 
   const existing = await findExistingInternshipForStudent(student.id);
 
@@ -460,30 +416,7 @@ async function seedInternship(seed: SeedInternship): Promise<void> {
     return;
   }
 
-  /*
-   * A student may have multiple completed records, but only one
-   * pending/active record.
-   */
-  if (existing.status === "completed") {
-    if (seed.status === "completed") {
-      await reconcileInternship(seed, existing, hte, adviser);
-    } else {
-      console.log(`  Existing completed internship found: ${existing.id}`);
-      console.log("  Skipping new operational record for this seed run.");
-    }
-    return;
-  }
-
-  if (seed.status === "completed") {
-    throw new Error(
-      `Student ${student.email} already has an operational ` +
-        `internship with status=${existing.status}; cannot create historical record ` +
-        `without a separate internship history seed.`,
-    );
-  }
-
   await reconcileInternship(seed, existing, hte, adviser);
-  return;
 }
 
 function isValidDate(value: string): boolean {
@@ -499,35 +432,30 @@ function validateSeedInternships(): void {
   const seenStudents = new Set<string>();
 
   for (const internship of seedInternships) {
+    const studentEmail = normalizeEmail(internship.studentEmail);
+
     if (seenSeedKeys.has(internship.seedKey)) {
       throw new Error(`Duplicate internship seed key: ${internship.seedKey}`);
     }
-
-    const studentEmail = normalizeEmail(internship.studentEmail);
-
     if (seenStudents.has(studentEmail)) {
       throw new Error(
         `Student ${studentEmail} appears in multiple internship seeds.`,
       );
     }
-
     if (
       !isValidDate(internship.startDate) ||
       !isValidDate(internship.endDate)
     ) {
       throw new Error(`Invalid internship period for ${internship.seedKey}.`);
     }
-
     if (internship.startDate >= internship.endDate) {
       throw new Error(
         `Internship start date must be before end date for ${internship.seedKey}.`,
       );
     }
-
     if (internship.requiredHours < 150 || internship.requiredHours > 350) {
       throw new Error(
-        `Invalid required hours for ${internship.seedKey}: ` +
-          `${internship.requiredHours}. Expected 150-350.`,
+        `Invalid required hours for ${internship.seedKey}: ${internship.requiredHours}.`,
       );
     }
 
@@ -540,7 +468,7 @@ async function seed(): Promise<void> {
   validateSeedInternships();
 
   console.log("========================================");
-  console.log("SBIMS Internship Seed");
+  console.log("SBIMS Development Internship Seed");
   console.log("========================================");
   console.log(`Internships to process: ${seedInternships.length}`);
 
@@ -553,7 +481,6 @@ async function seed(): Promise<void> {
       successCount++;
     } catch (error) {
       failureCount++;
-
       console.error(
         `✗ Failed to seed ${internship.seedKey}:`,
         error instanceof Error ? error.message : error,
@@ -562,14 +489,14 @@ async function seed(): Promise<void> {
   }
 
   console.log("\n========================================");
-  console.log("Internship seed complete");
+  console.log("Internship Seed Summary");
+  console.log("========================================");
   console.log(`Successful: ${successCount}`);
   console.log(`Failed:     ${failureCount}`);
-  console.log("========================================");
 
   if (failureCount > 0) {
     throw new Error(
-      `Internship seed completed with ${failureCount} failure(s).`,
+      `Internship seeding completed with ${failureCount} failure(s).`,
     );
   }
 }
