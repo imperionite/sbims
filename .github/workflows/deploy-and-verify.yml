@@ -16,6 +16,8 @@ concurrency:
 
 env:
   DENO_VERSION: "2.9.7"
+  DENO_ORG: "imperionite"
+  DENO_APP: "sbims"
   DENO_HEALTH_URL: "https://api.sbims.me/api/v1/health"
 
 jobs:
@@ -92,7 +94,10 @@ jobs:
           echo "Organization: ${DENO_ORG}"
           echo "Application: ${DENO_APP}"
 
-          deno deploy --prod
+          deno deploy \
+            --org "${DENO_ORG}" \
+            --app "${DENO_APP}" \
+            --prod
 
           END=$(date +%s)
           DURATION=$((END - START))

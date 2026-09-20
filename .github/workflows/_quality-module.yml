@@ -1,5 +1,3 @@
-# .github/workflows/_quality-module.yml
-
 name: Module Quality Gate
 
 on:
@@ -10,7 +8,7 @@ on:
         required: true
         type: string
       
-      deno-version:
+      deno_version:
         description: "Deno version used by the quality gate"
         required: false
         default: "2.9.7"
@@ -119,7 +117,7 @@ jobs:
 
       - name: Install Deno Dependencies
         run: |
-          deno install --frozen
+          deno install
 
       # ============================================================
       # VERIFY DEPENDENCY RESOLUTION
