@@ -117,7 +117,7 @@ jobs:
 
       - name: Install Deno Dependencies
         run: |
-          deno install
+          deno install --frozen
 
       # ============================================================
       # VERIFY DEPENDENCY RESOLUTION
