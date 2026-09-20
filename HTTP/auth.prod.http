@@ -50,7 +50,8 @@
 ###############################################################
 
 ### Health Check
-GET {{apiUrl}}/health
+GET https://api.sbims.me/api/v1/health
+Content-Type: application/json
 
 ###############################################################
 # LOGIN
@@ -74,7 +75,7 @@ Content-Type: application/json
 ### Expected:
 ### - Login succeeds
 ### - mustChangePassword = false
-POST {{apiUrl}}/auth/login
+POST https://api.sbims.me/api/v1/auth/login
 Content-Type: application/json
 
 {

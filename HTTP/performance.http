@@ -1,6 +1,6 @@
 ### Configuration
 
-@deno=https://sbims.imperionite.deno.net/api/v1/performance
+@deno=https://api.sbims.me/api/v1/performance
 @cf=https://sbims.lr-aimperial.workers.dev/api/v1/performance
 
 @denoDev=http://localhost:8000/api/v1/performance
