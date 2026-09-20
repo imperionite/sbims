@@ -19,7 +19,7 @@ env:
 
   DENO_ORG: "imperionite"
   DENO_APP: "sbims"
-  DENO_HEALTH_URL: "https://sbims.imperionite.deno.net/api/v1/health"
+  DENO_HEALTH_URL: "https://api.sbims.me/api/v1/health"
 
 jobs:
 

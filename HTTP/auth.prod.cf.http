@@ -23,7 +23,7 @@
 # Variables
 ###############################################################
 
-@apiUrl=https://sbims.lr-aimperial.workers.dev/api/v1
+@apiUrl=https://cf.sbims.me/api/v1
 
 ### Access token from a successful login
 @accessToken=PASTE_ACCESS_TOKEN_HERE
@@ -79,7 +79,7 @@ Content-Type: application/json
 
 {
   "email": "{{admin}}",
-  "password": "{{newPassword}}"
+  "password": "{{defaultPassword}}"
 }
 
 ###############################################################
