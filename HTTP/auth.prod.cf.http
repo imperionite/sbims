@@ -51,6 +51,7 @@
 
 ### Health Check
 GET {{apiUrl}}/health
+Content-Type: application/json
 
 ###############################################################
 # LOGIN
