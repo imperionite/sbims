@@ -9,6 +9,12 @@ on:
         description: "Module being tested"
         required: true
         type: string
+      
+      deno-version:
+        description: "Deno version used by the quality gate"
+        required: false
+        default: "2.9.7"
+        type: string
 
       unit_task:
         description: "Unit-test task. Optional for pipelines without tests."
@@ -91,7 +97,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.5"
+          deno-version: ${{ inputs.deno_version }}
 
       # ============================================================
       # DENO DEPENDENCY CACHE
@@ -113,7 +119,7 @@ jobs:
 
       - name: Install Deno Dependencies
         run: |
-          deno install
+          deno install --frozen
 
       # ============================================================
       # VERIFY DEPENDENCY RESOLUTION
