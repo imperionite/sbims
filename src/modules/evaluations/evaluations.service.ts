@@ -11,7 +11,12 @@ import type {
   UpdateEvaluationInput,
 } from "./evaluations.types.ts";
 
-type EvaluationManagerRole = "hte_supervisor" | "faculty_adviser";
+import { EVALUATION_CRITERIA } from "./evaluations.types.ts";
+
+type EvaluationManagerRole =
+  | "hte_supervisor"
+  | "faculty_adviser"
+  | "student";
 
 type EvaluationAccessRole =
   | "administrator"
@@ -26,9 +31,12 @@ interface InternshipAuthorizationRecord {
   hte_id: string;
   faculty_adviser_id: string | null;
   status: string;
-  hte_profiles: {
-    supervisor_id: string | null;
-  } | null;
+  hte_profiles:
+    | Array<{
+      supervisor_id: string | null;
+    }>
+    | { supervisor_id: string | null }
+    | null;
 }
 
 export class EvaluationService {
@@ -39,13 +47,10 @@ export class EvaluationService {
   }
 
   /**
-   * Verifies that the authenticated evaluator is assigned
-   * to the internship for the requested evaluation type.
+   * Retrieves the internship used for assignment and resource authorization.
    */
-  private async verifyEvaluatorAssignment(
+  private async getInternship(
     internshipId: string,
-    userId: string,
-    evaluationType: EvaluationType,
   ): Promise<InternshipAuthorizationRecord> {
     const { data, error } = await this.clients.supabaseAdmin
       .from("internships")
@@ -65,22 +70,34 @@ export class EvaluationService {
       .maybeSingle();
 
     if (error) {
-      console.error("VERIFY EVALUATOR ASSIGNMENT FAILED:", error);
-
-      throw new AppError(500, "Failed to verify internship assignment.");
+      console.error("GET INTERNSHIP FOR EVALUATION FAILED:", error);
+      throw new AppError(500, "Failed to verify internship access.");
     }
 
     if (!data) {
       throw new AppError(404, "Internship not found.");
     }
 
-    const internship = data as unknown as InternshipAuthorizationRecord;
+    return data as unknown as InternshipAuthorizationRecord;
+  }
+
+  /**
+   * Verifies that the authenticated evaluator is assigned to the
+   * internship for the requested evaluation type.
+   */
+  private async verifyEvaluatorAssignment(
+    internshipId: string,
+    userId: string,
+    evaluationType: EvaluationType,
+  ): Promise<InternshipAuthorizationRecord> {
+    const internship = await this.getInternship(internshipId);
 
     if (evaluationType === "hte_supervisor") {
-      if (
-        !internship.hte_profiles ||
-        internship.hte_profiles.supervisor_id !== userId
-      ) {
+      const supervisorId = Array.isArray(internship.hte_profiles)
+        ? (internship.hte_profiles[0]?.supervisor_id ?? null)
+        : (internship.hte_profiles?.supervisor_id ?? null);
+
+      if (!supervisorId || supervisorId !== userId) {
         throw new AppError(
           403,
           "You can only manage HTE evaluations for internships assigned to your HTE.",
@@ -132,10 +149,9 @@ export class EvaluationService {
   /**
    * Checks the final internship eligibility rule.
    *
-   * An evaluation is allowed only when:
-   * 1. The internship end date has passed.
-   * 2. Validated rendered hours are greater than or equal
-   *    to the required hours.
+   * This rule is intentionally used at final submission rather than
+   * draft creation. It remains the single source of truth for whether
+   * the internship is ready for final evaluation.
    */
   private async requireFinalEligibility(internshipId: string): Promise<void> {
     const eligibility = await this.eligibilityService.checkFinalEligibility(internshipId);
@@ -149,16 +165,10 @@ export class EvaluationService {
         throw new AppError(404, "Internship not found.");
 
       case "internship_period_not_ended":
-        throw new AppError(
-          400,
-          "The internship period has not ended yet.",
-        );
+        throw new AppError(400, "The internship period has not ended yet.");
 
       case "required_hours_not_set":
-        throw new AppError(
-          400,
-          "Required internship hours have not been set.",
-        );
+        throw new AppError(400, "Required internship hours have not been set.");
 
       case "required_hours_not_met":
         throw new AppError(
@@ -175,57 +185,18 @@ export class EvaluationService {
   }
 
   /**
-   * Retrieves the internship associated with an evaluation.
+   * Verifies access to an internship independently from evaluation state.
+   * This avoids using a fake evaluation record when an internship has
+   * no evaluations yet.
    */
-  private async getInternshipForEvaluation(
-    evaluation: EvaluationRecord,
-  ): Promise<InternshipAuthorizationRecord> {
-    const { data, error } = await this.clients.supabaseAdmin
-      .from("internships")
-      .select(
-        `
-        id,
-        student_id,
-        hte_id,
-        faculty_adviser_id,
-        status,
-        hte_profiles!inner (
-          supervisor_id
-        )
-        `,
-      )
-      .eq("id", evaluation.internship_id)
-      .maybeSingle();
-
-    if (error) {
-      console.error("GET INTERNSHIP FOR EVALUATION FAILED:", error);
-
-      throw new AppError(500, "Failed to verify evaluation access.");
-    }
-
-    if (!data) {
-      throw new AppError(404, "Internship not found.");
-    }
-
-    return data as unknown as InternshipAuthorizationRecord;
-  }
-
-  /**
-   * Verifies that the authenticated user may access
-   * the supplied evaluation.
-   */
-  private async verifyEvaluationAccess(
-    evaluation: EvaluationRecord,
+  private async authorizeInternshipAccess(
+    internshipId: string,
     userId: string,
     role: EvaluationAccessRole,
   ): Promise<InternshipAuthorizationRecord> {
-    const internship = await this.getInternshipForEvaluation(evaluation);
+    const internship = await this.getInternship(internshipId);
 
-    if (role === "administrator") {
-      return internship;
-    }
-
-    if (role === "internship_coordinator") {
+    if (role === "administrator" || role === "internship_coordinator") {
       return internship;
     }
 
@@ -237,21 +208,15 @@ export class EvaluationService {
         );
       }
 
-      if (evaluation.status !== "submitted") {
-        throw new AppError(
-          403,
-          "Evaluation results are only available after submission.",
-        );
-      }
-
       return internship;
     }
 
     if (role === "hte_supervisor") {
-      if (
-        !internship.hte_profiles ||
-        internship.hte_profiles.supervisor_id !== userId
-      ) {
+      const supervisorId = Array.isArray(internship.hte_profiles)
+        ? (internship.hte_profiles[0]?.supervisor_id ?? null)
+        : (internship.hte_profiles?.supervisor_id ?? null);
+
+      if (!supervisorId || supervisorId !== userId) {
         throw new AppError(
           403,
           "You can only access evaluations for internships assigned to your HTE.",
@@ -274,8 +239,57 @@ export class EvaluationService {
 
     throw new AppError(
       403,
-      "You are not authorized to access this evaluation.",
+      "You are not authorized to access this internship.",
     );
+  }
+
+  /**
+   * Verifies access to a particular evaluation.
+   *
+   * Evaluators may view evaluations belonging to internships assigned to
+   * them. Students may view only submitted evaluations belonging to their
+   * own internship.
+   */
+  private async verifyEvaluationAccess(
+    evaluation: EvaluationRecord,
+    userId: string,
+    role: EvaluationAccessRole,
+  ): Promise<InternshipAuthorizationRecord> {
+    const internship = await this.authorizeInternshipAccess(
+      evaluation.internship_id,
+      userId,
+      role,
+    );
+
+    if (role === "student" && evaluation.status !== "submitted") {
+      throw new AppError(
+        403,
+        "Evaluation results are only available after submission.",
+      );
+    }
+
+    return internship;
+  }
+
+  /**
+   * Ensures that every approved evaluation criterion has a score before
+   * an evaluation can become submitted.
+   */
+  private requireCompleteResponses(responses: EvaluationResponses): void {
+    const missingCriteria = EVALUATION_CRITERIA.filter(
+      (criterion) => responses[criterion] === undefined,
+    );
+
+    if (missingCriteria.length > 0) {
+      throw new AppError(
+        400,
+        `All evaluation criteria must be answered before submission. Missing: ${
+          missingCriteria.join(
+            ", ",
+          )
+        }.`,
+      );
+    }
   }
 
   /**
@@ -294,7 +308,6 @@ export class EvaluationService {
 
     if (error) {
       console.error("GET EVALUATION FAILED:", error);
-
       throw new AppError(500, "Failed to retrieve evaluation.");
     }
 
@@ -310,12 +323,11 @@ export class EvaluationService {
   }
 
   /**
-   * Creates an evaluation for an assigned internship.
+   * Creates a draft evaluation for an assigned internship.
    *
-   * HTE Supervisors create "hte_supervisor" evaluations.
-   * Faculty Advisers create "faculty_adviser" evaluations.
-   *
-   * Creation requires final internship eligibility.
+   * Final internship eligibility is intentionally NOT checked here.
+   * This allows evaluators to prepare drafts before the internship
+   * period ends or before required hours are fully satisfied.
    */
   async createEvaluation(
     userId: string,
@@ -332,8 +344,6 @@ export class EvaluationService {
       evaluationType,
     );
 
-    await this.requireFinalEligibility(input.internship_id);
-
     const { data: existingEvaluation, error: existingError } = await this.clients.supabaseAdmin
       .from("evaluations")
       .select("id, status")
@@ -344,7 +354,6 @@ export class EvaluationService {
 
     if (existingError) {
       console.error("CHECK EXISTING EVALUATION FAILED:", existingError);
-
       throw new AppError(500, "Failed to check existing evaluation.");
     }
 
@@ -389,15 +398,17 @@ export class EvaluationService {
   /**
    * Retrieves all evaluations for an internship.
    *
-   * Access is verified even when the internship has no
-   * evaluation records yet.
+   * Student requests are restricted at query level to submitted records.
+   * Other authorized roles can see both draft and submitted records.
    */
   async getEvaluationsByInternship(
     internshipId: string,
     userId: string,
     role: EvaluationAccessRole,
   ): Promise<EvaluationRecord[]> {
-    const { data, error } = await this.clients.supabaseAdmin
+    await this.authorizeInternshipAccess(internshipId, userId, role);
+
+    let query = this.clients.supabaseAdmin
       .from("evaluations")
       .select("*")
       .eq("internship_id", internshipId)
@@ -405,99 +416,111 @@ export class EvaluationService {
         ascending: true,
       });
 
+    if (role === "student") {
+      query = query.eq("status", "submitted");
+    }
+
+    const { data, error } = await query;
+
     if (error) {
       console.error("GET EVALUATIONS BY INTERNSHIP FAILED:", error);
 
       throw new AppError(500, "Failed to retrieve evaluations.");
     }
 
-    const evaluations = (data ?? []) as EvaluationRecord[];
-
-    /*
-     * Verify internship-level access even when there are
-     * zero evaluations. This prevents an unauthorized user
-     * from receiving a successful empty response for an
-     * internship they should not access.
-     */
-    if (evaluations.length === 0) {
-      const placeholderEvaluation: EvaluationRecord = {
-        id: "",
-        internship_id: internshipId,
-        evaluator_id: "",
-        evaluation_type: "hte_supervisor",
-        responses: {},
-        comments: null,
-        status: "submitted",
-        submitted_at: new Date().toISOString(),
-        created_at: "",
-        updated_at: "",
-      };
-
-      await this.verifyEvaluationAccess(placeholderEvaluation, userId, role);
-
-      return [];
-    }
-
-    for (const evaluation of evaluations) {
-      await this.verifyEvaluationAccess(evaluation, userId, role);
-    }
-
-    return evaluations;
+    return this.enrichEvaluationRecords((data ?? []) as EvaluationRecord[]);
   }
-
   /**
-   * Retrieves evaluations associated with the current evaluator.
+   * Retrieves evaluations actually created by the current evaluator.
    *
-   * HTE Supervisors receive evaluations for their assigned HTE.
-   * Faculty Advisers receive evaluations for internships assigned
-   * to them as faculty adviser.
+   * The endpoint contract is intentionally ownership-based:
+   * evaluator_id must equal the authenticated user ID.
    */
   async getMyEvaluations(
     userId: string,
     role: EvaluationManagerRole,
   ): Promise<EvaluationRecord[]> {
-    let query = this.clients.supabaseAdmin
+    if (role === "student") {
+      const { data: internships, error: internshipError } = await this.clients.supabaseAdmin
+        .from("internships")
+        .select("id")
+        .eq("student_id", userId);
+
+      if (internshipError) {
+        console.error(
+          "GET STUDENT EVALUATIONS - INTERNSHIP LOOKUP FAILED:",
+          internshipError,
+        );
+
+        throw new AppError(
+          500,
+          "Failed to retrieve student internships.",
+        );
+      }
+
+      const internshipIds = [
+        ...new Set(
+          (internships ?? [])
+            .map((internship) => internship.id)
+            .filter(Boolean),
+        ),
+      ];
+
+      if (internshipIds.length === 0) {
+        return [];
+      }
+
+      const { data, error } = await this.clients.supabaseAdmin
+        .from("evaluations")
+        .select("*")
+        .in("internship_id", internshipIds)
+        .eq("status", "submitted")
+        .order("submitted_at", {
+          ascending: false,
+        });
+
+      if (error) {
+        console.error(
+          "GET STUDENT EVALUATIONS FAILED:",
+          error,
+        );
+
+        throw new AppError(
+          500,
+          "Failed to retrieve your evaluations.",
+        );
+      }
+
+      return this.enrichEvaluationRecords(
+        (data ?? []) as EvaluationRecord[],
+      );
+    }
+
+    const evaluationType: EvaluationType = role === "hte_supervisor"
+      ? "hte_supervisor"
+      : "faculty_adviser";
+
+    const { data, error } = await this.clients.supabaseAdmin
       .from("evaluations")
-      .select(
-        `
-        *,
-        internships!inner (
-          hte_profiles (
-            supervisor_id
-          ),
-          faculty_adviser_id
-        )
-        `,
-      )
+      .select("*")
+      .eq("evaluator_id", userId)
+      .eq("evaluation_type", evaluationType)
       .order("created_at", {
         ascending: false,
       });
 
-    if (role === "hte_supervisor") {
-      query = query.eq("internships.hte_profiles.supervisor_id", userId);
-    } else {
-      query = query.eq("internships.faculty_adviser_id", userId);
-    }
-
-    const { data, error } = await query;
-
     if (error) {
       console.error("GET MY EVALUATIONS FAILED:", error);
 
-      throw new AppError(500, "Failed to retrieve evaluations.");
+      throw new AppError(
+        500,
+        "Failed to retrieve evaluations.",
+      );
     }
 
-    return (data ?? []).map(
-      (
-        evaluation: EvaluationRecord & {
-          internships?: unknown;
-        },
-      ) => {
-        const { internships: _internship, ...record } = evaluation;
-
-        return record;
-      },
-    ) as EvaluationRecord[];
+    return this.enrichEvaluationRecords(
+      (data ?? []) as EvaluationRecord[],
+    );
   }
 
   /**
@@ -560,9 +583,9 @@ export class EvaluationService {
   /**
    * Submits the current evaluator's draft evaluation.
    *
-   * Final internship eligibility is checked again at submission
-   * time so that a draft cannot bypass the business rule if
-   * internship state changes between creation and submission.
+   * Final internship eligibility is checked here so a draft cannot
+   * bypass the business rule if internship state changes after draft
+   * creation.
    */
   async submitEvaluation(
     evaluationId: string,
@@ -581,15 +604,7 @@ export class EvaluationService {
       throw new AppError(400, "Only draft evaluations can be submitted.");
     }
 
-    if (
-      !evaluation.responses ||
-      Object.keys(evaluation.responses).length === 0
-    ) {
-      throw new AppError(
-        400,
-        "Evaluation responses are required before submission.",
-      );
-    }
+    this.requireCompleteResponses(evaluation.responses);
 
     await this.requireFinalEligibility(evaluation.internship_id);
 
@@ -617,5 +632,229 @@ export class EvaluationService {
     }
 
     return data as EvaluationRecord;
+  }
+
+  private buildFullName(
+    profile: {
+      first_name?: string | null;
+      middle_name?: string | null;
+      last_name?: string | null;
+      suffix?: string | null;
+    } | null,
+  ): string {
+    if (!profile) {
+      return "";
+    }
+
+    return [
+      profile.first_name,
+      profile.middle_name,
+      profile.last_name,
+      profile.suffix,
+    ]
+      .filter((part): part is string => Boolean(part?.trim()))
+      .join(" ");
+  }
+
+  private async enrichEvaluationRecords(
+    evaluations: EvaluationRecord[],
+  ): Promise<EvaluationRecord[]> {
+    if (evaluations.length === 0) {
+      return [];
+    }
+
+    const internshipIds = [
+      ...new Set(
+        evaluations
+          .map((evaluation) => evaluation.internship_id)
+          .filter(Boolean),
+      ),
+    ];
+
+    if (internshipIds.length === 0) {
+      return evaluations;
+    }
+
+    const { data: internships, error: internshipError } = await this.clients.supabaseAdmin
+      .from("internships")
+      .select(
+        `
+        id,
+        student_id,
+        faculty_adviser_id,
+        hte_profiles (
+          id,
+          company_name,
+          contact_person,
+          contact_email,
+          supervisor_id
+        ),
+        student_profiles (
+          id,
+          student_number,
+          program,
+          year_level,
+          section,
+          profiles (
+            id,
+            email,
+            first_name,
+            middle_name,
+            last_name,
+            suffix
+          )
+        )
+      `,
+      )
+      .in("id", internshipIds);
+
+    if (internshipError) {
+      console.error(
+        "ENRICH EVALUATIONS - INTERNSHIP LOOKUP FAILED:",
+        internshipError,
+      );
+
+      throw new AppError(
+        500,
+        "Failed to retrieve evaluation internship information.",
+      );
+    }
+
+    const internshipMap = new Map(
+      (internships ?? []).map((internship) => [internship.id, internship]),
+    );
+
+    const profileIds = [
+      ...new Set(
+        [
+          ...evaluations.map((evaluation) => evaluation.evaluator_id),
+          ...(internships ?? []).map(
+            (internship) => internship.faculty_adviser_id,
+          ),
+          ...(internships ?? []).flatMap((internship) => {
+            const hteProfile = Array.isArray(internship.hte_profiles)
+              ? (internship.hte_profiles[0] ?? null)
+              : (internship.hte_profiles ?? null);
+
+            return hteProfile?.supervisor_id ? [hteProfile.supervisor_id] : [];
+          }),
+        ].filter(Boolean),
+      ),
+    ];
+
+    const { data: profiles, error: profileError } = profileIds.length > 0
+      ? await this.clients.supabaseAdmin
+        .from("profiles")
+        .select(
+          `
+            id,
+            email,
+            first_name,
+            middle_name,
+            last_name,
+            suffix
+          `,
+        )
+        .in("id", profileIds)
+      : { data: [], error: null };
+
+    if (profileError) {
+      console.error(
+        "ENRICH EVALUATIONS - PROFILE LOOKUP FAILED:",
+        profileError,
+      );
+
+      throw new AppError(
+        500,
+        "Failed to retrieve evaluation evaluator information.",
+      );
+    }
+
+    const profileMap = new Map(
+      (profiles ?? []).map((profile) => [profile.id, profile]),
+    );
+
+    return evaluations.map((evaluation) => {
+      const internship = internshipMap.get(evaluation.internship_id);
+
+      if (!internship) {
+        return evaluation;
+      }
+
+      const student = Array.isArray(internship.student_profiles)
+        ? (internship.student_profiles[0] ?? null)
+        : (internship.student_profiles ?? null);
+
+      const studentProfile = Array.isArray(student?.profiles)
+        ? (student.profiles[0] ?? null)
+        : (student?.profiles ?? null);
+
+      const hteProfile = Array.isArray(internship.hte_profiles)
+        ? (internship.hte_profiles[0] ?? null)
+        : (internship.hte_profiles ?? null);
+
+      const evaluatorProfile = profileMap.get(evaluation.evaluator_id);
+
+      const facultyAdviserProfile = internship.faculty_adviser_id
+        ? profileMap.get(internship.faculty_adviser_id)
+        : null;
+
+      const hteSupervisorId = hteProfile?.supervisor_id ?? null;
+
+      const hteSupervisorProfile = hteSupervisorId ? profileMap.get(hteSupervisorId) : null;
+
+      return {
+        ...evaluation,
+
+        student: student
+          ? {
+            id: student.id,
+            student_number: student.student_number,
+            email: studentProfile?.email ?? null,
+            program: student.program,
+            year_level: student.year_level,
+            section: student.section ?? null,
+            full_name: this.buildFullName(studentProfile) || "Unknown student",
+          }
+          : undefined,
+
+        evaluator: evaluatorProfile
+          ? {
+            id: evaluatorProfile.id,
+            email: evaluatorProfile.email ?? null,
+            full_name: this.buildFullName(evaluatorProfile) || "Unknown evaluator",
+          }
+          : undefined,
+
+        assignment: {
+          hte: hteProfile
+            ? {
+              id: hteProfile.id,
+              company_name: hteProfile.company_name,
+              contact_person: hteProfile.contact_person,
+              contact_email: hteProfile.contact_email ?? null,
+            }
+            : null,
+
+          hte_supervisor: hteSupervisorProfile
+            ? {
+              id: hteSupervisorProfile.id,
+              email: hteSupervisorProfile.email ?? null,
+              full_name: this.buildFullName(hteSupervisorProfile) ||
+                "Unknown HTE Supervisor",
+            }
+            : null,
+
+          faculty_adviser: facultyAdviserProfile
+            ? {
+              id: facultyAdviserProfile.id,
+              email: facultyAdviserProfile.email ?? null,
+              full_name: this.buildFullName(facultyAdviserProfile) ||
+                "Unknown Faculty Adviser",
+            }
+            : null,
+        },
+      };
+    });
   }
 }
