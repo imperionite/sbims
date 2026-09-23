@@ -35,7 +35,16 @@ const seedEvaluations: readonly SeedEvaluation[] = [
     studentEmail: "studentsbims1@grr.la",
     evaluationType: "hte_supervisor",
     status: "submitted",
-    responses: { criterion_1: 5, criterion_2: 4, criterion_3: 5 },
+    responses: {
+      criterion_1: 5,
+      criterion_2: 4,
+      criterion_3: 5,
+      criterion_4: 4,
+      criterion_5: 5,
+      criterion_6: 4,
+      criterion_7: 5,
+      criterion_8: 5,
+    },
     comments: "Strong technical performance and professional conduct.",
   },
   {
@@ -43,7 +52,16 @@ const seedEvaluations: readonly SeedEvaluation[] = [
     studentEmail: "studentsbims1@grr.la",
     evaluationType: "faculty_adviser",
     status: "submitted",
-    responses: { criterion_1: 5, criterion_2: 5, criterion_3: 4 },
+    responses: {
+      criterion_1: 5,
+      criterion_2: 5,
+      criterion_3: 4,
+      criterion_4: 5,
+      criterion_5: 4,
+      criterion_6: 5,
+      criterion_7: 5,
+      criterion_8: 4,
+    },
     comments: "Successfully completed the internship requirements.",
   },
   {
@@ -51,7 +69,16 @@ const seedEvaluations: readonly SeedEvaluation[] = [
     studentEmail: "studentsbims3@grr.la",
     evaluationType: "hte_supervisor",
     status: "submitted",
-    responses: { criterion_1: 4, criterion_2: 5, criterion_3: 4 },
+    responses: {
+      criterion_1: 4,
+      criterion_2: 5,
+      criterion_3: 4,
+      criterion_4: 4,
+      criterion_5: 5,
+      criterion_6: 4,
+      criterion_7: 5,
+      criterion_8: 4,
+    },
     comments: "Consistent performance with good workplace communication.",
   },
   {
@@ -75,7 +102,16 @@ const seedEvaluations: readonly SeedEvaluation[] = [
     studentEmail: "studentsbims4@grr.la",
     evaluationType: "faculty_adviser",
     status: "submitted",
-    responses: { criterion_1: 5, criterion_2: 4, criterion_3: 5 },
+    responses: {
+      criterion_1: 5,
+      criterion_2: 4,
+      criterion_3: 5,
+      criterion_4: 4,
+      criterion_5: 5,
+      criterion_6: 4,
+      criterion_7: 5,
+      criterion_8: 5,
+    },
     comments: "Completed internship with satisfactory overall performance.",
   },
 ];
@@ -100,9 +136,20 @@ function validateSeedEvaluations(): void {
       );
     }
 
+    const allowedCriteria = new Set([
+      "criterion_1",
+      "criterion_2",
+      "criterion_3",
+      "criterion_4",
+      "criterion_5",
+      "criterion_6",
+      "criterion_7",
+      "criterion_8",
+    ]);
+
     for (const [criterion, score] of Object.entries(seed.responses)) {
       if (
-        !criterion.trim() ||
+        !allowedCriteria.has(criterion) ||
         !Number.isInteger(score) ||
         score < 1 ||
         score > 5
@@ -113,10 +160,33 @@ function validateSeedEvaluations(): void {
       }
     }
 
-    if (seed.status === "submitted" && !seed.comments) {
-      throw new Error(
-        `Submitted evaluation ${seed.seedKey} requires comments.`,
-      );
+    if (seed.status === "submitted") {
+      const requiredCriteria = [
+        "criterion_1",
+        "criterion_2",
+        "criterion_3",
+        "criterion_4",
+        "criterion_5",
+        "criterion_6",
+        "criterion_7",
+        "criterion_8",
+      ];
+
+      if (
+        requiredCriteria.some(
+          (criterion) => seed.responses[criterion] === undefined,
+        )
+      ) {
+        throw new Error(
+          `Submitted evaluation ${seed.seedKey} must contain all eight criteria.`,
+        );
+      }
+
+      if (!seed.comments) {
+        throw new Error(
+          `Submitted evaluation ${seed.seedKey} requires comments.`,
+        );
+      }
     }
 
     seenKeys.add(seed.seedKey);

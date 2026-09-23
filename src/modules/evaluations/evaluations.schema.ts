@@ -1,10 +1,24 @@
 import { z } from "zod";
 
-const evaluationResponsesSchema = z
-  .record(z.string().trim().min(1), z.number().int().min(1).max(5))
-  .refine((responses) => Object.keys(responses).length > 0, {
-    message: "At least one evaluation criterion must be provided.",
-  });
+import { EVALUATION_CRITERIA } from "./evaluations.types.ts";
+
+const evaluationScoreSchema = z.number().int().min(1).max(5);
+
+const evaluationResponseFields = Object.fromEntries(
+  EVALUATION_CRITERIA.map((criterion) => [
+    criterion,
+    evaluationScoreSchema.optional(),
+  ]),
+);
+
+/**
+ * Evaluation responses use a fixed set of eight approved criteria.
+ * Drafts may contain no responses or only a partially completed set.
+ * Final submission validates that all eight criteria are present.
+ */
+export const evaluationResponsesSchema = z
+  .object(evaluationResponseFields)
+  .strict();
 
 export const createEvaluationSchema = z.object({
   internship_id: z.string().uuid(),

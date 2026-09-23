@@ -20,13 +20,12 @@ evaluations.use("*", requireAuth);
 /**
  * POST /evaluations
  *
- * Creates an evaluation for an eligible internship.
+ * Creates a draft evaluation for an internship assigned to the
+ * authenticated HTE Supervisor or Faculty Adviser.
  *
- * HTE Supervisor:
- *   Creates "hte_supervisor" evaluations.
- *
- * Faculty Adviser:
- *   Creates "faculty_adviser" evaluations.
+ * Final internship eligibility is intentionally NOT checked here.
+ * An evaluator may prepare a draft before the internship period ends
+ * or before the required hours have been satisfied.
  */
 evaluations.post(
   "/",
@@ -64,24 +63,33 @@ evaluations.post(
  * GET /evaluations/me
  *
  * HTE Supervisor:
- *   Retrieves evaluations associated with their assigned HTE.
+ *   Returns evaluations created by the authenticated HTE Supervisor.
  *
  * Faculty Adviser:
- *   Retrieves evaluations for internships assigned to them.
+ *   Returns evaluations created by the authenticated Faculty Adviser.
+ *
+ * Student:
+ *   Returns submitted evaluations belonging to the authenticated student.
+ *
+ * Students never receive draft evaluations.
  */
 evaluations.get(
   "/me",
-  requireRole("hte_supervisor", "faculty_adviser"),
+  requireRole("hte_supervisor", "faculty_adviser", "student"),
   async (c) => {
     const evaluationService = new EvaluationService(c.get("supabase"));
 
     const user = c.get("user");
     const role = c.get("userRole");
 
-    if (role !== "hte_supervisor" && role !== "faculty_adviser") {
+    if (
+      role !== "hte_supervisor" &&
+      role !== "faculty_adviser" &&
+      role !== "student"
+    ) {
       throw new AppError(
         403,
-        "You are not authorized to access evaluator evaluations.",
+        "You are not authorized to access your evaluations.",
       );
     }
 
@@ -109,10 +117,10 @@ evaluations.get(
  *   Can access only submitted evaluations for their own internship.
  *
  * Internship Coordinator:
- *   Read access.
+ *   Read-only access.
  *
  * Administrator:
- *   Read access.
+ *   Read-only access.
  */
 evaluations.get(
   "/internship/:internshipId",
@@ -133,16 +141,6 @@ evaluations.get(
 
     if (!internshipId) {
       throw new AppError(400, "Internship ID is required.");
-    }
-
-    if (
-      role !== "administrator" &&
-      role !== "internship_coordinator" &&
-      role !== "faculty_adviser" &&
-      role !== "student" &&
-      role !== "hte_supervisor"
-    ) {
-      throw new AppError(403, "You are not authorized to access evaluations.");
     }
 
     const result = await evaluationService.getEvaluationsByInternship(
@@ -191,16 +189,6 @@ evaluations.get(
       throw new AppError(400, "Evaluation ID is required.");
     }
 
-    if (
-      role !== "administrator" &&
-      role !== "internship_coordinator" &&
-      role !== "faculty_adviser" &&
-      role !== "student" &&
-      role !== "hte_supervisor"
-    ) {
-      throw new AppError(403, "You are not authorized to access evaluations.");
-    }
-
     const result = await evaluationService.getEvaluationById(id, user.id, role);
 
     return c.json({
@@ -213,9 +201,7 @@ evaluations.get(
 /**
  * PATCH /evaluations/:id
  *
- * HTE Supervisor or Faculty Adviser updates their
- * own draft evaluation.
- *
+ * HTE Supervisor or Faculty Adviser updates their own draft.
  * Submitted evaluations are immutable.
  */
 evaluations.patch(
@@ -257,10 +243,14 @@ evaluations.patch(
 /**
  * POST /evaluations/:id/submit
  *
- * HTE Supervisor or Faculty Adviser submits
- * their own draft evaluation.
+ * Finalizes the evaluator's draft.
  *
- * Submission is final and cannot be edited afterward.
+ * Final internship eligibility is checked here:
+ * - internship period has ended;
+ * - required hours are configured; and
+ * - validated rendered hours meet the required hours.
+ *
+ * All eight fixed evaluation criteria must also be answered.
  */
 evaluations.post(
   "/:id/submit",
