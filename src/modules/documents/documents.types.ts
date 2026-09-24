@@ -33,8 +33,24 @@ export interface DocumentRecord {
   updated_at: string;
 }
 
+/**
+ * Document data returned to authenticated frontend clients.
+ *
+ * `storage_path` remains available as backend/storage metadata.
+ * `file_url` is the short-lived signed URL that the frontend
+ * should use to preview or download the document.
+ */
+export interface DocumentResponse extends DocumentRecord {
+  file_url: string;
+}
+
 export interface DocumentReviewInput {
   reason?: string;
+}
+
+export interface DocumentDownloadResponse {
+  document: DocumentRecord;
+  url: string;
 }
 
 /**

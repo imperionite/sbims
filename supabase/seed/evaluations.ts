@@ -86,7 +86,10 @@ const seedEvaluations: readonly SeedEvaluation[] = [
     studentEmail: "studentsbims3@grr.la",
     evaluationType: "faculty_adviser",
     status: "draft",
-    responses: { criterion_1: 5, criterion_2: 4 },
+    responses: {
+      criterion_1: 5,
+      criterion_2: 4,
+    },
     comments: "Draft faculty evaluation for demonstration.",
   },
   {
@@ -94,7 +97,10 @@ const seedEvaluations: readonly SeedEvaluation[] = [
     studentEmail: "studentsbims4@grr.la",
     evaluationType: "hte_supervisor",
     status: "draft",
-    responses: { criterion_1: 4, criterion_2: 4 },
+    responses: {
+      criterion_1: 4,
+      criterion_2: 4,
+    },
     comments: "Draft HTE supervisor evaluation for demonstration.",
   },
   {
@@ -126,6 +132,7 @@ function validateSeedEvaluations(): void {
     }
 
     const combination = `${normalizeEmail(seed.studentEmail)}:${seed.evaluationType}`;
+
     if (seenCombinations.has(combination)) {
       throw new Error(`Duplicate evaluation type for student: ${combination}`);
     }
@@ -207,9 +214,13 @@ async function resolveEvaluationInternships(): Promise<
   }
 
   const students = new Map<string, string>();
+
   for (const row of studentRows ?? []) {
     const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
-    if (profile?.email) students.set(normalizeEmail(profile.email), row.id);
+
+    if (profile?.email) {
+      students.set(normalizeEmail(profile.email), row.id);
+    }
   }
 
   for (const email of EVALUATION_STUDENTS) {
@@ -232,11 +243,15 @@ async function resolveEvaluationInternships(): Promise<
     )
     .in("student_id", [...students.values()]);
 
-  if (error) throw seedError("evaluations.resolve-internships", error);
+  if (error) {
+    throw seedError("evaluations.resolve-internships", error);
+  }
 
   const result = new Map<string, InternshipRow>();
+
   for (const email of EVALUATION_STUDENTS) {
     const studentId = students.get(email)!;
+
     const internship = (data ?? []).find(
       (row) => row.student_id === studentId,
     ) as InternshipRow | undefined;
@@ -244,21 +259,25 @@ async function resolveEvaluationInternships(): Promise<
     if (!internship) {
       throw new Error(`Internship not found for evaluation student: ${email}`);
     }
+
     if (internship.status !== "completed") {
       throw new Error(
         `Evaluation student ${email} must have a completed internship.`,
       );
     }
+
     if (internship.required_hours !== 150) {
       throw new Error(
         `Evaluation student ${email} must have required_hours=150; received ${internship.required_hours}.`,
       );
     }
+
     if (!internship.hte_profiles?.supervisor_id) {
       throw new Error(
         `No HTE supervisor is assigned for evaluation student: ${email}`,
       );
     }
+
     if (!internship.faculty_adviser_id) {
       throw new Error(
         `No faculty adviser is assigned for evaluation student: ${email}`,
@@ -278,6 +297,7 @@ function buildRows(
 
   return seedEvaluations.map((seed) => {
     const internship = internships.get(normalizeEmail(seed.studentEmail));
+
     if (!internship) {
       throw new Error(`Missing internship for ${seed.studentEmail}`);
     }
@@ -314,7 +334,9 @@ async function seed(): Promise<void> {
     onConflict: "internship_id,evaluator_id,evaluation_type",
   });
 
-  if (error) throw seedError("evaluations.bulk-upsert", error);
+  if (error) {
+    throw seedError("evaluations.bulk-upsert", error);
+  }
 
   console.log("========================================");
   console.log("SBIMS Development Evaluation Seed");

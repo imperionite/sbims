@@ -24,6 +24,10 @@ documents.use("*", requireAuth);
  *
  * Upload an internship document.
  *
+ * The response contains `file_url`, which is a short-lived
+ * signed URL that the frontend can use to preview/download
+ * the newly uploaded document.
+ *
  * Allowed roles:
  * - internship_coordinator
  * - faculty_adviser
@@ -102,6 +106,12 @@ documents.post(
  *
  * List documents belonging to an internship.
  *
+ * Every returned document contains:
+ * - storage_path: backend storage metadata
+ * - file_url: short-lived signed URL for frontend use
+ *
+ * The frontend should use `file_url` for preview/download.
+ *
  * Resource-level authorization is handled by
  * DocumentService.
  */
@@ -147,8 +157,11 @@ documents.get(
 /**
  * GET /documents/:id
  *
- * Retrieve document metadata and a short-lived
- * signed download URL.
+ * Retrieve one authorized document.
+ *
+ * The response contains `file_url`, which is a short-lived
+ * signed URL that the frontend can use to preview/download
+ * the document.
  */
 documents.get(
   "/:id",
@@ -176,7 +189,7 @@ documents.get(
 
     const documentService = new DocumentService(c.get("supabase"));
 
-    const result = await documentService.getDocumentDownloadUrl(
+    const result = await documentService.getDocumentWithUrl(
       documentId,
       user.id,
       c.get("userRole"),
@@ -222,7 +235,7 @@ documents.delete(
 
     const documentService = new DocumentService(c.get("supabase"));
 
-    const result = await documentService.deleteDocument(
+    await documentService.deleteDocument(
       documentId,
       user.id,
       c.get("userRole"),
@@ -230,7 +243,7 @@ documents.delete(
 
     return c.json({
       success: true,
-      data: result,
+      data: null,
     });
   },
 );
@@ -240,8 +253,11 @@ documents.delete(
  *
  * Approve a pending document.
  *
+ * The response contains `file_url`, allowing the
+ * frontend to immediately continue displaying the
+ * approved document.
+ *
  * Allowed roles:
- * - administrator
  * - internship_coordinator
  */
 documents.patch(
@@ -283,6 +299,10 @@ documents.patch(
  *
  * Reject a pending document.
  *
+ * The response contains `file_url`, allowing the
+ * coordinator UI to continue viewing the rejected
+ * document when needed.
+ *
  * Request body:
  * {
  *   "reason": "Document is incomplete."
@@ -309,6 +329,7 @@ documents.patch(
     }
 
     const body = c.req.valid("json");
+
     const user = c.get("user");
 
     const documentService = new DocumentService(c.get("supabase"));

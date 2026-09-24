@@ -52,9 +52,9 @@ function createInternship(overrides: Record<string, unknown> = {}) {
 }
 
 function createDocument(
-  overrides: Partial<DocumentRecord> = {},
-): DocumentRecord {
-  return {
+  overrides: Partial<DocumentRecord & { file_url?: string }> = {},
+): DocumentRecord & { file_url?: string } {
+  const base: DocumentRecord & { file_url?: string } = {
     id: DOCUMENT_ID,
     internship_id: INTERNSHIP_ID,
     document_type: DOCUMENT_TYPE,
@@ -62,6 +62,7 @@ function createDocument(
     storage_path: `${INTERNSHIP_ID}/${DOCUMENT_ID}-endorsement.pdf`,
     mime_type: "application/pdf",
     file_size: 1024,
+    file_url: "https://example.test/signed-document-url",
     status: "pending",
     uploaded_by: STUDENT_ID,
     uploaded_at: "2026-09-04T08:00:00.000Z",
@@ -70,6 +71,10 @@ function createDocument(
     rejection_reason: null,
     created_at: "2026-09-04T08:00:00.000Z",
     updated_at: "2026-09-04T08:00:00.000Z",
+  };
+
+  return {
+    ...base,
     ...overrides,
   };
 }
@@ -82,13 +87,6 @@ function createTestFile(
   return new File([new Uint8Array(size)], name, { type });
 }
 
-/**
- * Creates a minimal Supabase mock matching the methods currently used
- * by DocumentService.
- *
- * Database terminal operations consume databaseResults in sequence.
- * Storage operations are independently configurable.
- */
 function createMockSupabase(options: MockOptions = {}): SupabaseClients {
   const databaseResults = options.databaseResults ?? [];
   let databaseIndex = 0;
@@ -538,13 +536,8 @@ Deno.test(
   async () => {
     const service = createService({
       databaseResults: [
-        // 1. getInternship()
         { data: createInternship() },
-
-        // 2. Check for an existing document.
         { data: null },
-
-        // 3. Insert document metadata fails.
         {
           data: null,
           error: { message: "Database failure" },
@@ -709,7 +702,7 @@ Deno.test(
     await assertRejects(
       () => service.getDocumentDownloadUrl(DOCUMENT_ID, STUDENT_ID, "student"),
       AppError,
-      "Failed to generate document download URL.",
+      "Failed to generate document file URL.",
     );
   },
 );
@@ -769,13 +762,8 @@ Deno.test(
 
     const service = createService({
       databaseResults: [
-        // 1. getDocumentById()
         { data: document },
-
-        // 2. getInternship() / authorization
         { data: createInternship() },
-
-        // 3. documents.delete() fails
         {
           data: null,
           error: { message: "Database deletion failed" },
