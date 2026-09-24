@@ -36,9 +36,7 @@ type Scenario = {
 };
 
 type MockEligibilityService = {
-  checkFinalEligibility: (
-    internshipId: string,
-  ) => Promise<{
+  checkFinalEligibility: (internshipId: string) => Promise<{
     eligible: boolean;
     reason?: string;
   }>;
@@ -338,6 +336,12 @@ async function createEvaluation(
       responses: {
         criterion_1: 5,
         criterion_2: 4,
+        criterion_3: 5,
+        criterion_4: 4,
+        criterion_5: 5,
+        criterion_6: 4,
+        criterion_7: 5,
+        criterion_8: 4,
       },
       comments: "Good performance.",
     }),
@@ -422,13 +426,9 @@ Deno.test("FR-08 HTE Supervisor can create HTE evaluation", async () => {
     const result = await evaluationResponse.json();
 
     assertEquals(evaluationResponse.status, 201);
-
     assertEquals(result.success, true);
-
     assertEquals(result.data.internship_id, internshipId);
-
     assertEquals(result.data.evaluation_type, "hte_supervisor");
-
     assertEquals(result.data.status, "draft");
   });
 });
@@ -453,11 +453,8 @@ Deno.test(
       const result = await evaluationResponse.json();
 
       assertEquals(evaluationResponse.status, 201);
-
       assertEquals(result.success, true);
-
       assertEquals(result.data.evaluation_type, "faculty_adviser");
-
       assertEquals(result.data.status, "draft");
     });
   },
@@ -536,7 +533,9 @@ Deno.test(
 
     const studentId = await ensureTestStudent();
 
-    const hteSupervisorId = await getTestUserId(TEST_USERS.hteSupervisor.email);
+    const hteSupervisorId = await getTestUserId(
+      TEST_USERS.hteSupervisor.email,
+    );
 
     const facultyAdviserId = await ensureFacultyAdviser(FACULTY_ADVISER);
 
@@ -578,7 +577,10 @@ Deno.test(
 
       assertEquals(evaluationResponse.status, 400);
     } finally {
-      await supabaseAdmin.from("internships").delete().eq("id", internship.id);
+      await supabaseAdmin
+        .from("internships")
+        .delete()
+        .eq("id", internship.id);
 
       await supabaseAdmin
         .from("hte_profiles")
@@ -587,7 +589,10 @@ Deno.test(
         })
         .eq("id", hteId);
 
-      await supabaseAdmin.from("hte_profiles").delete().eq("id", hteId);
+      await supabaseAdmin
+        .from("hte_profiles")
+        .delete()
+        .eq("id", hteId);
     }
   },
 ); */
@@ -699,9 +704,7 @@ Deno.test("FR-08 administrator can retrieve evaluation", async () => {
     const result = await response.json();
 
     assertEquals(response.status, 200);
-
     assertEquals(result.success, true);
-
     assertEquals(result.data.id, createBody.data.id);
   });
 });
@@ -787,11 +790,8 @@ Deno.test("FR-08 HTE Supervisor can update own draft", async () => {
     const result = await updateResponse.json();
 
     assertEquals(updateResponse.status, 200);
-
     assertEquals(result.success, true);
-
     assertEquals(result.data.status, "draft");
-
     assertEquals(result.data.responses.criterion_1, 5);
   });
 });
@@ -869,11 +869,8 @@ Deno.test("FR-08 HTE Supervisor can submit eligible evaluation", async () => {
     const result = await submitResponse.json();
 
     assertEquals(submitResponse.status, 200);
-
     assertEquals(result.success, true);
-
     assertEquals(result.data.status, "submitted");
-
     assertExists(result.data.submitted_at);
   });
 });
@@ -908,9 +905,7 @@ Deno.test("FR-08 Faculty Adviser can submit eligible evaluation", async () => {
     const result = await submitResponse.json();
 
     assertEquals(submitResponse.status, 200);
-
     assertEquals(result.success, true);
-
     assertEquals(result.data.status, "submitted");
   });
 });
@@ -959,9 +954,7 @@ Deno.test("FR-08 student can retrieve submitted evaluation", async () => {
     const result = await response.json();
 
     assertEquals(response.status, 200);
-
     assertEquals(result.success, true);
-
     assertEquals(result.data.status, "submitted");
   });
 });

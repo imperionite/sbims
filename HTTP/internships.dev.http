@@ -92,7 +92,7 @@
 @admin=adminsbims1@grr.la
 @coordinator=coordinatorsbims1@grr.la
 @faculty=facultysbims1@grr.la
-@student=studentsbims1@grr.la
+@student=studentsbims8@grr.la
 @hte=htesbims1@grr.la
 
 ###############################################################
@@ -118,7 +118,7 @@
 @studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
 @facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
 @facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
-@studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
+@studentAccessToken=
 ###############################################################
 
 # HEALTH
@@ -210,7 +210,7 @@ Content-Type: application/json
 
 {
 "email": "{{student}}",
-"password": "{{newPassword}}"
+"password": "{{defaultPassword}}"
 }
 
 ###

@@ -1,9 +1,23 @@
 import type { SupabaseClients } from "../../lib/supabase.ts";
 import { AppError } from "../../errors/app-error.ts";
 
-import type { DocumentRecord, DocumentStatus, DocumentType } from "./documents.types.ts";
+import type {
+  DocumentDownloadResponse,
+  DocumentRecord,
+  DocumentResponse,
+  DocumentStatus,
+  DocumentType,
+} from "./documents.types.ts";
 
 const STORAGE_BUCKET = "internship-documents";
+
+/**
+ * Signed URLs are intentionally short-lived.
+ *
+ * The frontend should request document data again when a URL
+ * has expired instead of storing the URL permanently.
+ */
+const SIGNED_URL_EXPIRATION_SECONDS = 300;
 
 const ALLOWED_MIME_TYPES = new Set([
   "application/pdf",
@@ -198,13 +212,66 @@ export class DocumentService {
     return data as DocumentRecord;
   }
 
+  /**
+   * Generates a short-lived signed URL for a document.
+   *
+   * This method must only be called after resource-level
+   * authorization has succeeded.
+   */
+  private async createDocumentFileUrl(
+    document: DocumentRecord,
+  ): Promise<string> {
+    const { data, error } = await this.clients.supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .createSignedUrl(document.storage_path, SIGNED_URL_EXPIRATION_SECONDS);
+
+    if (error || !data?.signedUrl) {
+      console.error("CREATE DOCUMENT SIGNED URL FAILED:", error);
+
+      throw new AppError(500, "Failed to generate document file URL.");
+    }
+
+    return data.signedUrl;
+  }
+
+  /**
+   * Converts an authorized database document record into
+   * the frontend-facing document response.
+   */
+  private async toDocumentResponse(
+    document: DocumentRecord,
+  ): Promise<DocumentResponse> {
+    const fileUrl = await this.createDocumentFileUrl(document);
+
+    return {
+      ...document,
+      file_url: fileUrl,
+    };
+  }
+
+  /**
+   * Converts an authorized database document record into the
+   * compatibility response shape used by callers expecting
+   * `{ document, url }`.
+   */
+  private async toDocumentDownloadResponse(
+    document: DocumentRecord,
+  ): Promise<DocumentDownloadResponse> {
+    const fileUrl = await this.createDocumentFileUrl(document);
+
+    return {
+      document,
+      url: fileUrl,
+    };
+  }
+
   async uploadDocument(
     userId: string,
     role: DocumentAccessRole,
     internshipId: string,
     documentType: DocumentType,
     file: File,
-  ): Promise<DocumentRecord> {
+  ): Promise<DocumentResponse> {
     this.validateFile(file);
 
     await this.authorizeInternshipAccess(internshipId, userId, role, "upload");
@@ -218,6 +285,7 @@ export class DocumentService {
 
     if (existingError) {
       console.error("CHECK EXISTING DOCUMENT FAILED:", existingError);
+
       throw new AppError(500, "Failed to check existing document.");
     }
 
@@ -229,7 +297,9 @@ export class DocumentService {
     }
 
     const documentId = existing?.id ?? crypto.randomUUID();
+
     const filename = this.sanitizeFilename(file.name);
+
     const storagePath = `${internshipId}/${documentId}-${filename}`;
 
     const { error: uploadError } = await this.clients.supabaseAdmin.storage
@@ -241,6 +311,7 @@ export class DocumentService {
 
     if (uploadError) {
       console.error("UPLOAD DOCUMENT FAILED:", uploadError);
+
       throw new AppError(500, "Failed to upload document.");
     }
 
@@ -271,6 +342,7 @@ export class DocumentService {
           .remove([storagePath]);
 
         console.error("REPLACE DOCUMENT FAILED:", error);
+
         throw new AppError(500, "Failed to update document metadata.");
       }
 
@@ -284,7 +356,7 @@ export class DocumentService {
         }
       }
 
-      return data as DocumentRecord;
+      return this.toDocumentResponse(data as DocumentRecord);
     }
 
     const { data, error } = await this.clients.supabaseAdmin
@@ -309,33 +381,52 @@ export class DocumentService {
         .remove([storagePath]);
 
       console.error("CREATE DOCUMENT FAILED:", error);
+
       throw new AppError(500, "Failed to save document metadata.");
     }
 
-    return data as DocumentRecord;
+    return this.toDocumentResponse(data as DocumentRecord);
   }
 
+  /**
+   * Lists authorized documents and generates a signed
+   * frontend URL for every returned document.
+   */
   async listDocuments(
     internshipId: string,
     userId: string,
     role: DocumentAccessRole,
-  ): Promise<DocumentRecord[]> {
+  ): Promise<DocumentResponse[]> {
     await this.authorizeInternshipAccess(internshipId, userId, role, "view");
 
     const { data, error } = await this.clients.supabaseAdmin
       .from("documents")
       .select("*")
       .eq("internship_id", internshipId)
-      .order("created_at", { ascending: true });
+      .order("created_at", {
+        ascending: true,
+      });
 
     if (error) {
       console.error("LIST DOCUMENTS FAILED:", error);
+
       throw new AppError(500, "Failed to retrieve documents.");
     }
 
-    return (data ?? []) as DocumentRecord[];
+    const documents = (data ?? []) as DocumentRecord[];
+
+    return Promise.all(
+      documents.map((document) => this.toDocumentResponse(document)),
+    );
   }
 
+  /**
+   * Retrieves one authorized document without
+   * generating a URL.
+   *
+   * This remains an internal service method used
+   * for authorization and document mutations.
+   */
   async getDocument(
     documentId: string,
     userId: string,
@@ -353,26 +444,30 @@ export class DocumentService {
     return document;
   }
 
-  async getDocumentDownloadUrl(
+  /**
+   * Retrieves one authorized document together with
+   * its short-lived frontend file URL.
+   */
+  async getDocumentWithUrl(
     documentId: string,
     userId: string,
     role: DocumentAccessRole,
-  ): Promise<{ document: DocumentRecord; url: string }> {
+  ): Promise<DocumentDownloadResponse> {
     const document = await this.getDocument(documentId, userId, role);
 
-    const { data, error } = await this.clients.supabaseAdmin.storage
-      .from(STORAGE_BUCKET)
-      .createSignedUrl(document.storage_path, 300);
+    return this.toDocumentDownloadResponse(document);
+  }
 
-    if (error || !data?.signedUrl) {
-      console.error("CREATE DOCUMENT SIGNED URL FAILED:", error);
-      throw new AppError(500, "Failed to generate document download URL.");
-    }
-
-    return {
-      document,
-      url: data.signedUrl,
-    };
+  /**
+   * Retained as an explicit service method for compatibility
+   * with existing callers.
+   */
+  getDocumentDownloadUrl(
+    documentId: string,
+    userId: string,
+    role: DocumentAccessRole,
+  ): Promise<DocumentDownloadResponse> {
+    return this.getDocumentWithUrl(documentId, userId, role);
   }
 
   async deleteDocument(
@@ -395,6 +490,7 @@ export class DocumentService {
 
     if (storageError) {
       console.error("DELETE DOCUMENT STORAGE FAILED:", storageError);
+
       throw new AppError(500, "Failed to delete document file.");
     }
 
@@ -405,6 +501,7 @@ export class DocumentService {
 
     if (databaseError) {
       console.error("DELETE DOCUMENT DATABASE FAILED:", databaseError);
+
       throw new AppError(
         500,
         "Document file was removed, but metadata deletion failed.",
@@ -412,13 +509,17 @@ export class DocumentService {
     }
   }
 
+  /**
+   * Reviews a pending document and returns the updated
+   * document together with a fresh signed URL.
+   */
   async reviewDocument(
     documentId: string,
     userId: string,
     role: DocumentAccessRole,
     status: Extract<DocumentStatus, "approved" | "rejected">,
     reason?: string,
-  ): Promise<DocumentRecord> {
+  ): Promise<DocumentResponse> {
     if (role !== "internship_coordinator") {
       throw new AppError(
         403,
@@ -458,9 +559,10 @@ export class DocumentService {
 
     if (error || !data) {
       console.error("REVIEW DOCUMENT FAILED:", error);
+
       throw new AppError(500, "Failed to update document review status.");
     }
 
-    return data as DocumentRecord;
+    return this.toDocumentResponse(data as DocumentRecord);
   }
 }

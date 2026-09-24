@@ -24,23 +24,40 @@ import type {
 // Constants
 // ============================================================
 
-const HTE_SUPERVISOR_ID = "11111111-1111-1111-1111-111111111111";
+const HTE_SUPERVISOR_ID = "11111111-1111-4111-8111-111111111111";
 
-const OTHER_HTE_SUPERVISOR_ID = "22222222-2222-2222-2222-222222222222";
+const OTHER_HTE_SUPERVISOR_ID = "22222222-2222-4222-8222-222222222222";
 
-const FACULTY_ADVISER_ID = "77777777-7777-7777-7777-777777777777";
+const FACULTY_ADVISER_ID = "77777777-7777-4777-8777-777777777777";
 
-const OTHER_FACULTY_ADVISER_ID = "88888888-8888-8888-8888-888888888888";
+const OTHER_FACULTY_ADVISER_ID = "88888888-8888-4888-8888-888888888888";
 
-const STUDENT_ID = "55555555-5555-5555-5555-555555555555";
+const STUDENT_ID = "55555555-5555-4555-8555-555555555555";
 
-const INTERNSHIP_ID = "33333333-3333-3333-3333-333333333333";
+const INTERNSHIP_ID = "33333333-3333-4333-8333-333333333333";
 
-const EVALUATION_ID = "44444444-4444-4444-4444-444444444444";
+const EVALUATION_ID = "44444444-4444-4444-8444-444444444444";
+
+const HTE_ID = "66666666-6666-4666-8666-666666666666";
+
+const ADMIN_ID = "99999999-9999-4999-8999-999999999999";
 
 // ============================================================
 // Test fixtures
 // ============================================================
+
+function createCompleteResponses() {
+  return {
+    criterion_1: 5,
+    criterion_2: 4,
+    criterion_3: 5,
+    criterion_4: 4,
+    criterion_5: 5,
+    criterion_6: 4,
+    criterion_7: 5,
+    criterion_8: 4,
+  };
+}
 
 function createEvaluationRecord(
   overrides: Partial<EvaluationRecord> = {},
@@ -67,7 +84,7 @@ function createInternship(overrides: Record<string, unknown> = {}) {
   return {
     id: INTERNSHIP_ID,
     student_id: STUDENT_ID,
-    hte_id: "66666666-6666-6666-6666-666666666666",
+    hte_id: HTE_ID,
     faculty_adviser_id: FACULTY_ADVISER_ID,
     status: "active",
     start_date: "2026-06-01",
@@ -235,25 +252,13 @@ Deno.test(
   },
 );
 
-Deno.test("createEvaluationSchema - rejects invalid evaluation type", () => {
-  const result = createEvaluationSchema.safeParse({
-    internship_id: INTERNSHIP_ID,
-    evaluation_type: "administrator",
-    responses: {
-      criterion_1: 5,
-    },
-  });
-
-  assertEquals(result.success, false);
-});
-
-Deno.test("createEvaluationSchema - rejects empty responses", () => {
+Deno.test("createEvaluationSchema - accepts empty responses for drafts", () => {
   const result = createEvaluationSchema.safeParse({
     internship_id: INTERNSHIP_ID,
     responses: {},
   });
 
-  assertEquals(result.success, false);
+  assertEquals(result.success, true);
 });
 
 Deno.test("createEvaluationSchema - rejects score below 1", () => {
@@ -409,109 +414,84 @@ Deno.test("Evaluation routes - register authentication middleware", () => {
 // SERVICE: CREATE
 // ============================================================
 
-Deno.test(
-  "createEvaluation - creates eligible HTE Supervisor evaluation",
-  async () => {
-    const evaluation = createEvaluationRecord();
+Deno.test("createEvaluation - creates HTE Supervisor draft", async () => {
+  const evaluation = createEvaluationRecord();
 
-    const service = createMockEvaluationService([
-      // 1. evaluator assignment
-      {
-        data: createEligibleInternship(),
+  const service = createMockEvaluationService([
+    // 1. evaluator assignment
+    {
+      data: createEligibleInternship(),
+    },
+
+    // 2. duplicate check
+    {
+      data: null,
+    },
+
+    // 3. insert
+    {
+      data: evaluation,
+    },
+  ]);
+
+  const result = await service.createEvaluation(
+    HTE_SUPERVISOR_ID,
+    "hte_supervisor",
+    {
+      internship_id: INTERNSHIP_ID,
+      evaluation_type: "hte_supervisor",
+      responses: {
+        criterion_1: 5,
+        criterion_2: 4,
       },
+      comments: "Good performance.",
+    },
+  );
 
-      // 2. eligibility internship
-      {
-        data: createEligibleInternship(),
-      },
+  assertEquals(result, evaluation);
+  assertEquals(result.evaluation_type, "hte_supervisor");
+  assertEquals(result.status, "draft");
+});
 
-      // 3. validated attendance
-      {
-        data: createValidatedAttendance(),
-      },
+Deno.test("createEvaluation - creates Faculty Adviser draft", async () => {
+  const evaluation = createEvaluationRecord({
+    evaluator_id: FACULTY_ADVISER_ID,
+    evaluation_type: "faculty_adviser",
+  });
 
-      // 4. duplicate check
-      {
-        data: null,
-      },
+  const service = createMockEvaluationService([
+    // 1. evaluator assignment
+    {
+      data: createEligibleInternship(),
+    },
 
-      // 5. insert
-      {
-        data: evaluation,
-      },
-    ]);
+    // 2. duplicate check
+    {
+      data: null,
+    },
 
-    const result = await service.createEvaluation(
-      HTE_SUPERVISOR_ID,
-      "hte_supervisor",
-      {
-        internship_id: INTERNSHIP_ID,
-        evaluation_type: "hte_supervisor",
-        responses: {
-          criterion_1: 5,
-          criterion_2: 4,
-        },
-        comments: "Good performance.",
-      },
-    );
+    // 3. insert
+    {
+      data: evaluation,
+    },
+  ]);
 
-    assertEquals(result, evaluation);
-    assertEquals(result.evaluation_type, "hte_supervisor");
-    assertEquals(result.status, "draft");
-  },
-);
-
-Deno.test(
-  "createEvaluation - creates eligible Faculty Adviser evaluation",
-  async () => {
-    const evaluation = createEvaluationRecord({
-      evaluator_id: FACULTY_ADVISER_ID,
+  const result = await service.createEvaluation(
+    FACULTY_ADVISER_ID,
+    "faculty_adviser",
+    {
+      internship_id: INTERNSHIP_ID,
       evaluation_type: "faculty_adviser",
-    });
-
-    const service = createMockEvaluationService([
-      // assignment
-      {
-        data: createEligibleInternship(),
+      responses: {
+        criterion_1: 5,
       },
+    },
+  );
 
-      // eligibility internship
-      {
-        data: createEligibleInternship(),
-      },
-
-      // attendance
-      {
-        data: createValidatedAttendance(),
-      },
-
-      // duplicate
-      {
-        data: null,
-      },
-
-      // insert
-      {
-        data: evaluation,
-      },
-    ]);
-
-    const result = await service.createEvaluation(
-      FACULTY_ADVISER_ID,
-      "faculty_adviser",
-      {
-        internship_id: INTERNSHIP_ID,
-        evaluation_type: "faculty_adviser",
-        responses: {
-          criterion_1: 5,
-        },
-      },
-    );
-
-    assertEquals(result.evaluation_type, "faculty_adviser");
-    assertEquals(result.evaluator_id, FACULTY_ADVISER_ID);
-  },
-);
+  assertEquals(result.evaluation_type, "faculty_adviser");
+  assertEquals(result.evaluator_id, FACULTY_ADVISER_ID);
+  assertEquals(result.status, "draft");
+});
 
 Deno.test(
   "createEvaluation - rejects HTE Supervisor requesting Faculty evaluation",
@@ -601,141 +581,45 @@ Deno.test("createEvaluation - rejects unrelated Faculty Adviser", async () => {
 });
 
 Deno.test(
-  "createEvaluation - rejects internship whose period has not ended",
+  "createEvaluation - allows draft creation before internship eligibility",
   async () => {
+    const evaluation = createEvaluationRecord();
+
     const service = createMockEvaluationService([
+      // Assignment authorization only.
       {
         data: createInternship({
           end_date: "2999-12-31",
         }),
       },
-      {
-        data: createInternship({
-          end_date: "2999-12-31",
-        }),
-      },
-      {
-        data: createValidatedAttendance(),
-      },
-    ]);
 
-    await assertRejects(
-      () =>
-        service.createEvaluation(HTE_SUPERVISOR_ID, "hte_supervisor", {
-          internship_id: INTERNSHIP_ID,
-          responses: {
-            criterion_1: 5,
-          },
-        }),
-      AppError,
-      "The internship period has not ended yet.",
-    );
-  },
-);
-
-Deno.test(
-  "createEvaluation - rejects end date equal to current date",
-  async () => {
-    const today = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Asia/Manila",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-
-    const service = createMockEvaluationService([
+      // Duplicate check.
       {
-        data: createInternship({
-          end_date: today,
-        }),
+        data: null,
       },
+
+      // Insert draft.
       {
-        data: createInternship({
-          end_date: today,
-        }),
-      },
-      {
-        data: createValidatedAttendance(),
+        data: evaluation,
       },
     ]);
 
-    await assertRejects(
-      () =>
-        service.createEvaluation(HTE_SUPERVISOR_ID, "hte_supervisor", {
-          internship_id: INTERNSHIP_ID,
-          responses: {
-            criterion_1: 5,
-          },
-        }),
-      AppError,
-      "The internship period has not ended yet.",
-    );
-  },
-);
-
-Deno.test(
-  "createEvaluation - rejects insufficient validated rendered hours",
-  async () => {
-    const service = createMockEvaluationService([
+    const result = await service.createEvaluation(
+      HTE_SUPERVISOR_ID,
+      "hte_supervisor",
       {
-        data: createEligibleInternship(),
-      },
-      {
-        data: createEligibleInternship(),
-      },
-      {
-        data: [
-          {
-            time_in: "08:00:00",
-            time_out: "17:00:00",
-          },
-        ],
-      },
-    ]);
-
-    await assertRejects(
-      () =>
-        service.createEvaluation(HTE_SUPERVISOR_ID, "hte_supervisor", {
-          internship_id: INTERNSHIP_ID,
-          responses: {
-            criterion_1: 5,
-          },
-        }),
-      AppError,
-      "The required validated rendered hours have not been met.",
-    );
-  },
-);
-
-Deno.test("createEvaluation - rejects missing required hours", async () => {
-  const service = createMockEvaluationService([
-    {
-      data: createInternship({
-        required_hours: null,
-      }),
-    },
-    {
-      data: createInternship({
-        required_hours: null,
-      }),
-    },
-    {
-      data: createValidatedAttendance(),
-    },
-  ]);
-
-  await assertRejects(
-    () =>
-      service.createEvaluation(HTE_SUPERVISOR_ID, "hte_supervisor", {
         internship_id: INTERNSHIP_ID,
+        evaluation_type: "hte_supervisor",
         responses: {
           criterion_1: 5,
         },
-      }),
-    AppError,
-    "Required internship hours have not been set.",
-  );
-});
+      },
+    );
+
+    assertEquals(result.status, "draft");
+    assertEquals(result.id, EVALUATION_ID);
+  },
+);
 
 Deno.test(
   "createEvaluation - rejects duplicate same-type evaluation",
@@ -743,15 +627,12 @@ Deno.test(
     const existing = createEvaluationRecord();
 
     const service = createMockEvaluationService([
+      // Assignment authorization.
       {
         data: createEligibleInternship(),
       },
-      {
-        data: createEligibleInternship(),
-      },
-      {
-        data: createValidatedAttendance(),
-      },
+
+      // Existing evaluation.
       {
         data: {
           id: existing.id,
@@ -837,7 +718,7 @@ Deno.test("getEvaluationById - allows administrator", async () => {
 
   const result = await service.getEvaluationById(
     EVALUATION_ID,
-    "99999999-9999-9999-9999-999999999999",
+    ADMIN_ID,
     "administrator",
   );
 
@@ -858,7 +739,7 @@ Deno.test("getEvaluationById - allows internship coordinator", async () => {
 
   const result = await service.getEvaluationById(
     EVALUATION_ID,
-    "99999999-9999-9999-9999-999999999999",
+    ADMIN_ID,
     "internship_coordinator",
   );
 
@@ -925,7 +806,7 @@ Deno.test(
       },
       {
         data: createInternship({
-          student_id: "99999999-9999-9999-9999-999999999999",
+          student_id: "99999999-9999-4999-8999-999999999999",
         }),
       },
     ]);
@@ -1052,26 +933,38 @@ Deno.test("updateEvaluation - rejects submitted evaluation", async () => {
 // ============================================================
 
 Deno.test("submitEvaluation - submits eligible HTE draft", async () => {
-  const draft = createEvaluationRecord();
+  const draft = createEvaluationRecord({
+    responses: createCompleteResponses(),
+  });
 
   const submitted = createEvaluationRecord({
+    responses: createCompleteResponses(),
     status: "submitted",
     submitted_at: "2026-08-16T09:00:00.000Z",
   });
 
   const service = createMockEvaluationService([
+    // 1. Evaluation retrieval / authorization.
     {
       data: draft,
     },
+
+    // 2. Internship authorization.
+    {
+      data: createInternship(),
+    },
+
+    // 3. Final eligibility internship.
     {
       data: createEligibleInternship(),
     },
-    {
-      data: createEligibleInternship(),
-    },
+
+    // 4. Validated attendance.
     {
       data: createValidatedAttendance(),
     },
+
+    // 5. Updated evaluation.
     {
       data: submitted,
     },
@@ -1093,28 +986,39 @@ Deno.test(
     const draft = createEvaluationRecord({
       evaluator_id: FACULTY_ADVISER_ID,
       evaluation_type: "faculty_adviser",
+      responses: createCompleteResponses(),
     });
 
     const submitted = createEvaluationRecord({
       evaluator_id: FACULTY_ADVISER_ID,
       evaluation_type: "faculty_adviser",
+      responses: createCompleteResponses(),
       status: "submitted",
       submitted_at: "2026-08-16T09:00:00.000Z",
     });
 
     const service = createMockEvaluationService([
+      // 1. Evaluation retrieval / authorization.
       {
         data: draft,
       },
+
+      // 2. Internship authorization.
       {
         data: createInternship(),
       },
+
+      // 3. Final eligibility internship.
       {
         data: createEligibleInternship(),
       },
+
+      // 4. Validated attendance.
       {
         data: createValidatedAttendance(),
       },
+
+      // 5. Updated evaluation.
       {
         data: submitted,
       },
@@ -1169,9 +1073,11 @@ Deno.test(
     });
 
     const service = createMockEvaluationService([
+      // 1. Evaluation retrieval
       {
         data: draft,
       },
+      // 2. Internship authorization
       {
         data: createInternship(),
       },
@@ -1185,28 +1091,71 @@ Deno.test(
           "hte_supervisor",
         ),
       AppError,
-      "Evaluation responses are required before submission.",
+      "All evaluation criteria must be answered before submission.",
     );
   },
 );
 
 Deno.test(
-  "submitEvaluation - rechecks eligibility before submission",
+  "submitEvaluation - rejects evaluation with incomplete responses",
   async () => {
-    const draft = createEvaluationRecord();
+    const draft = createEvaluationRecord({
+      responses: {
+        criterion_1: 5,
+        criterion_2: 4,
+        criterion_3: 5,
+      },
+    });
 
     const service = createMockEvaluationService([
+      // 1. Evaluation retrieval
       {
         data: draft,
       },
+      // 2. Internship authorization
       {
         data: createInternship(),
       },
+    ]);
+
+    await assertRejects(
+      () =>
+        service.submitEvaluation(
+          EVALUATION_ID,
+          HTE_SUPERVISOR_ID,
+          "hte_supervisor",
+        ),
+      AppError,
+      "All evaluation criteria must be answered before submission.",
+    );
+  },
+);
+Deno.test(
+  "submitEvaluation - rechecks eligibility before submission",
+  async () => {
+    const draft = createEvaluationRecord({
+      responses: createCompleteResponses(),
+    });
+
+    const service = createMockEvaluationService([
+      // 1. Evaluation retrieval / authorization.
+      {
+        data: draft,
+      },
+
+      // 2. Internship authorization.
+      {
+        data: createInternship(),
+      },
+
+      // 3. Final eligibility check fails because period has not ended.
       {
         data: createInternship({
           end_date: "2999-12-31",
         }),
       },
+
+      // 4. Attendance would be checked only after date eligibility.
       {
         data: createValidatedAttendance(),
       },
@@ -1228,23 +1177,33 @@ Deno.test(
 Deno.test(
   "submitEvaluation - rejects when required hours become insufficient",
   async () => {
-    const draft = createEvaluationRecord();
+    const draft = createEvaluationRecord({
+      responses: createCompleteResponses(),
+    });
 
     const service = createMockEvaluationService([
+      // 1. Evaluation retrieval / authorization.
       {
         data: draft,
       },
+
+      // 2. Internship authorization.
       {
         data: createInternship(),
       },
+
+      // 3. Final eligibility internship.
       {
         data: createEligibleInternship(),
       },
+
+      // 4. Insufficient validated attendance.
       {
         data: [
           {
             time_in: "08:00:00",
             time_out: "17:00:00",
+            validation_status: "validated",
           },
         ],
       },
@@ -1259,6 +1218,47 @@ Deno.test(
         ),
       AppError,
       "The required validated rendered hours have not been met.",
+    );
+  },
+);
+
+Deno.test(
+  "submitEvaluation - rejects when required hours are missing",
+  async () => {
+    const draft = createEvaluationRecord({
+      responses: createCompleteResponses(),
+    });
+
+    const service = createMockEvaluationService([
+      // 1. Evaluation retrieval / authorization
+      {
+        data: draft,
+      },
+      // 2. Internship authorization
+      {
+        data: createInternship(),
+      },
+      // 3. Final eligibility internship with missing required hours
+      {
+        data: createEligibleInternship({
+          required_hours: null,
+        }),
+      },
+      // 4. Attendance query mock (if queried prior to validation check)
+      {
+        data: [],
+      },
+    ]);
+
+    await assertRejects(
+      () =>
+        service.submitEvaluation(
+          EVALUATION_ID,
+          HTE_SUPERVISOR_ID,
+          "hte_supervisor",
+        ),
+      AppError,
+      "Required internship hours have not been set.",
     );
   },
 );

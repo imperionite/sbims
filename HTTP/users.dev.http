@@ -51,7 +51,7 @@
 
 @adminToken=
 @studentToken=
-@coordinatorToken=
+@coordinatorToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyM2RjYmY4ZS0yNzI5LTRmZTktYTA0MS0xMGQ4Mjk3OTZjOGEiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzkwMjI5NjEzLCJpYXQiOjE3OTAyMjYwMTMsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzZWVkX2tleSI6ImludGVybnNoaXAtY29vcmRpbmF0b3ItMDEiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzkwMjI2MDEzfV0sInNlc3Npb25faWQiOiIyYTllODA4NS03NTczLTQ0ZmEtOTMzNi1mOWJjNmMyZmNhZmQiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.GedS501eaWfu8rydROqoxTIa79DoG8CpPo-cH5LxVEqueEhaR3W7b5KgtNdVMxKZLYv4XyEtrmktWlmxCPKPtg
 @facultyToken=PASTE_FACULTY_ACCESS_TOKEN
 @hteToken=PASTE_HTE_ACCESS_TOKEN
 ###############################################################
@@ -62,7 +62,7 @@
 
 # Replace after creating user
 
-@userId=fb0a078e-b6b8-4c8d-8f59-fce9329b728f
+@userId=8693901c-329b-4dcc-987d-c53edf125a1d
 
 
 
@@ -151,7 +151,7 @@ Authorization: Bearer {{adminToken}}
 ### - Returns profile information
 
 GET {{apiUrl}}/users/{{userId}}
-Authorization: Bearer {{adminToken}}
+Authorization: Bearer {{coordinatorToken}}
 
 
 

@@ -19,6 +19,7 @@
     "seed:internships": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/internships.ts",
     "seed:attendance": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/attendance.ts",
     "seed:evaluations": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/evaluations.ts",
+    "seed:documents": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/documents.ts",
     "fmt": "deno fmt",
     "lint": "deno lint",
     "verify": "deno fmt --check && deno lint && deno task check",
@@ -51,7 +52,7 @@
     "test:integration:evaluations": "deno test --env-file=.env.test tests/integration/evaluations.integration.test.ts --allow-all",
     "test:integration:documents": "deno test --env-file=.env.test tests/integration/documents.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:reports": "deno test --env-file=.env.test tests/integration/reports.integration.test.ts --allow-read --allow-env --allow-net",
-    "test:integration:audit": "deno test --env-file=.env.test tests/integration/audit.integration.test.ts --allow-read --allow-env --allow-net",
+    "test:integration:audit": "deno test --env-file=.env.test tests/integration/audit.integration.test.ts --allow-all",
     "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts"
   },
   "fmt": {
