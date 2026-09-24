@@ -318,5 +318,4 @@ The backend status can be summarized as:
 > domains, authentication, authorization, business rules, document storage, evaluation workflows,
 > attendance processing, reporting, and audit logging have been implemented. Current development is
 > focused on integration testing, API contract alignment, frontend-backend verification, and
-> stabilization before prototype presentation. The core backend implementation is substantially
-> complete for the functional prototype.**
+> stabilization before prototype presentation.**
