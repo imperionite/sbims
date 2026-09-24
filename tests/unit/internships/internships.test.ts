@@ -1,3 +1,4 @@
+// tests/unit/internships/internships.test.ts
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
 
 import { z } from "zod";
@@ -28,19 +29,23 @@ import type { SupabaseClients } from "../../../src/lib/supabase.ts";
  * ============================================================
  * TEST CONSTANTS
  * ============================================================
+ *
+ * These are valid RFC UUIDs.
+ * The 13th hexadecimal digit is the UUID version (4).
+ * The first hexadecimal digit of the 4th group is the variant (8).
  */
 
-const INTERNSHIP_ID = "11111111-1111-1111-1111-111111111111";
+const INTERNSHIP_ID = "11111111-1111-4111-8111-111111111111";
 
-const STUDENT_ID = "22222222-2222-2222-2222-222222222222";
+const STUDENT_ID = "22222222-2222-4222-8222-222222222222";
 
-const HTE_ID = "33333333-3333-3333-3333-333333333333";
+const HTE_ID = "33333333-3333-4333-8333-333333333333";
 
-const NEW_HTE_ID = "44444444-4444-4444-4444-444444444444";
+const NEW_HTE_ID = "44444444-4444-4444-8444-444444444444";
 
-const FACULTY_ADVISER_ID = "55555555-5555-5555-5555-555555555555";
+const FACULTY_ADVISER_ID = "55555555-5555-4555-8555-555555555555";
 
-const NEW_FACULTY_ADVISER_ID = "66666666-6666-6666-6666-666666666666";
+const NEW_FACULTY_ADVISER_ID = "66666666-6666-4666-8666-666666666666";
 
 const TEST_START_DATE = "2026-08-03";
 const TEST_END_DATE = "2026-10-31";
@@ -1078,7 +1083,7 @@ Deno.test(
  * Full authentication/authorization route behavior is tested
  * by the integration suite. These unit tests verify that the
  * route-facing schemas and request contracts agree with the
- * intended API.
+ * current backend API contract.
  */
 
 Deno.test(
@@ -1175,10 +1180,11 @@ Deno.test(
 );
 
 /*
- * Keep Zod imported explicitly in this consolidated test file.
- * This also protects against accidental replacement of the
- * schema tests with hand-written validation.
+ * ============================================================
+ * ZOD
+ * ============================================================
  */
+
 Deno.test("Internship schema uses Zod validation", () => {
   assertExists(z);
 });
