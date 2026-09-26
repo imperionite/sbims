@@ -85,6 +85,10 @@ jobs:
           echo "START_TIME=$(date +%s)" >> "$GITHUB_ENV"
           echo "START_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_ENV"
 
+          echo "SBIMS CI initialized."
+          echo "Module: ${{ inputs.module }}"
+          echo "Run ID: ${{ github.run_id }}"
+
       # ============================================================
       # CHECKOUT
       # ============================================================
@@ -107,14 +111,48 @@ jobs:
       # ============================================================
 
       - name: Install Dependencies
-        run: deno ci
+        shell: bash
+        run: |
+          set +e
+
+          deno install --frozen \
+            2>&1 | tee test-results/install.txt
+
+          EXIT_CODE=${PIPESTATUS[0]}
+
+          echo "INSTALL_EXIT_CODE=$EXIT_CODE" >> "$GITHUB_ENV"
+
+          if [ "$EXIT_CODE" -eq 0 ]; then
+            echo "INSTALL_STATUS=PASS" >> "$GITHUB_ENV"
+          else
+            echo "INSTALL_STATUS=FAIL" >> "$GITHUB_ENV"
+          fi
+
+          exit "$EXIT_CODE"
 
       # ============================================================
       # VERIFY DEPENDENCY RESOLUTION
       # ============================================================
 
       - name: Verify Dependency Resolution
-        run: deno info src/main.ts
+        shell: bash
+        run: |
+          set +e
+
+          deno info src/main.ts \
+            2>&1 | tee test-results/dependency-resolution.txt
+
+          EXIT_CODE=${PIPESTATUS[0]}
+
+          echo "DEPENDENCY_EXIT_CODE=$EXIT_CODE" >> "$GITHUB_ENV"
+
+          if [ "$EXIT_CODE" -eq 0 ]; then
+            echo "DEPENDENCY_STATUS=PASS" >> "$GITHUB_ENV"
+          else
+            echo "DEPENDENCY_STATUS=FAIL" >> "$GITHUB_ENV"
+          fi
+
+          exit "$EXIT_CODE"
 
       # ============================================================
       # FORMAT
@@ -126,6 +164,11 @@ jobs:
           set +e
 
           START=$(date +%s)
+
+          echo "======================================================================"
+          echo "FORMAT CHECK"
+          echo "======================================================================"
+          echo ""
 
           deno fmt --check \
             2>&1 | tee test-results/format-check.txt
@@ -155,6 +198,11 @@ jobs:
 
           START=$(date +%s)
 
+          echo "======================================================================"
+          echo "LINT CHECK"
+          echo "======================================================================"
+          echo ""
+
           deno lint \
             2>&1 | tee test-results/lint-check.txt
 
@@ -182,6 +230,11 @@ jobs:
           set +e
 
           START=$(date +%s)
+
+          echo "======================================================================"
+          echo "TYPE CHECK"
+          echo "======================================================================"
+          echo ""
 
           deno check src/main.ts \
             2>&1 | tee test-results/type-check.txt
@@ -214,16 +267,31 @@ jobs:
 
           START=$(date +%s)
 
-          echo "======================================================================"
-          echo "UNIT TESTS - ${{ inputs.module }}"
-          echo "======================================================================"
-          echo ""
+          {
+            echo "======================================================================"
+            echo "UNIT TESTS - ${{ inputs.module }}"
+            echo "======================================================================"
+            echo ""
+            echo "Task: ${{ inputs.unit_task }}"
+            echo "Started: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            echo ""
+          } | tee test-results/unit-tests.txt
 
           deno task "${{ inputs.unit_task }}" \
-            2>&1 | tee test-results/unit-tests.txt
+            2>&1 | tee -a test-results/unit-tests.txt
 
           TEST_EXIT_CODE=${PIPESTATUS[0]}
           END=$(date +%s)
+
+          {
+            echo ""
+            echo "======================================================================"
+            echo "UNIT TEST EXECUTION SUMMARY"
+            echo "======================================================================"
+            echo "Exit Code: $TEST_EXIT_CODE"
+            echo "Duration: $((END - START))s"
+            echo "Finished: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          } | tee -a test-results/unit-tests.txt
 
           echo "UNIT_TIME=$((END - START))s" >> "$GITHUB_ENV"
           echo "UNIT_EXIT_CODE=$TEST_EXIT_CODE" >> "$GITHUB_ENV"
@@ -250,16 +318,31 @@ jobs:
 
           START=$(date +%s)
 
-          echo "======================================================================"
-          echo "INTEGRATION TESTS - ${{ inputs.module }}"
-          echo "======================================================================"
-          echo ""
+          {
+            echo "======================================================================"
+            echo "INTEGRATION TESTS - ${{ inputs.module }}"
+            echo "======================================================================"
+            echo ""
+            echo "Task: ${{ inputs.integration_task }}"
+            echo "Started: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            echo ""
+          } | tee test-results/integration-tests.txt
 
           deno task "${{ inputs.integration_task }}" \
-            2>&1 | tee test-results/integration-tests.txt
+            2>&1 | tee -a test-results/integration-tests.txt
 
           TEST_EXIT_CODE=${PIPESTATUS[0]}
           END=$(date +%s)
+
+          {
+            echo ""
+            echo "======================================================================"
+            echo "INTEGRATION TEST EXECUTION SUMMARY"
+            echo "======================================================================"
+            echo "Exit Code: $TEST_EXIT_CODE"
+            echo "Duration: $((END - START))s"
+            echo "Finished: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          } | tee -a test-results/integration-tests.txt
 
           echo "INTEGRATION_TIME=$((END - START))s" >> "$GITHUB_ENV"
           echo "INTEGRATION_EXIT_CODE=$TEST_EXIT_CODE" >> "$GITHUB_ENV"
@@ -286,16 +369,31 @@ jobs:
 
           START=$(date +%s)
 
-          echo "======================================================================"
-          echo "SMOKE TESTS - ${{ inputs.module }}"
-          echo "======================================================================"
-          echo ""
+          {
+            echo "======================================================================"
+            echo "SMOKE TESTS - ${{ inputs.module }}"
+            echo "======================================================================"
+            echo ""
+            echo "Task: ${{ inputs.smoke_task }}"
+            echo "Started: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            echo ""
+          } | tee test-results/smoke-tests.txt
 
           deno task "${{ inputs.smoke_task }}" \
-            2>&1 | tee test-results/smoke-tests.txt
+            2>&1 | tee -a test-results/smoke-tests.txt
 
           TEST_EXIT_CODE=${PIPESTATUS[0]}
           END=$(date +%s)
+
+          {
+            echo ""
+            echo "======================================================================"
+            echo "SMOKE TEST EXECUTION SUMMARY"
+            echo "======================================================================"
+            echo "Exit Code: $TEST_EXIT_CODE"
+            echo "Duration: $((END - START))s"
+            echo "Finished: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          } | tee -a test-results/smoke-tests.txt
 
           echo "SMOKE_TIME=$((END - START))s" >> "$GITHUB_ENV"
           echo "SMOKE_EXIT_CODE=$TEST_EXIT_CODE" >> "$GITHUB_ENV"
@@ -309,6 +407,101 @@ jobs:
           exit "$TEST_EXIT_CODE"
 
       # ============================================================
+      # PREPARE TEST EVIDENCE
+      # ============================================================
+
+      - name: Prepare Test Evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p test-results
+
+          # ----------------------------------------------------------
+          # Always create metadata
+          # ----------------------------------------------------------
+
+          cat > test-results/README.txt <<EOF
+          SBIMS MODULE QUALITY GATE
+          =========================
+
+          Module      : ${{ inputs.module }}
+          Repository  : ${{ github.repository }}
+          Workflow    : ${{ github.workflow }}
+          Event       : ${{ github.event_name }}
+          Commit      : ${{ github.sha }}
+          Actor       : ${{ github.actor }}
+          Run ID      : ${{ github.run_id }}
+
+          Started     : ${START_TIMESTAMP:-N/A}
+          Generated   : $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+
+          Unit Tests        : ${UNIT_STATUS:-NOT RUN}
+          Integration Tests : ${INTEGRATION_STATUS:-NOT RUN}
+          Smoke Tests       : ${SMOKE_STATUS:-NOT RUN}
+
+          Format Check      : ${FORMAT_STATUS:-NOT RUN}
+          Lint Check        : ${LINT_STATUS:-NOT RUN}
+          Type Check        : ${TYPE_STATUS:-NOT RUN}
+          EOF
+
+          # ----------------------------------------------------------
+          # Guarantee unit test evidence file
+          # ----------------------------------------------------------
+
+          if [ ! -f test-results/unit-tests.txt ]; then
+            cat > test-results/unit-tests.txt <<EOF
+          UNIT TESTS - ${{ inputs.module }}
+          ===============================
+
+          Unit tests were not configured or were not reached during
+          this CI execution.
+
+          Status: ${UNIT_STATUS:-NOT RUN}
+          EOF
+          fi
+
+          # ----------------------------------------------------------
+          # Guarantee integration test evidence file
+          # ----------------------------------------------------------
+
+          if [ ! -f test-results/integration-tests.txt ]; then
+            cat > test-results/integration-tests.txt <<EOF
+          INTEGRATION TESTS - ${{ inputs.module }}
+          ====================================
+
+          Integration tests were not configured or were not reached
+          during this CI execution.
+
+          Status: ${INTEGRATION_STATUS:-NOT RUN}
+          EOF
+          fi
+
+          # ----------------------------------------------------------
+          # Guarantee smoke test evidence file
+          # ----------------------------------------------------------
+
+          if [ ! -f test-results/smoke-tests.txt ]; then
+            cat > test-results/smoke-tests.txt <<EOF
+          SMOKE TESTS - ${{ inputs.module }}
+          ==============================
+
+          Smoke tests were not configured or were not reached during
+          this CI execution.
+
+          Status: ${SMOKE_STATUS:-NOT RUN}
+          EOF
+          fi
+
+          echo ""
+          echo "======================================================================"
+          echo "TEST EVIDENCE FILES"
+          echo "======================================================================"
+
+          find test-results -maxdepth 1 -type f -print | sort
+
+      # ============================================================
       # FINAL REPORT
       # ============================================================
 
@@ -320,6 +513,53 @@ jobs:
           END_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
           TOTAL=$((END_TIME - START_TIME))
+
+          # ==========================================================
+          # DETERMINE FINAL STATUS
+          # ==========================================================
+
+          OVERALL_STATUS="PASS"
+
+          if [ "${INSTALL_STATUS:-FAIL}" != "PASS" ]; then
+            OVERALL_STATUS="FAIL"
+          fi
+
+          if [ "${DEPENDENCY_STATUS:-FAIL}" != "PASS" ]; then
+            OVERALL_STATUS="FAIL"
+          fi
+
+          if [ "${FORMAT_STATUS:-FAIL}" != "PASS" ]; then
+            OVERALL_STATUS="FAIL"
+          fi
+
+          if [ "${LINT_STATUS:-FAIL}" != "PASS" ]; then
+            OVERALL_STATUS="FAIL"
+          fi
+
+          if [ "${TYPE_STATUS:-FAIL}" != "PASS" ]; then
+            OVERALL_STATUS="FAIL"
+          fi
+
+          if [ -n "${UNIT_EXIT_CODE:-}" ] && \
+             [ "${UNIT_EXIT_CODE}" != "0" ]; then
+            OVERALL_STATUS="FAIL"
+          fi
+
+          if [ -n "${INTEGRATION_EXIT_CODE:-}" ] && \
+             [ "${INTEGRATION_EXIT_CODE}" != "0" ]; then
+            OVERALL_STATUS="FAIL"
+          fi
+
+          if [ -n "${SMOKE_EXIT_CODE:-}" ] && \
+             [ "${SMOKE_EXIT_CODE}" != "0" ]; then
+            OVERALL_STATUS="FAIL"
+          fi
+
+          echo "OVERALL_STATUS=$OVERALL_STATUS" >> "$GITHUB_ENV"
+
+          # ==========================================================
+          # CONSOLE REPORT
+          # ==========================================================
 
           echo ""
           echo "======================================================================"
@@ -341,12 +581,8 @@ jobs:
           echo "Run ID      : ${{ github.run_id }}"
 
           echo ""
-          echo "Started     : $START_TIMESTAMP"
-          echo "Finished    : $END_TIMESTAMP"
-
-          # ==========================================================
-          # QUALITY CHECKS
-          # ==========================================================
+          echo "Started     : ${START_TIMESTAMP}"
+          echo "Finished    : ${END_TIMESTAMP}"
 
           echo ""
           echo "======================================================================"
@@ -407,58 +643,6 @@ jobs:
               "N/A"
           fi
 
-          # ==========================================================
-          # TEST EVIDENCE SUMMARY
-          # ==========================================================
-
-          echo ""
-          echo "======================================================================"
-          echo "TEST EVIDENCE"
-          echo "======================================================================"
-
-          if [ -n "${UNIT_TIME:-}" ]; then
-            echo ""
-            echo "UNIT TESTS"
-            echo "  Status     : ${UNIT_STATUS:-UNKNOWN}"
-            echo "  Exit Code  : ${UNIT_EXIT_CODE:-N/A}"
-            echo "  Duration   : ${UNIT_TIME}"
-            echo "  Evidence   : test-results/unit-tests.txt"
-          else
-            echo ""
-            echo "UNIT TESTS"
-            echo "  Status     : NOT RUN"
-          fi
-
-          if [ -n "${INTEGRATION_TIME:-}" ]; then
-            echo ""
-            echo "INTEGRATION TESTS"
-            echo "  Status     : ${INTEGRATION_STATUS:-UNKNOWN}"
-            echo "  Exit Code  : ${INTEGRATION_EXIT_CODE:-N/A}"
-            echo "  Duration   : ${INTEGRATION_TIME}"
-            echo "  Evidence   : test-results/integration-tests.txt"
-          else
-            echo ""
-            echo "INTEGRATION TESTS"
-            echo "  Status     : NOT RUN"
-          fi
-
-          if [ -n "${SMOKE_TIME:-}" ]; then
-            echo ""
-            echo "SMOKE TESTS"
-            echo "  Status     : ${SMOKE_STATUS:-UNKNOWN}"
-            echo "  Exit Code  : ${SMOKE_EXIT_CODE:-N/A}"
-            echo "  Duration   : ${SMOKE_TIME}"
-            echo "  Evidence   : test-results/smoke-tests.txt"
-          else
-            echo ""
-            echo "SMOKE TESTS"
-            echo "  Status     : NOT RUN"
-          fi
-
-          # ==========================================================
-          # TOTAL DURATION
-          # ==========================================================
-
           echo ""
           echo "----------------------------------------------------------------------"
           echo "Total CI Duration : ${TOTAL}s"
@@ -473,43 +657,20 @@ jobs:
           echo "RESULT"
           echo "======================================================================"
 
-          if [ "${FORMAT_STATUS:-FAIL}" != "PASS" ] || \
-             [ "${LINT_STATUS:-FAIL}" != "PASS" ] || \
-             [ "${TYPE_STATUS:-FAIL}" != "PASS" ] || \
-             { [ -n "${UNIT_EXIT_CODE:-}" ] && [ "${UNIT_EXIT_CODE}" != "0" ]; } || \
-             { [ -n "${INTEGRATION_EXIT_CODE:-}" ] && [ "${INTEGRATION_EXIT_CODE}" != "0" ]; } || \
-             { [ -n "${SMOKE_EXIT_CODE:-}" ] && [ "${SMOKE_EXIT_CODE}" != "0" ]; }; then
+          echo ""
+          echo "STATUS : ${OVERALL_STATUS}"
 
-            OVERALL_STATUS="FAIL"
-
+          if [ "$OVERALL_STATUS" = "PASS" ]; then
             echo ""
-            echo "STATUS : FAIL"
+            echo "Quality Gate Passed"
+          else
             echo ""
             echo "Quality Gate Failed"
             echo "One or more quality checks failed."
-            echo "Module : ${{ inputs.module }}"
-
-          else
-
-            OVERALL_STATUS="PASS"
-
-            echo ""
-            echo "STATUS : PASS"
-            echo ""
-            echo "Quality Gate Passed"
-            echo "Module : ${{ inputs.module }}"
-
-            if [ -z "${UNIT_TIME:-}" ] && \
-               [ -z "${INTEGRATION_TIME:-}" ] && \
-               [ -z "${SMOKE_TIME:-}" ]; then
-              echo "Tests  : Not configured"
-            else
-              echo "Tests  : Configured"
-            fi
-
           fi
 
-          echo "OVERALL_STATUS=$OVERALL_STATUS" >> "$GITHUB_ENV"
+          echo ""
+          echo "Module : ${{ inputs.module }}"
 
           # ==========================================================
           # GITHUB STEP SUMMARY
@@ -563,35 +724,16 @@ jobs:
             echo ""
             echo "## Unit Test Evidence"
             echo ""
-
-            if [ -f test-results/unit-tests.txt ]; then
-              echo '```text'
-              cat test-results/unit-tests.txt
-              echo '```'
-            else
-              echo "Unit tests were not configured."
-            fi
+            echo '```text'
+            cat test-results/unit-tests.txt
+            echo '```'
 
             echo ""
             echo "## Integration Test Evidence"
             echo ""
-
-            if [ -f test-results/integration-tests.txt ]; then
-              echo '```text'
-              cat test-results/integration-tests.txt
-              echo '```'
-            else
-              echo "Integration tests were not configured."
-            fi
-
-            if [ -f test-results/smoke-tests.txt ]; then
-              echo ""
-              echo "## Smoke Test Evidence"
-              echo ""
-              echo '```text'
-              cat test-results/smoke-tests.txt
-              echo '```'
-            fi
+            echo '```text'
+            cat test-results/integration-tests.txt
+            echo '```'
 
             echo ""
             echo "## Final Result"
@@ -618,7 +760,7 @@ jobs:
         with:
           name: sbims-${{ inputs.module }}-test-evidence-${{ github.run_id }}
           path: test-results/
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
 
       # ============================================================
