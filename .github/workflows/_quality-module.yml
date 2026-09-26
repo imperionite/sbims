@@ -68,30 +68,26 @@ jobs:
       UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
       UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
 
-      RATE_LIMIT_ENABLED: false
-      ENVIRONMENT: test
-
     steps:
-
       # ============================================================
-      # START TRACE
+      # INITIALIZE
       # ============================================================
       - name: Initialize CI Traceability
+        shell: bash
         run: |
-          echo "START_TIME=$(date +%s)" >> "$GITHUB_ENV"
-          echo "START_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_ENV"
+          echo "START_TIME=$(date +\%s)" >> "$GITHUB_ENV"
+          echo "START_TIMESTAMP=$(date -u '+\%Y-\%m-\%d \%H:\%M:\%S UTC')" >> "$GITHUB_ENV"
+          mkdir -p test-results
 
       # ============================================================
       # CHECKOUT
       # ============================================================
-
       - name: Checkout Repository
         uses: actions/checkout@v5
 
       # ============================================================
       # DENO SETUP
       # ============================================================
-
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
@@ -100,7 +96,6 @@ jobs:
       # ============================================================
       # DENO DEPENDENCY CACHE
       # ============================================================
-
       - name: Cache Deno Dependencies
         uses: actions/cache@v4
         with:
@@ -112,9 +107,8 @@ jobs:
             deno-${{ runner.os }}-
 
       # ============================================================
-      # INSTALL PROJECT DEPENDENCIES
+      # INSTALL
       # ============================================================
-
       - name: Install Deno Dependencies
         run: |
           deno install --frozen
@@ -122,7 +116,6 @@ jobs:
       # ============================================================
       # VERIFY DEPENDENCY RESOLUTION
       # ============================================================
-
       - name: Verify Dependency Resolution
         run: |
           deno info src/main.ts
@@ -130,195 +123,326 @@ jobs:
       # ============================================================
       # FORMAT
       # ============================================================
-
       - name: Format Check
+        shell: bash
         run: |
           START=$(date +%s)
-
+          set +e
           deno fmt --check
+          EXIT_CODE=$?
+          set -e
 
           END=$(date +%s)
+          echo "FORMAT_TIME=$((END - START))s" >> "$GITHUB_ENV"
+          echo "FORMAT_EXIT_CODE=$EXIT_CODE" >> "$GITHUB_ENV"
 
-          echo "FORMAT_TIME=$((END-START))s" >> "$GITHUB_ENV"
+          if [ "$EXIT_CODE" -eq 0 ]; then
+            echo "FORMAT_STATUS=PASS" >> "$GITHUB_ENV"
+          else
+            echo "FORMAT_STATUS=FAIL" >> "$GITHUB_ENV"
+          fi
+
+          exit 0
 
       # ============================================================
       # LINT
       # ============================================================
-
       - name: Lint Check
+        shell: bash
         run: |
           START=$(date +%s)
-
+          set +e
           deno lint
+          EXIT_CODE=$?
+          set -e
 
           END=$(date +%s)
+          echo "LINT_TIME=$((END - START))s" >> "$GITHUB_ENV"
+          echo "LINT_EXIT_CODE=$EXIT_CODE" >> "$GITHUB_ENV"
 
-          echo "LINT_TIME=$((END-START))s" >> "$GITHUB_ENV"
+          if [ "$EXIT_CODE" -eq 0 ]; then
+            echo "LINT_STATUS=PASS" >> "$GITHUB_ENV"
+          else
+            echo "LINT_STATUS=FAIL" >> "$GITHUB_ENV"
+          fi
+
+          exit 0
 
       # ============================================================
       # TYPE CHECK
       # ============================================================
-
       - name: Type Check
+        shell: bash
         run: |
           START=$(date +%s)
-
+          set +e
           deno check src/main.ts
+          EXIT_CODE=$?
+          set -e
 
           END=$(date +%s)
+          echo "TYPE_TIME=$((END - START))s" >> "$GITHUB_ENV"
+          echo "TYPE_EXIT_CODE=$EXIT_CODE" >> "$GITHUB_ENV"
 
-          echo "TYPE_TIME=$((END-START))s" >> "$GITHUB_ENV"
+          if [ "$EXIT_CODE" -eq 0 ]; then
+            echo "TYPE_STATUS=PASS" >> "$GITHUB_ENV"
+          else
+            echo "TYPE_STATUS=FAIL" >> "$GITHUB_ENV"
+          fi
+
+          exit 0
 
       # ============================================================
       # UNIT TESTS
       # ============================================================
-
       - name: Unit Tests (${{ inputs.module }})
-        if: ${{ inputs.unit_task != '' }}
+        if: inputs.unit_task != ''
+        shell: bash
         env:
-          RATE_LIMIT_ENABLED: false
+          RATELIMIT_ENABLED: false
         run: |
           START=$(date +%s)
+          set +e
 
-          deno task "${{ inputs.unit_task }}"
+          deno task "${{ inputs.unit_task }}" \
+            --junit-path="test-results/unit-tests.xml" \
+            2>&1 | tee "test-results/unit-tests.txt"
 
+          TEST_EXIT_CODE=${PIPESTATUS[0]}
+          set -e
           END=$(date +%s)
 
-          echo "UNIT_TIME=$((END-START))s" >> "$GITHUB_ENV"
+          echo "UNIT_TIME=$((END - START))s" >> "$GITHUB_ENV"
+          echo "UNIT_EXIT_CODE=$TEST_EXIT_CODE" >> "$GITHUB_ENV"
+
+          if [ "$TEST_EXIT_CODE" -eq 0 ]; then
+            echo "UNIT_STATUS=PASS" >> "$GITHUB_ENV"
+          else
+            echo "UNIT_STATUS=FAIL" >> "$GITHUB_ENV"
+          fi
+
+          exit 0
 
       # ============================================================
       # INTEGRATION TESTS
       # ============================================================
-
       - name: Integration Tests (${{ inputs.module }})
-        if: ${{ inputs.integration_task != '' }}
+        if: inputs.integration_task != ''
+        shell: bash
         env:
-          RATE_LIMIT_ENABLED: false
+          RATELIMIT_ENABLED: false
         run: |
           START=$(date +%s)
+          set +e
 
-          deno task "${{ inputs.integration_task }}"
+          deno task "${{ inputs.integration_task }}" \
+            --junit-path="test-results/integration-tests.xml" \
+            2>&1 | tee "test-results/integration-tests.txt"
 
+          TEST_EXIT_CODE=${PIPESTATUS[0]}
+          set -e
           END=$(date +%s)
 
-          echo "INTEGRATION_TIME=$((END-START))s" >> "$GITHUB_ENV"
+          echo "INTEGRATION_TIME=$((END - START))s" >> "$GITHUB_ENV"
+          echo "INTEGRATION_EXIT_CODE=$TEST_EXIT_CODE" >> "$GITHUB_ENV"
+
+          if [ "$TEST_EXIT_CODE" -eq 0 ]; then
+            echo "INTEGRATION_STATUS=PASS" >> "$GITHUB_ENV"
+          else
+            echo "INTEGRATION_STATUS=FAIL" >> "$GITHUB_ENV"
+          fi
+
+          exit 0
 
       # ============================================================
-      # EXTERNAL SMOKE TESTS
+      # SMOKE TESTS
       # ============================================================
-
       - name: Smoke Tests (${{ inputs.smoke_task }})
-        if: ${{ inputs.smoke_task != '' }}
+        if: inputs.smoke_task != ''
+        shell: bash
         env:
-          RATE_LIMIT_ENABLED: true
+          RATELIMIT_ENABLED: true
         run: |
           START=$(date +%s)
+          set +e
 
-          deno task "${{ inputs.smoke_task }}"
+          deno task "${{ inputs.smoke_task }}" \
+            --junit-path="test-results/smoke-tests.xml" \
+            2>&1 | tee "test-results/smoke-tests.txt"
 
+          TEST_EXIT_CODE=${PIPESTATUS[0]}
+          set -e
           END=$(date +%s)
 
-          echo "SMOKE_TIME=$((END-START))s" >> "$GITHUB_ENV"
+          echo "SMOKE_TIME=$((END - START))s" >> "$GITHUB_ENV"
+          echo "SMOKE_EXIT_CODE=$TEST_EXIT_CODE" >> "$GITHUB_ENV"
+
+          if [ "$TEST_EXIT_CODE" -eq 0 ]; then
+            echo "SMOKE_STATUS=PASS" >> "$GITHUB_ENV"
+          else
+            echo "SMOKE_STATUS=FAIL" >> "$GITHUB_ENV"
+          fi
+
+          exit 0
 
       # ============================================================
-      # FINAL REPORT
+      # PARSE JUNIT TEST RESULTS
       # ============================================================
+      - name: Generate Test Evidence
+        if: always()
+        shell: bash
+        run: |
+          python3 <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
 
+          RESULTS = Path("test-results")
+
+          def parse_junit(xml_file, output_file, title):
+              output = Path(output_file)
+              if not Path(xml_file).exists():
+                  output.write_text(f"{title}\nNo JUnit test report was generated.\n")
+                  return {"tests": 0, "passed": 0, "failed": 0, "skipped": 0}
+
+              root = ET.parse(xml_file).getroot()
+              testcases = root.findall(".//testcase")
+
+              total = len(testcases)
+              passed = 0
+              failed = 0
+              skipped = 0
+
+              lines = [title, "=" * 70, ""]
+              for testcase in testcases:
+                  name = testcase.attrib.get("name", "Unnamed test")
+                  classname = testcase.attrib.get("classname", "")
+                  duration = testcase.attrib.get("time", "")
+
+                  failure = testcase.find("failure")
+                  error = testcase.find("error")
+                  skipped_node = testcase.find("skipped")
+
+                  if failure is not None or error is not None:
+                      status, failed, symbol = "FAIL", failed + 1, "✗"
+                  elif skipped_node is not None:
+                      status, skipped, symbol = "SKIP", skipped + 1, "⊘"
+                  else:
+                      status, passed, symbol = "PASS", passed + 1, "✓"
+
+                  display_name = f"{classname} > {name}" if classname else name
+                  if duration:
+                      lines.append(f"{symbol} {status:<5} {display_name} ({duration}s)")
+                  else:
+                      lines.append(f"{symbol} {status:<5} {display_name}")
+
+              lines.extend(["", "-" * 70, f"Total   : {total}", f"Passed  : {passed}", f"Failed  : {failed}", f"Skipped : {skipped}", "-" * 70])
+              output.write_text("\n".join(lines) + "\n")
+              return {"tests": total, "passed": passed, "failed": failed, "skipped": skipped}
+
+          unit = parse_junit(RESULTS / "unit-tests.xml", RESULTS / "unit-test-evidence.txt", "UNIT TEST RESULTS")
+          integration = parse_junit(RESULTS / "integration-tests.xml", RESULTS / "integration-test-evidence.txt", "INTEGRATION TEST RESULTS")
+          smoke = parse_junit(RESULTS / "smoke-tests.xml", RESULTS / "smoke-test-evidence.txt", "SMOKE TEST RESULTS")
+
+          with open("test-results/test-statistics.env", "w") as f:
+              f.write(f"UNIT_TOTAL={unit['tests']}\nUNIT_PASSED={unit['passed']}\nUNIT_FAILED={unit['failed']}\nUNIT_SKIPPED={unit['skipped']}\n")
+              f.write(f"INTEGRATION_TOTAL={integration['tests']}\nINTEGRATION_PASSED={integration['passed']}\nINTEGRATION_FAILED={integration['failed']}\nINTEGRATION_SKIPPED={integration['skipped']}\n")
+              f.write(f"SMOKE_TOTAL={smoke['tests']}\nSMOKE_PASSED={smoke['passed']}\nSMOKE_FAILED={smoke['failed']}\nSMOKE_SKIPPED={smoke['skipped']}\n")
+          PY
+
+          cat test-results/test-statistics.env >> "$GITHUB_ENV"
+
+      # ============================================================
+      # QUALITY GATE REPORT
+      # ============================================================
       - name: SBIMS Quality Gate Report
         if: always()
+        shell: bash
         run: |
           END_TIME=$(date +%s)
           END_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          TOTAL=$((END_TIME - START_TIME))
 
-          TOTAL=$((END_TIME-START_TIME))
+          OVERALL_STATUS="PASS"
+          if [ "${FORMAT_STATUS:-FAIL}" != "PASS" ]; then OVERALL_STATUS="FAIL"; fi
+          if [ "${LINT_STATUS:-FAIL}" != "PASS" ]; then OVERALL_STATUS="FAIL"; fi
+          if [ "${TYPE_STATUS:-FAIL}" != "PASS" ]; then OVERALL_STATUS="FAIL"; fi
+          if [ -n "${UNIT_EXIT_CODE:-}" ] && [ "${UNIT_EXIT_CODE}" != "0" ]; then OVERALL_STATUS="FAIL"; fi
+          if [ -n "${INTEGRATION_EXIT_CODE:-}" ] && [ "${INTEGRATION_EXIT_CODE}" != "0" ]; then OVERALL_STATUS="FAIL"; fi
+          if [ -n "${SMOKE_EXIT_CODE:-}" ] && [ "${SMOKE_EXIT_CODE}" != "0" ]; then OVERALL_STATUS="FAIL"; fi
+          if [ "${UNIT_FAILED:-0}" -gt 0 ]; then OVERALL_STATUS="FAIL"; fi
+          if [ "${INTEGRATION_FAILED:-0}" -gt 0 ]; then OVERALL_STATUS="FAIL"; fi
+          if [ "${SMOKE_FAILED:-0}" -gt 0 ]; then OVERALL_STATUS="FAIL"; fi
 
-          echo ""
-          echo "======================================================================"
-          echo "                     SBIMS QUALITY GATE"
-          echo "======================================================================"
+          echo "OVERALL_STATUS=$OVERALL_STATUS" >> "$GITHUB_ENV"
 
-          echo ""
-          echo "Module      : ${{ inputs.module }}"
-          echo "Repository  : ${{ github.repository }}"
-          echo "Workflow    : ${{ github.workflow }}"
-          echo "Event       : ${{ github.event_name }}"
-
-          echo ""
-          echo "Base Branch : ${{ github.base_ref }}"
-          echo "Head Branch : ${{ github.head_ref }}"
-          echo "PR          : #${{ github.event.pull_request.number }}"
-          echo "Commit      : ${{ github.sha }}"
-          echo "Actor       : ${{ github.actor }}"
-          echo "Run ID      : ${{ github.run_id }}"
-
-          echo ""
-          echo "Started     : $START_TIMESTAMP"
-          echo "Finished    : $END_TIMESTAMP"
-
-          echo ""
-          echo "======================================================================"
-          echo "QUALITY CHECKS"
-          echo "======================================================================"
-
-          echo ""
-
-          echo "Format Check          ${FORMAT_TIME:-FAILED}"
-          echo "Lint Check            ${LINT_TIME:-FAILED}"
-          echo "Type Check            ${TYPE_TIME:-FAILED}"
-
-          if [ -n "${UNIT_TIME:-}" ]; then
-            echo "Unit Tests            ${UNIT_TIME}"
-          else
-            echo "Unit Tests            NOT RUN"
-          fi
-
-          if [ -n "${INTEGRATION_TIME:-}" ]; then
-            echo "Integration Tests     ${INTEGRATION_TIME}"
-          else
-            echo "Integration Tests     NOT RUN"
-          fi
-
-          if [ -n "${SMOKE_TIME:-}" ]; then
-            echo "Smoke Tests           ${SMOKE_TIME}"
-          else
-            echo "Smoke Tests           NOT RUN"
-          fi
-
-          echo ""
-          echo "----------------------------------------------------------------------"
-          echo "Total CI Duration : ${TOTAL}s"
-          echo "----------------------------------------------------------------------"
-
-          echo ""
-          echo "======================================================================"
-          echo "RESULT"
-          echo "======================================================================"
-
-          if [ "${{ job.status }}" = "success" ]; then
-
+          {
+            echo "# SBIMS Quality Gate"
             echo ""
-            echo "STATUS : PASS"
+            echo "## Run Information"
+            echo "| Property | Value |"
+            echo "|---|---|"
+            echo "| Module | \`${{ inputs.module }}\` |"
+            echo "| Repository | \`${{ github.repository }}\` |"
+            echo "| Workflow | \`${{ github.workflow }}\` |"
+            echo "| Event | \`${{ github.event_name }}\` |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+            echo "| Actor | \`${{ github.actor }}\` |"
+            echo "| Run ID | \`${{ github.run_id }}\` |"
+            echo "| Started | ${START_TIMESTAMP} |"
+            echo "| Finished | ${END_TIMESTAMP} |"
             echo ""
-            echo "Quality Gate Passed"
-            echo "Module : ${{ inputs.module }}"
+            echo "## Quality Checks"
+            echo "| Check | Status | Duration |"
+            echo "|---|---|---:|"
+            echo "| Format Check | ${FORMAT_STATUS:-FAIL} \vert{}${FORMAT_TIME:-N/A} |"
+            echo "| Lint Check | ${LINT_STATUS:-FAIL} \vert{}${LINT_TIME:-N/A} |"
+            echo "| Type Check | ${TYPE_STATUS:-FAIL} \vert{}${TYPE_TIME:-N/A} |"
 
-            if [ -z "${UNIT_TIME:-}" ] && \
-               [ -z "${INTEGRATION_TIME:-}" ] && \
-               [ -z "${SMOKE_TIME:-}" ]; then
-              echo "Tests  : Not configured"
+            if [ -n "${UNIT_TIME:-}" ]; then
+              echo "| Unit Tests | ${UNIT_STATUS} \vert{}${UNIT_TIME} |"
             else
-              echo "Tests  : Configured"
+              echo "| Unit Tests | NOT RUN | N/A |"
             fi
 
-          else
+            if [ -n "${INTEGRATION_TIME:-}" ]; then
+              echo "| Integration Tests | ${INTEGRATION_STATUS} \vert{}${INTEGRATION_TIME} |"
+            else
+              echo "| Integration Tests | NOT RUN | N/A |"
+            fi
+
+            if [ -n "${SMOKE_TIME:-}" ]; then
+              echo "| Smoke Tests | ${SMOKE_STATUS} \vert{}${SMOKE_TIME} |"
+            else
+              echo "| Smoke Tests | NOT RUN | N/A |"
+            fi
 
             echo ""
-            echo "STATUS : FAIL"
-            echo ""
-            echo "Quality Gate Failed"
-            echo "Module : ${{ inputs.module }}"
-            echo "Fix required"
+            echo "## Final Result"
+            echo "### ${OVERALL_STATUS}"
+            echo "**Total CI Duration:** ${TOTAL}s"
+          } >> "$GITHUB_STEP_SUMMARY"
 
+      # ============================================================
+      # UPLOAD TEST EVIDENCE
+      # ============================================================
+      - name: Upload Test Evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbims-${{ inputs.module }}-test-evidence-${{ github.run_id }}
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 30
+
+      # ============================================================
+      # ENFORCE QUALITY GATE
+      # ============================================================
+      - name: Enforce Quality Gate
+        if: always()
+        shell: bash
+        run: |
+          if [ "${OVERALL_STATUS:-FAIL}" != "PASS" ]; then
+            echo "Quality Gate Failed."
             exit 1
-
           fi
+          echo "Quality Gate Passed."
