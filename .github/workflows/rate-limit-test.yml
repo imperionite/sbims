@@ -1,0 +1,236 @@
+name: Rate Limit Tests
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rate-limit-tests:
+    name: Rate Limit Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: 2.9.7
+          cache: true
+
+      - name: Install dependencies
+        run: deno install --frozen
+
+      - name: Prepare test environment
+        env:
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+        run: |
+          cat > .env.test <<EOF
+          UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL}
+          UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN}
+          EOF
+
+      - name: Initialize report
+        run: |
+          {
+            echo "# Rate Limit Test Report"
+            echo
+            echo "## Run Information"
+            echo
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Repository | ${{ github.repository }} |"
+            echo "| Branch | ${{ github.ref_name }} |"
+            echo "| Commit | \`${GITHUB_SHA::7}\` |"
+            echo "| Run | #${{ github.run_number }} |"
+            echo "| Triggered by | ${{ github.actor }} |"
+            echo "| Runner | ${{ runner.os }} |"
+            echo "| Deno | 2.9.7 |"
+            echo "| Started | $(date -u '+%Y-%m-%d %H:%M:%S UTC') |"
+            echo
+            echo "## Test Results"
+            echo
+            echo "| Test | Status | Duration |"
+            echo "|---|---|---:|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run infrastructure rate limit test
+        id: infrastructure
+        continue-on-error: true
+        run: |
+          deno test \
+            --env-file=.env.test \
+            tests/unit/infrastructure/noop-rate-limit.store.test.ts \
+            --allow-read \
+            --allow-env \
+            --allow-net \
+            --junit-path=infra.junit.xml
+
+      - name: Run middleware rate limit tests
+        id: middleware
+        continue-on-error: true
+        run: |
+          deno test \
+            --env-file=.env.test \
+            tests/unit/middleware/rate-limit.middleware.test.ts \
+            --allow-read \
+            --allow-env \
+            --allow-net \
+            --junit-path=middleware.junit.xml
+
+      - name: Run Upstash Redis smoke test
+        id: upstash
+        continue-on-error: true
+        run: |
+          deno test \
+            --env-file=.env.test \
+            tests/smoke/upstash-redis.smoke.test.ts \
+            --allow-read \
+            --allow-env \
+            --allow-net \
+            --junit-path=upstash.junit.xml
+
+      - name: Generate test report
+        if: always()
+        run: |
+          deno eval '
+          const files = [
+            "infra.junit.xml",
+            "middleware.junit.xml",
+            "upstash.junit.xml",
+          ];
+
+          const summaryFile = Deno.env.get("GITHUB_STEP_SUMMARY");
+
+          if (!summaryFile) {
+            throw new Error("GITHUB_STEP_SUMMARY is not available");
+          }
+
+          let total = 0;
+          let passed = 0;
+          let failed = 0;
+
+          const results = [];
+
+          for (const file of files) {
+            try {
+              const xml = await Deno.readTextFile(file);
+
+              const testsuiteMatch = xml.match(
+                /<testsuite[^>]*tests="([^"]+)"[^>]*failures="([^"]+)"[^>]*errors="([^"]+)"/
+              );
+
+              if (!testsuiteMatch) {
+                continue;
+              }
+
+              total += Number(testsuiteMatch[1]);
+              failed +=
+                Number(testsuiteMatch[2]) +
+                Number(testsuiteMatch[3]);
+
+              const testcaseRegex =
+                /<testcase\s+name="([^"]*)"[^>]*time="([^"]*)"[^>]*>([\s\S]*?)<\/testcase>|<testcase\s+name="([^"]*)"[^>]*time="([^"]*)"[^>]*\/>/g;
+
+              let match;
+
+              while ((match = testcaseRegex.exec(xml)) !== null) {
+                const name = match[1] ?? match[4];
+                const time = match[2] ?? match[5];
+
+                const body = match[3] ?? "";
+
+                const isFailed =
+                  body.includes("<failure") ||
+                  body.includes("<error");
+
+                const status = isFailed ? "FAILED" : "PASSED";
+
+                if (!isFailed) {
+                  passed++;
+                }
+
+                results.push({
+                  name,
+                  status,
+                  duration: `${(
+                    Number(time) * 1000
+                  ).toFixed(0)}ms`,
+                });
+              }
+            } catch {
+              // Test may not have generated a report.
+            }
+          }
+
+          if (results.length === 0) {
+            results.push({
+              name: "No test results were generated",
+              status: "FAILED",
+              duration: "-",
+            });
+
+            failed++;
+          }
+
+          const lines = [];
+
+          for (const result of results) {
+            lines.push(
+              `| ${result.name.replaceAll("|", "\\|")} | ${result.status} | ${result.duration} |`
+            );
+          }
+
+          lines.push("");
+          lines.push("## Summary");
+          lines.push("");
+          lines.push(
+            `**${total} tests: ${passed} passed, ${failed} failed**`
+          );
+          lines.push("");
+          lines.push(
+            `Finished: ${new Date().toISOString()}`
+          );
+
+          await Deno.writeTextFile(
+            summaryFile,
+            lines.join("\n") + "\n",
+            { append: true },
+          );
+          '
+
+      - name: Determine final result
+        if: always()
+        run: |
+          FAILED=0
+
+          if [ "${{ steps.infrastructure.outcome }}" != "success" ]; then
+            FAILED=1
+          fi
+
+          if [ "${{ steps.middleware.outcome }}" != "success" ]; then
+            FAILED=1
+          fi
+
+          if [ "${{ steps.upstash.outcome }}" != "success" ]; then
+            FAILED=1
+          fi
+
+          echo "========================================"
+          echo "Rate Limit Test Suite"
+          echo "========================================"
+          echo "Infrastructure : ${{ steps.infrastructure.outcome }}"
+          echo "Middleware     : ${{ steps.middleware.outcome }}"
+          echo "Upstash        : ${{ steps.upstash.outcome }}"
+          echo "========================================"
+
+          if [ "$FAILED" -ne 0 ]; then
+            echo "Result: FAILED"
+            exit 1
+          fi
+
+          echo "Result: PASSED"
