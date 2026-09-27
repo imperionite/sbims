@@ -11,7 +11,7 @@ jobs:
   quality-gate:
     uses: ./.github/workflows/_quality-module.yml
     with:
-      module: htes
+      module: internships
       unit_task: test:unit:internships
       integration_task: test:integration:internships
     secrets: inherit

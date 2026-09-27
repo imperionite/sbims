@@ -19,8 +19,19 @@ import type { SupabaseClients } from "../../../src/lib/supabase.ts";
 // TEST CONSTANTS
 // ============================================================
 
-const USER_ID = "11111111-1111-1111-1111-111111111111";
-const RESOURCE_ID = "33333333-3333-3333-3333-333333333333";
+/*
+ * These are valid UUID v4 values.
+ *
+ * Important:
+ * Zod's UUID validation checks both the UUID version and variant.
+ *
+ * UUID v4:
+ *   xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+ *
+ * where y must be 8, 9, a, or b.
+ */
+const USER_ID = "11111111-1111-4111-8111-111111111111";
+const RESOURCE_ID = "33333333-3333-4333-8333-333333333333";
 
 // ============================================================
 // MOCK SUPABASE HELPERS
@@ -95,10 +106,13 @@ function createMockClients(responses: MockResponse[]): SupabaseClients {
   return {
     // deno-lint-ignore no-explicit-any
     supabaseClient: supabaseAdmin as any,
+
     // deno-lint-ignore no-explicit-any
     supabaseAdmin: supabaseAdmin as any,
+
     // deno-lint-ignore no-explicit-any
     createAuthenticatedClient: () => supabaseAdmin as any,
+
     // deno-lint-ignore no-explicit-any
     createPublicClient: () => supabaseAdmin as any,
   };
@@ -116,11 +130,8 @@ Deno.test(
   "FR-11 types should define required user-management audit actions",
   () => {
     assertEquals(AUDIT_ACTIONS.includes("CREATE_USER"), true);
-
     assertEquals(AUDIT_ACTIONS.includes("UPDATE_USER"), true);
-
     assertEquals(AUDIT_ACTIONS.includes("CHANGE_ROLE"), true);
-
     assertEquals(AUDIT_ACTIONS.includes("DEACTIVATE_USER"), true);
   },
 );
@@ -129,11 +140,8 @@ Deno.test(
   "FR-11 types should define internship, attendance, evaluation, and document actions",
   () => {
     assertEquals(AUDIT_ACTIONS.includes("CREATE_INTERNSHIP"), true);
-
     assertEquals(AUDIT_ACTIONS.includes("CREATE_ATTENDANCE"), true);
-
     assertEquals(AUDIT_ACTIONS.includes("CREATE_EVALUATION"), true);
-
     assertEquals(AUDIT_ACTIONS.includes("UPLOAD_DOCUMENT"), true);
   },
 );
@@ -186,7 +194,15 @@ Deno.test("FR-11 query schema should accept supported filters", () => {
     limit: 10,
   });
 
-  assertEquals(result.success, true);
+  assertEquals(
+    result.success,
+    true,
+    result.success ? undefined : `Expected supported audit filters to be accepted. ${
+      JSON.stringify(
+        result.error.issues,
+      )
+    }`,
+  );
 
   if (result.success) {
     assertEquals(result.data.userId, USER_ID);
@@ -255,10 +271,13 @@ Deno.test("FR-11 AuditService.log should insert an audit record", async () => {
   const clients = {
     // deno-lint-ignore no-explicit-any
     supabaseClient: supabaseAdmin as any,
+
     // deno-lint-ignore no-explicit-any
     supabaseAdmin: supabaseAdmin as any,
+
     // deno-lint-ignore no-explicit-any
     createAuthenticatedClient: () => supabaseAdmin as any,
+
     // deno-lint-ignore no-explicit-any
     createPublicClient: () => supabaseAdmin as any,
   };
@@ -299,10 +318,13 @@ Deno.test(
     const clients = {
       // deno-lint-ignore no-explicit-any
       supabaseClient: supabaseAdmin as any,
+
       // deno-lint-ignore no-explicit-any
       supabaseAdmin: supabaseAdmin as any,
+
       // deno-lint-ignore no-explicit-any
       createAuthenticatedClient: () => supabaseAdmin as any,
+
       // deno-lint-ignore no-explicit-any
       createPublicClient: () => supabaseAdmin as any,
     };
@@ -343,10 +365,13 @@ Deno.test(
     const clients = {
       // deno-lint-ignore no-explicit-any
       supabaseClient: supabaseAdmin as any,
+
       // deno-lint-ignore no-explicit-any
       supabaseAdmin: supabaseAdmin as any,
+
       // deno-lint-ignore no-explicit-any
       createAuthenticatedClient: () => supabaseAdmin as any,
+
       // deno-lint-ignore no-explicit-any
       createPublicClient: () => supabaseAdmin as any,
     };

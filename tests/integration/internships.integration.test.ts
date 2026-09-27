@@ -90,12 +90,24 @@ async function authenticatedRequest(
 // Date helpers
 // ============================================================
 
+/**
+ * Capture the calendar date once when the test module loads.
+ *
+ * All relative test dates are derived from this same value so a test
+ * cannot cross midnight between calls and accidentally generate an
+ * inconsistent date range.
+ *
+ * The application/database should use the same timezone convention
+ * for date-only business rules.
+ */
+const TEST_TODAY = new Date();
+
 function dateOnly(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-function addDays(days: number): string {
-  const date = new Date();
+function addDays(days: number, baseDate = TEST_TODAY): string {
+  const date = new Date(baseDate);
   date.setUTCDate(date.getUTCDate() + days);
   return dateOnly(date);
 }
@@ -832,27 +844,55 @@ Deno.test(
     const { response: loginResponse, body: loginBody } = await login();
 
     assertEquals(loginResponse.status, 200);
+    assertEquals(loginBody.success, true);
+    assertExists(loginBody.data?.accessToken);
 
-    const hte = await createTestHte(loginBody.data.accessToken);
+    const accessToken = loginBody.data.accessToken;
+
+    const hte = await createTestHte(accessToken);
+
+    // Use a date safely in the future so this test cannot become
+    // ambiguous because of a midnight/date-boundary race.
+    const startDate = daysFromNow(2);
+    const endDate = daysFromNow(9);
 
     const internship = await createTestInternship(
-      loginBody.data.accessToken,
+      accessToken,
       student.id,
       hte.id,
       facultyAdviserId,
       {
-        startDate: tomorrow(),
-        endDate: daysFromNow(7),
+        startDate,
+        endDate,
       },
     );
 
-    const { response } = await updateInternshipStatus(
-      loginBody.data.accessToken,
+    assertEquals(internship.status, "pending");
+    assertEquals(internship.start_date, startDate);
+    assertEquals(internship.end_date, endDate);
+
+    const { response, body } = await updateInternshipStatus(
+      accessToken,
       internship.id,
       "active",
     );
 
+    // FR-05 requires activation to be rejected before start_date.
     assertEquals(response.status, 400);
+    assertEquals(body.success, false);
+
+    // The failed transition must not mutate the internship.
+    const getResponse = await authenticatedRequest(
+      `/api/v1/internships/${internship.id}`,
+      accessToken,
+    );
+
+    const getBody = await getResponse.json();
+
+    assertEquals(getResponse.status, 200);
+    assertEquals(getBody.success, true);
+    assertEquals(getBody.data.id, internship.id);
+    assertEquals(getBody.data.status, "pending");
   },
 );
 
