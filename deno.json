@@ -2,13 +2,13 @@
   "nodeModulesDir": "auto",
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.19",
-    "@std/testing": "jsr:@std/testing@^1.0.20",
-    "@upstash/redis": "npm:@upstash/redis@^1.38.4",
-    "hono": "npm:hono@^4.13.8",
+    "@std/testing": "jsr:@std/testing@^1.0.21",
+    "@upstash/redis": "npm:@upstash/redis@^1.39.0",
+    "hono": "npm:hono@^4.13.9",
     "@hono/zod-validator": "npm:@hono/zod-validator@^0.9.1",
     "zod": "npm:zod@^4.6.5",
-    "@supabase/supabase-js": "npm:@supabase/supabase-js@^2.116.0",
-    "@std/testing/mock": "jsr:@std/testing@^1.0.20/mock",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@^2.117.2",
+    "@std/testing/mock": "jsr:@std/testing@^1.0.21/mock",
     "hono-rate-limiter": "npm:hono-rate-limiter@^0.5.4"
   },
   "tasks": {
@@ -20,6 +20,7 @@
     "seed:attendance": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/attendance.ts",
     "seed:evaluations": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/evaluations.ts",
     "seed:documents": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/documents.ts",
+    "seed:reports": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/reports.ts",
     "fmt": "deno fmt",
     "lint": "deno lint",
     "verify": "deno fmt --check && deno lint && deno task check",
