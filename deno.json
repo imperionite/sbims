@@ -21,6 +21,7 @@
     "seed:evaluations": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/evaluations.ts",
     "seed:documents": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/documents.ts",
     "seed:reports": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/reports.ts",
+    "seed:audit": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/audit.ts",
     "fmt": "deno fmt",
     "lint": "deno lint",
     "verify": "deno fmt --check && deno lint && deno task check",
