@@ -7,6 +7,7 @@ import type {
   CreateAttendanceInput,
   UpdateAttendanceRequest,
 } from "./attendance.types.ts";
+import { AuthRole } from "../auth/auth.types.ts";
 
 /**
  * Converts HH:MM or HH:MM:SS into minutes from midnight.
@@ -236,11 +237,15 @@ export class AttendanceService {
   }
 
   /**
-   * GET /attendance/:id
+   * Internal attendance lookup.
    *
-   * Retrieves a single attendance record.
+   * This method intentionally performs no requester authorization.
+   * It is used only by service operations that have already established
+   * their authorization requirements through their own business rules.
    */
-  async getAttendanceById(attendanceId: string): Promise<AttendanceRecord> {
+  private async getAttendanceRecordById(
+    attendanceId: string,
+  ): Promise<AttendanceRecord> {
     const { data, error } = await this.clients.supabaseAdmin
       .from("attendance_records")
       .select("*")
@@ -260,6 +265,58 @@ export class AttendanceService {
     return data as AttendanceRecord;
   }
 
+  /**
+   * GET /attendance/:id
+   *
+   * Retrieves a single attendance record.
+   *
+   * Students may retrieve only attendance belonging to
+   * their own internship.
+   *
+   * Internship coordinators may retrieve the record.
+   */
+  async getAttendanceById(
+    attendanceId: string,
+    requesterId: string,
+    requesterRole: AuthRole,
+  ): Promise<AttendanceRecord> {
+    const attendance = await this.getAttendanceRecordById(attendanceId);
+
+    /*
+     * Coordinators are authorized by the route-level role
+     * middleware and do not require student ownership checking.
+     */
+    if (requesterRole === "internship_coordinator") {
+      return attendance;
+    }
+
+    /*
+     * Student access requires ownership of the associated internship.
+     */
+    if (requesterRole === "student") {
+      const { data: internship, error: internshipError } = await this.clients.supabaseAdmin
+        .from("internships")
+        .select("student_id")
+        .eq("id", attendance.internship_id)
+        .maybeSingle();
+
+      if (internshipError) {
+        console.error("VERIFY ATTENDANCE OWNERSHIP FAILED:", internshipError);
+
+        throw new AppError(500, "Failed to verify attendance ownership.");
+      }
+
+      if (!internship) {
+        throw new AppError(404, "Internship not found.");
+      }
+
+      if (internship.student_id !== requesterId) {
+        throw new AppError(403, "You can only retrieve your own attendance.");
+      }
+    }
+
+    return attendance;
+  }
   /**
    * GET /attendance/me
    *
@@ -339,7 +396,7 @@ export class AttendanceService {
     /*
      * Make sure the attendance record exists.
      */
-    const attendance = await this.getAttendanceById(attendanceId);
+    const attendance = await this.getAttendanceRecordById(attendanceId);
 
     /*
      * Only pending records may be validated/rejected.
@@ -431,7 +488,7 @@ export class AttendanceService {
     /*
      * Retrieve the existing attendance record.
      */
-    const attendance = await this.getAttendanceById(attendanceId);
+    const attendance = await this.getAttendanceRecordById(attendanceId);
 
     /*
      * Only pending records may be changed.

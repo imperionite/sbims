@@ -72,8 +72,12 @@ function createMockClients() {
 
           if (state.orderBy) {
             filtered.sort((a, b) => {
-              const left = (a as Record<string, unknown>)[state.orderBy!.column];
-              const right = (b as Record<string, unknown>)[state.orderBy!.column];
+              const left = (a as Record<string, unknown>)[
+                state.orderBy!.column
+              ];
+              const right = (b as Record<string, unknown>)[
+                state.orderBy!.column
+              ];
 
               if (left === right) return 0;
 
@@ -460,9 +464,23 @@ Deno.test("AttendanceService - retrieves attendance by id", async () => {
     },
   ];
 
+  tables.internships = [
+    {
+      id: "internship-1",
+      student_id: "student-1",
+      status: "active",
+      start_date: "2026-01-01",
+      end_date: "2026-12-31",
+    },
+  ];
+
   const service = new AttendanceService(clients);
 
-  const result = await service.getAttendanceById("attendance-1");
+  const result = await service.getAttendanceById(
+    "attendance-1",
+    "student-1",
+    "student",
+  );
 
   assertEquals(result.id, "attendance-1");
 });
@@ -477,7 +495,7 @@ Deno.test(
     const service = new AttendanceService(clients);
 
     await assertRejects(
-      () => service.getAttendanceById("missing"),
+      () => service.getAttendanceById("missing", "student-1", "student"),
       AppError,
       "Attendance record not found.",
     );
@@ -672,6 +690,80 @@ Deno.test(
         }),
       AppError,
       "Only pending attendance records can be updated.",
+    );
+  },
+);
+
+Deno.test(
+  "AttendanceService - allows student to retrieve their own attendance",
+  async () => {
+    const { clients, tables } = createMockClients();
+
+    tables.attendance_records = [
+      {
+        id: "attendance-1",
+        internship_id: "internship-1",
+        attendance_date: "2026-06-01",
+        time_in: "08:00",
+        time_out: "17:00",
+        validation_status: "pending",
+      },
+    ];
+
+    tables.internships = [
+      {
+        id: "internship-1",
+        student_id: "student-1",
+        status: "active",
+        start_date: "2026-01-01",
+        end_date: "2026-12-31",
+      },
+    ];
+
+    const service = new AttendanceService(clients);
+
+    const result = await service.getAttendanceById(
+      "attendance-1",
+      "student-1",
+      "student",
+    );
+
+    assertEquals(result.id, "attendance-1");
+  },
+);
+
+Deno.test(
+  "AttendanceService - rejects student retrieving another student's attendance",
+  async () => {
+    const { clients, tables } = createMockClients();
+
+    tables.attendance_records = [
+      {
+        id: "attendance-1",
+        internship_id: "internship-1",
+        attendance_date: "2026-06-01",
+        time_in: "08:00",
+        time_out: "17:00",
+        validation_status: "pending",
+      },
+    ];
+
+    tables.internships = [
+      {
+        id: "internship-1",
+        student_id: "different-student",
+        status: "active",
+        start_date: "2026-01-01",
+        end_date: "2026-12-31",
+      },
+    ];
+
+    const service = new AttendanceService(clients);
+
+    await assertRejects(
+      () => service.getAttendanceById("attendance-1", "student-1", "student"),
+      AppError,
+      "You can only retrieve your own attendance.",
     );
   },
 );

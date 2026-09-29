@@ -128,8 +128,9 @@ attendance.get(
 /**
  * GET /attendance/:id
  *
- * Student or internship coordinator retrieves
- * an attendance record.
+ * Student retrieves only their own attendance record.
+ * Internship coordinators may retrieve any attendance
+ * record permitted by their role.
  */
 attendance.get(
   "/:id",
@@ -137,13 +138,19 @@ attendance.get(
   async (c) => {
     const attendanceService = new AttendanceService(c.get("supabase"));
 
+    const user = c.get("user");
+    const userRole = c.get("userRole");
     const id = c.req.param("id");
 
     if (!id) {
       throw new AppError(400, "Attendance ID is required.");
     }
 
-    const result = await attendanceService.getAttendanceById(id);
+    const result = await attendanceService.getAttendanceById(
+      id,
+      user.id,
+      userRole,
+    );
 
     return c.json({
       success: true,
