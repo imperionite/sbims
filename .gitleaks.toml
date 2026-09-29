@@ -1,0 +1,12 @@
+title = "SBIMS Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Project documentation and development seed paths excluded from secret scanning"
+
+paths = [
+  '''(^|/)HTTP(/|$)''',
+  '''(^|/)supabase/seed(/|$)'''
+]
