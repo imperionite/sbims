@@ -1,0 +1,309 @@
+name: Security Baseline Characterization
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+env:
+  DENO_VERSION: "2.9.7"
+
+jobs:
+
+  # ============================================================
+  # 1. SOURCE CODE SECURITY ANALYSIS
+  # ============================================================
+  codeql:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: /security-baseline/backend
+
+  # ============================================================
+  # 2. SECRET DETECTION
+  # ============================================================
+
+  secrets:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v3
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ============================================================
+  # 3. DEPENDENCY SECURITY
+  # ============================================================
+
+  dependencies:
+    name: Dependency Vulnerability Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+          cache: true
+
+      - name: Install from lockfile
+        run: deno ci
+
+      - name: Run Deno dependency audit
+        continue-on-error: true
+        run: |
+          deno audit 2>&1 | tee deno-audit.txt
+
+      - name: Upload dependency audit
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: dependency-security-baseline
+          path: deno-audit.txt
+
+  # ============================================================
+  # 4. LIVE API SECURITY BASELINE
+  # ============================================================
+
+  zap-baseline:
+    name: OWASP ZAP Baseline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run ZAP Baseline
+        uses: zaproxy/action-baseline@v0.15.0
+        continue-on-error: true
+        with:
+          target: ${{ secrets.SECURITY_TARGET_URL }}
+          fail_action: false
+          artifact_name: sbims-zap-baseline
+
+      - name: Security baseline note
+        if: always()
+        run: |
+          echo "ZAP baseline completed."
+          echo "This is a passive baseline scan and not a penetration test."
+
+  # ============================================================
+  # 5. API SECURITY CONTROL PROBES
+  # ============================================================
+
+  api-controls:
+    name: API Security Control Probes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run API security probes
+        env:
+          TARGET: ${{ secrets.SECURITY_TARGET_URL }}
+          ALLOWED_ORIGIN: ${{ secrets.SECURITY_ALLOWED_ORIGIN }}
+          DISALLOWED_ORIGIN: ${{ secrets.SECURITY_DISALLOWED_ORIGIN }}
+        shell: bash
+        run: |
+          set +e
+
+          mkdir -p security-results
+
+          echo "SBIMS API SECURITY BASELINE"
+          echo "Target: ${TARGET}"
+          echo "Date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo
+
+          # ------------------------------------------------------
+          # Public health endpoint
+          # ------------------------------------------------------
+
+          HEALTH_STATUS=$(
+            curl -s -o /dev/null -w "%{http_code}" \
+              "${TARGET}/api/v1/health"
+          )
+
+          echo "HEALTH_STATUS=${HEALTH_STATUS}" \
+            | tee -a security-results/control-results.txt
+
+
+          # ------------------------------------------------------
+          # Protected endpoint without token
+          # ------------------------------------------------------
+
+          AUTH_STATUS=$(
+            curl -s -o /dev/null -w "%{http_code}" \
+              "${TARGET}/api/v1/auth/me"
+          )
+
+          echo "AUTH_ME_WITHOUT_TOKEN=${AUTH_STATUS}" \
+            | tee -a security-results/control-results.txt
+
+
+          # ------------------------------------------------------
+          # Administrator endpoint without token
+          # ------------------------------------------------------
+
+          ADMIN_STATUS=$(
+            curl -s -o /dev/null -w "%{http_code}" \
+              "${TARGET}/api/v1/auth/admin-check"
+          )
+
+          echo "ADMIN_CHECK_WITHOUT_TOKEN=${ADMIN_STATUS}" \
+            | tee -a security-results/control-results.txt
+
+
+          # ------------------------------------------------------
+          # Protected business endpoint without token
+          # ------------------------------------------------------
+
+          STUDENTS_STATUS=$(
+            curl -s -o /dev/null -w "%{http_code}" \
+              "${TARGET}/api/v1/students"
+          )
+
+          echo "STUDENTS_WITHOUT_TOKEN=${STUDENTS_STATUS}" \
+            | tee -a security-results/control-results.txt
+
+
+          # ------------------------------------------------------
+          # CORS - allowed origin
+          # ------------------------------------------------------
+
+          echo
+          echo "=== CORS: allowed origin ==="
+
+          curl -s -D security-results/cors-allowed.headers \
+            -o /dev/null \
+            -H "Origin: ${ALLOWED_ORIGIN}" \
+            "${TARGET}/api/v1/health"
+
+
+          # ------------------------------------------------------
+          # CORS - disallowed origin
+          # ------------------------------------------------------
+
+          echo
+          echo "=== CORS: disallowed origin ==="
+
+          curl -s -D security-results/cors-disallowed.headers \
+            -o /dev/null \
+            -H "Origin: ${DISALLOWED_ORIGIN}" \
+            "${TARGET}/api/v1/health"
+
+
+          # ------------------------------------------------------
+          # Security headers
+          # ------------------------------------------------------
+
+          echo
+          echo "=== Security headers ==="
+
+          curl -s -D security-results/security.headers \
+            -o /dev/null \
+            "${TARGET}/api/v1/health"
+
+          for HEADER in \
+            "strict-transport-security" \
+            "content-security-policy" \
+            "x-content-type-options" \
+            "x-frame-options" \
+            "referrer-policy" \
+            "permissions-policy"
+          do
+            if grep -qi "^${HEADER}:" security-results/security.headers; then
+              echo "${HEADER}: PRESENT" \
+                | tee -a security-results/security-header-results.txt
+            else
+              echo "${HEADER}: NOT_OBSERVED" \
+                | tee -a security-results/security-header-results.txt
+            fi
+          done
+
+
+          # ------------------------------------------------------
+          # Summary
+          # ------------------------------------------------------
+
+          {
+            echo
+            echo "=== SECURITY CONTROL EXPECTATIONS ==="
+            echo "Expected:"
+            echo "  /auth/me without token       -> 401"
+            echo "  /auth/admin-check no token  -> 401"
+            echo "  /students without token     -> 401"
+            echo
+            echo "Observed:"
+            cat security-results/control-results.txt
+          } > security-results/security-baseline-summary.txt
+
+      - name: Upload API security baseline
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: api-security-control-baseline
+          path: security-results/
+
+  # ============================================================
+  # 6. CONSOLIDATED SUMMARY
+  # ============================================================
+
+  summary:
+    name: Security Baseline Summary
+    runs-on: ubuntu-latest
+    needs:
+      - codeql
+      - secrets
+      - dependencies
+      - zap-baseline
+      - api-controls
+
+    if: always()
+
+    steps:
+      - name: Generate workflow summary
+        run: |
+          {
+            echo "# SBIMS Backend Security Baseline"
+            echo
+            echo "## Scope"
+            echo
+            echo "This workflow provides a baseline security characterization."
+            echo "It is not a penetration test."
+            echo
+            echo "| Assessment Area | Workflow Component |"
+            echo "|---|---|"
+            echo "| Source-code security | CodeQL |"
+            echo "| Secret exposure | Gitleaks |"
+            echo "| Dependency vulnerabilities | Deno audit |"
+            echo "| HTTP/API baseline | OWASP ZAP Baseline |"
+            echo "| Authentication/authorization/CORS/headers | API probes |"
+            echo
+            echo "Run ID: ${{ github.run_id }}"
+            echo "Commit: ${{ github.sha }}"
+            echo "Triggered by: ${{ github.actor }}"
+          } >> "$GITHUB_STEP_SUMMARY"
