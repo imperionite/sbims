@@ -111,19 +111,25 @@ students.get(
 
     const user = c.get("user");
 
+    // const result = await studentService.getStudent(
+    //   id,
+    //   user.id,
+    //   (
+    //     user as {
+    //       id: string;
+    //       role:
+    //         | "administrator"
+    //         | "internship_coordinator"
+    //         | "faculty_adviser"
+    //         | "student";
+    //     }
+    //   ).role,
+    // );
+
     const result = await studentService.getStudent(
       id,
       user.id,
-      (
-        user as {
-          id: string;
-          role:
-            | "administrator"
-            | "internship_coordinator"
-            | "faculty_adviser"
-            | "student";
-        }
-      ).role,
+      c.get("userRole"),
     );
 
     return c.json({ success: true, data: result });
