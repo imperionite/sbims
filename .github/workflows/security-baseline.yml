@@ -18,6 +18,7 @@ jobs:
       SECURITY_PROTECTED_PATH: ${{ secrets.SECURITY_PROTECTED_PATH }}
 
     steps:
+
       # ==========================================================
       # CHECKOUT
       # ==========================================================
@@ -33,21 +34,24 @@ jobs:
       - name: Initialize security baseline
         shell: bash
         run: |
+          set -u
+
           mkdir -p security-baseline
 
           cat > security-baseline/results.env <<'EOF'
-          TARGET_STATUS=NOT RUN
-          GITLEAKS_STATUS=NOT RUN
-          DENO_STATUS=NOT RUN
-          CODEQL_INIT_STATUS=NOT RUN
-          CODEQL_STATUS=NOT RUN
-          ZAP_STATUS=NOT RUN
-          API_STATUS=NOT RUN
-          API_HEALTH_STATUS=NOT RUN
-          API_AUTH_STATUS=NOT RUN
-          API_HEADERS_STATUS=NOT RUN
-          API_CORS_STATUS=NOT RUN
+          TARGET_STATUS=NOT_RUN
+          GITLEAKS_STATUS=NOT_RUN
+          DENO_STATUS=NOT_RUN
+          CODEQL_STATUS=NOT_RUN
+          ZAP_STATUS=NOT_RUN
+          API_STATUS=NOT_RUN
+          API_HEALTH_STATUS=NOT_RUN
+          API_AUTH_STATUS=NOT_RUN
+          API_HEADERS_STATUS=NOT_RUN
+          API_CORS_STATUS=NOT_RUN
           EOF
+
+          echo "Security baseline initialized."
 
       # ==========================================================
       # TARGET CONNECTIVITY
@@ -61,15 +65,13 @@ jobs:
 
           if [ -z "${SECURITY_TARGET_URL:-}" ]; then
             echo "SECURITY_TARGET_URL is not configured."
-
-            sed -i \
-              's/^TARGET_STATUS=.*/TARGET_STATUS=FAIL/' \
+            sed -i 's/^TARGET_STATUS=.*/TARGET_STATUS=FAIL/' \
               security-baseline/results.env
-
             exit 1
           fi
 
-          echo "Checking security target..."
+          echo "Checking security target:"
+          echo "$SECURITY_TARGET_URL"
 
           HTTP_STATUS="$(
             curl \
@@ -83,24 +85,20 @@ jobs:
               "$SECURITY_TARGET_URL"
           )"
 
-          echo "HTTP status: $HTTP_STATUS"
+          echo "Target HTTP status: $HTTP_STATUS"
 
           if [ "$HTTP_STATUS" -ge 200 ] &&
              [ "$HTTP_STATUS" -lt 500 ]; then
 
-            sed -i \
-              's/^TARGET_STATUS=.*/TARGET_STATUS=PASS/' \
+            sed -i 's/^TARGET_STATUS=.*/TARGET_STATUS=PASS/' \
               security-baseline/results.env
 
-            echo "Target reachable."
             exit 0
           fi
 
-          sed -i \
-            's/^TARGET_STATUS=.*/TARGET_STATUS=FAIL/' \
+          sed -i 's/^TARGET_STATUS=.*/TARGET_STATUS=FAIL/' \
             security-baseline/results.env
 
-          echo "Target is not reachable."
           exit 1
 
       # ==========================================================
@@ -120,12 +118,10 @@ jobs:
         shell: bash
         run: |
           if [ "${{ steps.gitleaks.outcome }}" = "success" ]; then
-            sed -i \
-              's/^GITLEAKS_STATUS=.*/GITLEAKS_STATUS=PASS/' \
+            sed -i 's/^GITLEAKS_STATUS=.*/GITLEAKS_STATUS=PASS/' \
               security-baseline/results.env
           else
-            sed -i \
-              's/^GITLEAKS_STATUS=.*/GITLEAKS_STATUS=REVIEW/' \
+            sed -i 's/^GITLEAKS_STATUS=.*/GITLEAKS_STATUS=REVIEW/' \
               security-baseline/results.env
           fi
 
@@ -150,8 +146,6 @@ jobs:
 
           cat security-baseline/deno-ci.txt
 
-          echo "$STATUS" > security-baseline/deno-ci.exit
-
           exit "$STATUS"
 
       - name: Run Deno dependency audit
@@ -164,7 +158,8 @@ jobs:
           deno audit > security-baseline/deno-audit.txt 2>&1
           STATUS=$?
 
-          echo "$STATUS" > security-baseline/deno-audit.exit
+          printf '%s\n' "$STATUS" \
+            > security-baseline/deno-audit.exit
 
           cat security-baseline/deno-audit.txt
 
@@ -175,17 +170,15 @@ jobs:
         shell: bash
         run: |
           STATUS="$(
-            cat security-baseline/deno-audit.exit 2>/dev/null \
-              || echo 1
+            cat security-baseline/deno-audit.exit \
+              2>/dev/null || echo 1
           )"
 
           if [ "$STATUS" = "0" ]; then
-            sed -i \
-              's/^DENO_STATUS=.*/DENO_STATUS=PASS/' \
+            sed -i 's/^DENO_STATUS=.*/DENO_STATUS=PASS/' \
               security-baseline/results.env
           else
-            sed -i \
-              's/^DENO_STATUS=.*/DENO_STATUS=REVIEW/' \
+            sed -i 's/^DENO_STATUS=.*/DENO_STATUS=REVIEW/' \
               security-baseline/results.env
           fi
 
@@ -216,28 +209,18 @@ jobs:
           if [ "${{ steps.codeql-init.outcome }}" = "success" ] &&
              [ "${{ steps.codeql-analyze.outcome }}" = "success" ]; then
 
-            sed -i \
-              's/^CODEQL_INIT_STATUS=.*/CODEQL_INIT_STATUS=PASS/' \
-              security-baseline/results.env
-
-            sed -i \
-              's/^CODEQL_STATUS=.*/CODEQL_STATUS=PASS/' \
+            sed -i 's/^CODEQL_STATUS=.*/CODEQL_STATUS=PASS/' \
               security-baseline/results.env
 
           else
 
-            sed -i \
-              's/^CODEQL_INIT_STATUS=.*/CODEQL_INIT_STATUS=REVIEW/' \
-              security-baseline/results.env
-
-            sed -i \
-              's/^CODEQL_STATUS=.*/CODEQL_STATUS=REVIEW/' \
+            sed -i 's/^CODEQL_STATUS=.*/CODEQL_STATUS=REVIEW/' \
               security-baseline/results.env
 
           fi
 
       # ==========================================================
-      # ZAP TARGET CONNECTIVITY
+      # ZAP TARGET
       # ==========================================================
 
       - name: Verify ZAP target
@@ -294,14 +277,12 @@ jobs:
           if [ "${{ steps.zap-target.outcome }}" = "success" ] &&
              [ "${{ steps.zap.outcome }}" = "success" ]; then
 
-            sed -i \
-              's/^ZAP_STATUS=.*/ZAP_STATUS=PASS/' \
+            sed -i 's/^ZAP_STATUS=.*/ZAP_STATUS=PASS/' \
               security-baseline/results.env
 
           else
 
-            sed -i \
-              's/^ZAP_STATUS=.*/ZAP_STATUS=REVIEW/' \
+            sed -i 's/^ZAP_STATUS=.*/ZAP_STATUS=REVIEW/' \
               security-baseline/results.env
 
           fi
@@ -323,19 +304,22 @@ jobs:
           echo "=============================================================="
           echo "API SECURITY CONTROL PROBES"
           echo "=============================================================="
+          echo ""
 
-          # ======================================================
-          # CONFIGURATION
-          # ======================================================
+          # ------------------------------------------------------
+          # Validate configuration
+          # ------------------------------------------------------
 
           if [ -z "${SECURITY_HEALTH_PATH:-}" ]; then
-            echo "SECURITY_HEALTH_PATH is not configured."
-            HEALTH_STATUS="N/A"
             HEALTH_RESULT="NOT CONFIGURED"
+            HEALTH_STATUS="N/A"
           else
-            HEALTH_URL="${BASE_URL}/${SECURITY_HEALTH_PATH#/}"
+            HEALTH_PATH="/${SECURITY_HEALTH_PATH#/}"
+            HEALTH_URL="${BASE_URL}${HEALTH_PATH}"
 
-            echo "Health URL: $HEALTH_URL"
+            echo "Health endpoint:"
+            echo "$HEALTH_URL"
+            echo ""
 
             HEALTH_STATUS="$(
               curl \
@@ -343,24 +327,24 @@ jobs:
                 --silent \
                 --show-error \
                 --output security-baseline/health-body.txt \
-                --dump-header security-baseline/health-headers.txt \
                 --write-out "%{http_code}" \
                 --max-time 20 \
                 "$HEALTH_URL"
             )"
 
-            echo "Health status: $HEALTH_STATUS"
+            echo "Health HTTP status: $HEALTH_STATUS"
 
-            if [ "$HEALTH_STATUS" = "200" ]; then
+            if [ "$HEALTH_STATUS" -ge 200 ] &&
+               [ "$HEALTH_STATUS" -lt 400 ]; then
               HEALTH_RESULT="PASS"
             else
               HEALTH_RESULT="REVIEW"
             fi
           fi
 
-          # ======================================================
-          # PROTECTED ENDPOINT / NO AUTHORIZATION
-          # ======================================================
+          # ------------------------------------------------------
+          # Protected endpoint without authentication
+          # ------------------------------------------------------
 
           if [ -z "${SECURITY_PROTECTED_PATH:-}" ]; then
 
@@ -369,9 +353,12 @@ jobs:
 
           else
 
-            PROTECTED_URL="${BASE_URL}/${SECURITY_PROTECTED_PATH#/}"
+            PROTECTED_PATH="/${SECURITY_PROTECTED_PATH#/}"
+            PROTECTED_URL="${BASE_URL}${PROTECTED_PATH}"
 
-            echo "Protected URL: $PROTECTED_URL"
+            echo ""
+            echo "Protected endpoint:"
+            echo "$PROTECTED_URL"
 
             PROTECTED_STATUS="$(
               curl \
@@ -379,47 +366,33 @@ jobs:
                 --silent \
                 --show-error \
                 --output security-baseline/protected-body.txt \
-                --dump-header security-baseline/protected-headers.txt \
                 --write-out "%{http_code}" \
                 --max-time 20 \
                 "$PROTECTED_URL"
             )"
 
-            echo "Protected endpoint status: $PROTECTED_STATUS"
+            echo "Protected HTTP status: $PROTECTED_STATUS"
 
             case "$PROTECTED_STATUS" in
-
               401|403)
                 AUTH_RESULT="PASS"
                 ;;
-
               404)
                 AUTH_RESULT="NOT VERIFIED"
                 ;;
-
-              200|201|202|204|3*)
+              200|201|202|204|301|302|307|308)
                 AUTH_RESULT="FAIL"
                 ;;
-
               *)
                 AUTH_RESULT="REVIEW"
                 ;;
-
             esac
 
           fi
 
-          # ======================================================
-          # SECURITY HEADERS
-          #
-          # API-oriented checks:
-          #
-          #   HSTS
-          #   X-Content-Type-Options
-          #
-          # CSP is not required for a JSON API baseline because
-          # CSP is primarily a browser/content-rendering control.
-          # ======================================================
+          # ------------------------------------------------------
+          # Security headers
+          # ------------------------------------------------------
 
           curl \
             --location \
@@ -432,27 +405,29 @@ jobs:
 
           HEADER_FILE="security-baseline/security-headers.txt"
 
-          HSTS_STATUS="MISSING"
-          CONTENT_TYPE_STATUS="MISSING"
+          HEADER_FINDINGS=""
 
-          if grep -qi '^strict-transport-security:' "$HEADER_FILE"; then
-            HSTS_STATUS="PRESENT"
+          if ! grep -qi '^strict-transport-security:' "$HEADER_FILE"; then
+            HEADER_FINDINGS="${HEADER_FINDINGS} HSTS"
           fi
 
-          if grep -qi '^x-content-type-options:' "$HEADER_FILE"; then
-            CONTENT_TYPE_STATUS="PRESENT"
+          if ! grep -qi '^x-content-type-options:' "$HEADER_FILE"; then
+            HEADER_FINDINGS="${HEADER_FINDINGS} X-Content-Type-Options"
           fi
 
-          if [ "$HSTS_STATUS" = "PRESENT" ] &&
-             [ "$CONTENT_TYPE_STATUS" = "PRESENT" ]; then
+          if ! grep -qi '^content-security-policy:' "$HEADER_FILE"; then
+            HEADER_FINDINGS="${HEADER_FINDINGS} CSP"
+          fi
+
+          if [ -z "$HEADER_FINDINGS" ]; then
             HEADER_RESULT="PASS"
           else
             HEADER_RESULT="REVIEW"
           fi
 
-          # ======================================================
-          # CORS OBSERVATION
-          # ======================================================
+          # ------------------------------------------------------
+          # CORS
+          # ------------------------------------------------------
 
           curl \
             --location \
@@ -464,61 +439,45 @@ jobs:
             -H "Origin: https://security-baseline-invalid.example" \
             "$BASE_URL"
 
-          CORS_ALLOW_ORIGIN="$(
-            grep -i '^access-control-allow-origin:' \
-              security-baseline/cors-headers.txt \
-              | tail -n 1 \
-              | sed 's/\r$//' \
-              || true
-          )"
-
-          CORS_ALLOW_CREDENTIALS="$(
-            grep -i '^access-control-allow-credentials:' \
-              security-baseline/cors-headers.txt \
-              | tail -n 1 \
-              | sed 's/\r$//' \
-              || true
-          )"
-
-          if echo "$CORS_ALLOW_ORIGIN" |
-             grep -qi \
-             'https://security-baseline-invalid\.example'; then
+          if grep -qi \
+            '^access-control-allow-origin: https://security-baseline-invalid.example' \
+            security-baseline/cors-headers.txt; then
 
             CORS_RESULT="REVIEW"
 
-          elif echo "$CORS_ALLOW_ORIGIN" |
-               grep -qi '^\s*access-control-allow-origin:\s*\*'; then
+          elif grep -qi \
+            '^access-control-allow-origin: \*' \
+            security-baseline/cors-headers.txt; then
 
-            CORS_RESULT="OBSERVED: *"
-
-          elif [ -n "$CORS_ALLOW_ORIGIN" ]; then
-
-            CORS_RESULT="OBSERVED"
+            CORS_RESULT="REVIEW"
 
           else
 
-            CORS_RESULT="NO CORS HEADER"
+            CORS_RESULT="OBSERVED"
 
           fi
 
-          # ======================================================
-          # SAVE MACHINE-READABLE RESULTS
-          # ======================================================
+          printf 'HEALTH_STATUS=%s\n' "$HEALTH_STATUS" \
+            > security-baseline/api-results.env
 
-          cat > security-baseline/api-results.env <<EOF
-          HEALTH_STATUS=$HEALTH_STATUS
-          HEALTH_RESULT=$HEALTH_RESULT
-          PROTECTED_STATUS=$PROTECTED_STATUS
-          AUTH_RESULT=$AUTH_RESULT
-          HSTS_STATUS=$HSTS_STATUS
-          CONTENT_TYPE_STATUS=$CONTENT_TYPE_STATUS
-          HEADER_RESULT=$HEADER_RESULT
-          CORS_RESULT=$CORS_RESULT
-          EOF
+          printf 'HEALTH_RESULT=%s\n' "$HEALTH_RESULT" \
+            >> security-baseline/api-results.env
 
-          # ======================================================
-          # API OVERALL RESULT
-          # ======================================================
+          printf 'PROTECTED_STATUS=%s\n' "$PROTECTED_STATUS" \
+            >> security-baseline/api-results.env
+
+          printf 'AUTH_RESULT=%s\n' "$AUTH_RESULT" \
+            >> security-baseline/api-results.env
+
+          printf 'HEADER_RESULT=%s\n' "$HEADER_RESULT" \
+            >> security-baseline/api-results.env
+
+          printf 'CORS_RESULT=%s\n' "$CORS_RESULT" \
+            >> security-baseline/api-results.env
+
+          # ------------------------------------------------------
+          # API overall result
+          # ------------------------------------------------------
 
           if [ "$HEALTH_RESULT" = "PASS" ] &&
              [ "$AUTH_RESULT" = "PASS" ] &&
@@ -537,43 +496,122 @@ jobs:
 
           fi
 
-          sed -i \
-            "s/^API_STATUS=.*/API_STATUS=$API_RESULT/" \
+          sed -i "s/^API_STATUS=.*/API_STATUS=$API_RESULT/" \
             security-baseline/results.env
 
-          sed -i \
-            "s/^API_HEALTH_STATUS=.*/API_HEALTH_STATUS=$HEALTH_RESULT/" \
+          sed -i "s/^API_HEALTH_STATUS=.*/API_HEALTH_STATUS=$HEALTH_RESULT/" \
             security-baseline/results.env
 
-          sed -i \
-            "s/^API_AUTH_STATUS=.*/API_AUTH_STATUS=$AUTH_RESULT/" \
+          sed -i "s/^API_AUTH_STATUS=.*/API_AUTH_STATUS=$AUTH_RESULT/" \
             security-baseline/results.env
 
-          sed -i \
-            "s/^API_HEADERS_STATUS=.*/API_HEADERS_STATUS=$HEADER_RESULT/" \
+          sed -i "s/^API_HEADERS_STATUS=.*/API_HEADERS_STATUS=$HEADER_RESULT/" \
             security-baseline/results.env
 
-          sed -i \
-            "s/^API_CORS_STATUS=.*/API_CORS_STATUS=$CORS_RESULT/" \
+          sed -i "s/^API_CORS_STATUS=.*/API_CORS_STATUS=$CORS_RESULT/" \
             security-baseline/results.env
+
+          # ------------------------------------------------------
+          # Console dashboard
+          # ------------------------------------------------------
+
+          echo ""
+          echo "=============================================================="
+          echo "API SECURITY CONTROL"
+          echo "=============================================================="
+          printf '%-34s %-10s %-18s\n' \
+            "CONTROL" "HTTP" "RESULT"
+          printf '%-34s %-10s %-18s\n' \
+            "----------------------------------" \
+            "----------" \
+            "------------------"
+
+          printf '%-34s %-10s %-18s\n' \
+            "Health / public endpoint" \
+            "$HEALTH_STATUS" \
+            "$HEALTH_RESULT"
+
+          printf '%-34s %-10s %-18s\n' \
+            "Protected endpoint / no auth" \
+            "$PROTECTED_STATUS" \
+            "$AUTH_RESULT"
+
+          printf '%-34s %-10s %-18s\n' \
+            "Security headers" \
+            "N/A" \
+            "$HEADER_RESULT"
+
+          printf '%-34s %-10s %-18s\n' \
+            "CORS observation" \
+            "N/A" \
+            "$CORS_RESULT"
+
+          echo "=============================================================="
 
       # ==========================================================
-      # FINAL SECURITY DASHBOARD
+      # FINAL CONSOLIDATED DASHBOARD
       # ==========================================================
 
       - name: Generate security baseline dashboard
         if: always()
         shell: bash
         run: |
-          source security-baseline/results.env
+          set -u
+
+          # ------------------------------------------------------
+          # Read only fixed, machine-safe result values
+          # ------------------------------------------------------
+
+          TARGET_STATUS="NOT RUN"
+          GITLEAKS_STATUS="NOT RUN"
+          DENO_STATUS="NOT RUN"
+          CODEQL_STATUS="NOT RUN"
+          ZAP_STATUS="NOT RUN"
+          API_STATUS="NOT RUN"
+
+          API_HEALTH_STATUS="NOT RUN"
+          API_AUTH_STATUS="NOT RUN"
+          API_HEADERS_STATUS="NOT RUN"
+          API_CORS_STATUS="NOT RUN"
+
+          while IFS='=' read -r KEY VALUE; do
+            case "$KEY" in
+              TARGET_STATUS) TARGET_STATUS="$VALUE" ;;
+              GITLEAKS_STATUS) GITLEAKS_STATUS="$VALUE" ;;
+              DENO_STATUS) DENO_STATUS="$VALUE" ;;
+              CODEQL_STATUS) CODEQL_STATUS="$VALUE" ;;
+              ZAP_STATUS) ZAP_STATUS="$VALUE" ;;
+              API_STATUS) API_STATUS="$VALUE" ;;
+              API_HEALTH_STATUS) API_HEALTH_STATUS="$VALUE" ;;
+              API_AUTH_STATUS) API_AUTH_STATUS="$VALUE" ;;
+              API_HEADERS_STATUS) API_HEADERS_STATUS="$VALUE" ;;
+              API_CORS_STATUS) API_CORS_STATUS="$VALUE" ;;
+            esac
+          done < security-baseline/results.env
+
+          HEALTH_STATUS="N/A"
+          HEALTH_RESULT="$API_HEALTH_STATUS"
+
+          PROTECTED_STATUS="N/A"
+          AUTH_RESULT="$API_AUTH_STATUS"
 
           if [ -f security-baseline/api-results.env ]; then
-            source security-baseline/api-results.env
+            while IFS='=' read -r KEY VALUE; do
+              case "$KEY" in
+                HEALTH_STATUS) HEALTH_STATUS="$VALUE" ;;
+                HEALTH_RESULT) HEALTH_RESULT="$VALUE" ;;
+                PROTECTED_STATUS) PROTECTED_STATUS="$VALUE" ;;
+                AUTH_RESULT) AUTH_RESULT="$VALUE" ;;
+              esac
+            done < security-baseline/api-results.env
           fi
 
-          # ======================================================
-          # OVERALL STATUS
-          # ======================================================
+          HEADER_RESULT="$API_HEADERS_STATUS"
+          CORS_RESULT="$API_CORS_STATUS"
+
+          # ------------------------------------------------------
+          # Overall status
+          # ------------------------------------------------------
 
           OVERALL="PASS"
 
@@ -587,7 +625,6 @@ jobs:
           do
 
             if [ "$STATUS" = "FAIL" ]; then
-
               OVERALL="FAIL"
 
             elif [ "$STATUS" = "REVIEW" ] ||
@@ -596,48 +633,13 @@ jobs:
               if [ "$OVERALL" != "FAIL" ]; then
                 OVERALL="REVIEW REQUIRED"
               fi
-
             fi
 
           done
 
-          # ======================================================
-          # DISPLAY HELPERS
-          # ======================================================
-
-          status_display() {
-            case "$1" in
-              PASS)
-                echo "PASS"
-                ;;
-              FAIL)
-                echo "FAIL"
-                ;;
-              REVIEW)
-                echo "REVIEW"
-                ;;
-              "NOT VERIFIED")
-                echo "NOT VERIFIED"
-                ;;
-              "NOT CONFIGURED")
-                echo "NOT CONFIGURED"
-                ;;
-              *)
-                echo "$1"
-                ;;
-            esac
-          }
-
-          TARGET_DISPLAY="$(status_display "$TARGET_STATUS")"
-          GITLEAKS_DISPLAY="$(status_display "$GITLEAKS_STATUS")"
-          DENO_DISPLAY="$(status_display "$DENO_STATUS")"
-          CODEQL_DISPLAY="$(status_display "$CODEQL_STATUS")"
-          ZAP_DISPLAY="$(status_display "$ZAP_STATUS")"
-          API_DISPLAY="$(status_display "$API_STATUS")"
-
-          # ======================================================
-          # GITHUB STEP SUMMARY
-          # ======================================================
+          # ------------------------------------------------------
+          # GitHub Summary
+          # ------------------------------------------------------
 
           {
             echo "# Security Baseline"
@@ -647,8 +649,6 @@ jobs:
             echo "**Commit:** \`${GITHUB_SHA}\`"
             echo ""
             echo "**Run:** \`${GITHUB_RUN_ID}\`"
-            echo ""
-            echo "**Target:** \`${SECURITY_TARGET_URL:-NOT CONFIGURED}\`"
             echo ""
 
             echo "## Overall Status"
@@ -663,9 +663,9 @@ jobs:
             echo "## Control Dashboard"
             echo ""
             echo '```text'
+
             printf '%-30s %-18s\n' \
-              "CONTROL" \
-              "STATUS"
+              "CONTROL" "STATUS"
 
             printf '%-30s %-18s\n' \
               "------------------------------" \
@@ -673,198 +673,84 @@ jobs:
 
             printf '%-30s %-18s\n' \
               "Target Connectivity" \
-              "$TARGET_DISPLAY"
+              "$TARGET_STATUS"
 
             printf '%-30s %-18s\n' \
               "Gitleaks" \
-              "$GITLEAKS_DISPLAY"
+              "$GITLEAKS_STATUS"
 
             printf '%-30s %-18s\n' \
               "Dependency Audit" \
-              "$DENO_DISPLAY"
+              "$DENO_STATUS"
 
             printf '%-30s %-18s\n' \
               "CodeQL" \
-              "$CODEQL_DISPLAY"
+              "$CODEQL_STATUS"
 
             printf '%-30s %-18s\n' \
               "OWASP ZAP Baseline" \
-              "$ZAP_DISPLAY"
+              "$ZAP_STATUS"
 
             printf '%-30s %-18s\n' \
               "API Security Controls" \
-              "$API_DISPLAY"
+              "$API_STATUS"
 
             echo '```'
             echo ""
-
-            # ====================================================
-            # API SECURITY
-            # ====================================================
 
             echo "## API Security Controls"
             echo ""
             echo '```text'
 
-            printf '%-34s %-12s %-18s\n' \
-              "CONTROL" \
-              "HTTP" \
-              "RESULT"
+            printf '%-34s %-10s %-18s\n' \
+              "CONTROL" "HTTP" "RESULT"
 
-            printf '%-34s %-12s %-18s\n' \
+            printf '%-34s %-10s %-18s\n' \
               "----------------------------------" \
-              "------------" \
+              "----------" \
               "------------------"
 
-            printf '%-34s %-12s %-18s\n' \
-              "Health endpoint" \
-              "${HEALTH_STATUS:-N/A}" \
-              "${HEALTH_RESULT:-NOT RUN}"
+            printf '%-34s %-10s %-18s\n' \
+              "Health / public endpoint" \
+              "$HEALTH_STATUS" \
+              "$HEALTH_RESULT"
 
-            printf '%-34s %-12s %-18s\n' \
+            printf '%-34s %-10s %-18s\n' \
               "Protected endpoint / no auth" \
-              "${PROTECTED_STATUS:-N/A}" \
-              "${AUTH_RESULT:-NOT RUN}"
+              "$PROTECTED_STATUS" \
+              "$AUTH_RESULT"
 
-            printf '%-34s %-12s %-18s\n' \
+            printf '%-34s %-10s %-18s\n' \
               "Security headers" \
               "N/A" \
-              "${HEADER_RESULT:-NOT RUN}"
+              "$HEADER_RESULT"
 
-            printf '%-34s %-12s %-18s\n' \
+            printf '%-34s %-10s %-18s\n' \
               "CORS observation" \
               "N/A" \
-              "${CORS_RESULT:-NOT RUN}"
+              "$CORS_RESULT"
 
             echo '```'
             echo ""
 
-            # ====================================================
-            # API CONFIGURATION
-            # ====================================================
-
-            echo "### API Endpoints Tested"
-            echo ""
-            echo "| Control | Endpoint |"
-            echo "|---|---|"
-            echo "| Health | \`${SECURITY_HEALTH_PATH:-NOT CONFIGURED}\` |"
-            echo "| Authentication | \`${SECURITY_PROTECTED_PATH:-NOT CONFIGURED}\` |"
-            echo ""
-
-            # ====================================================
-            # AUTH INTERPRETATION
-            # ====================================================
-
-            echo "### Authentication Control"
-            echo ""
-
-            case "${AUTH_RESULT:-}" in
-
-              PASS)
-                echo "PASS — the protected endpoint rejected the unauthenticated request with HTTP ${PROTECTED_STATUS}."
-                ;;
-
-              FAIL)
-                echo "FAIL — the protected endpoint accepted an unauthenticated request or returned a redirect response."
-                ;;
-
-              "NOT VERIFIED")
-                echo "NOT VERIFIED — the configured protected endpoint returned HTTP 404."
-                echo "The configured path may not exist in the deployed environment."
-                ;;
-
-              "NOT CONFIGURED")
-                echo "NOT CONFIGURED — no protected endpoint path was supplied."
-                ;;
-
-              *)
-                echo "REVIEW — authentication behavior requires manual inspection."
-                ;;
-
-            esac
-
-            echo ""
-
-            # ====================================================
-            # HEALTH INTERPRETATION
-            # ====================================================
-
-            echo "### Health Control"
-            echo ""
-
-            if [ "${HEALTH_RESULT:-}" = "PASS" ]; then
-
-              echo "PASS — the configured health endpoint returned HTTP 200."
-
-            elif [ "${HEALTH_RESULT:-}" = "NOT CONFIGURED" ]; then
-
-              echo "NOT CONFIGURED — no health endpoint path was supplied."
-
-            else
-
-              echo "REVIEW — the configured health endpoint returned HTTP ${HEALTH_STATUS:-N/A}."
-
-            fi
-
-            echo ""
-
-            # ====================================================
-            # SECURITY HEADERS
-            # ====================================================
-
-            echo "### Security Headers"
+            echo "## API Configuration"
             echo ""
             echo '```text'
 
-            printf '%-32s %s\n' \
-              "Strict-Transport-Security" \
-              "${HSTS_STATUS:-NOT CHECKED}"
+            printf '%-24s %s\n' \
+              "Target" \
+              "$SECURITY_TARGET_URL"
 
-            printf '%-32s %s\n' \
-              "X-Content-Type-Options" \
-              "${CONTENT_TYPE_STATUS:-NOT CHECKED}"
+            printf '%-24s %s\n' \
+              "Health path" \
+              "${SECURITY_HEALTH_PATH:-NOT CONFIGURED}"
 
-            printf '%-32s %s\n' \
-              "Content-Security-Policy" \
-              "NOT REQUIRED FOR API BASELINE"
+            printf '%-24s %s\n' \
+              "Protected path" \
+              "${SECURITY_PROTECTED_PATH:-NOT CONFIGURED}"
 
             echo '```'
             echo ""
-
-            # ====================================================
-            # CORS
-            # ====================================================
-
-            echo "### CORS Observation"
-            echo ""
-            echo "The workflow sends:"
-            echo ""
-            echo "\`Origin: https://security-baseline-invalid.example\`"
-            echo ""
-
-            if [ -n "${CORS_ALLOW_ORIGIN:-}" ]; then
-              echo "**Access-Control-Allow-Origin:**"
-              echo ""
-              echo "\`$CORS_ALLOW_ORIGIN\`"
-              echo ""
-            else
-              echo "No Access-Control-Allow-Origin response header was observed."
-              echo ""
-            fi
-
-            if [ -n "${CORS_ALLOW_CREDENTIALS:-}" ]; then
-              echo "**Access-Control-Allow-Credentials:**"
-              echo ""
-              echo "\`$CORS_ALLOW_CREDENTIALS\`"
-              echo ""
-            fi
-
-            echo "CORS is reported as an observation and should be evaluated against the application's intended cross-origin policy."
-            echo ""
-
-            # ====================================================
-            # DEPENDENCY AUDIT
-            # ====================================================
 
             echo "## Dependency Audit"
             echo ""
@@ -873,16 +759,16 @@ jobs:
 
               echo "**Status:** PASS"
               echo ""
-              echo "No known dependency vulnerabilities were reported by \`deno audit\`."
+              echo "No known dependency vulnerabilities were reported."
 
             else
 
               echo "**Status:** REVIEW REQUIRED"
               echo ""
-
               echo '```text'
 
-              cat security-baseline/deno-audit.txt 2>/dev/null \
+              cat security-baseline/deno-audit.txt \
+                2>/dev/null \
                 || echo "No audit output available."
 
               echo '```'
@@ -891,73 +777,71 @@ jobs:
 
             echo ""
 
-            # ====================================================
-            # GITLEAKS
-            # ====================================================
-
-            echo "## Secret Scanning"
-            echo ""
-            echo "**Gitleaks:** $GITLEAKS_DISPLAY"
+            echo "## API Interpretation"
             echo ""
 
-            # ====================================================
-            # CODEQL
-            # ====================================================
+            case "$AUTH_RESULT" in
 
-            echo "## Static Analysis"
-            echo ""
-            echo "**CodeQL:** $CODEQL_DISPLAY"
+              PASS)
+                echo "- The protected endpoint rejected unauthenticated access."
+                echo "- HTTP 401/403 is treated as evidence that authentication enforcement is present."
+                ;;
+
+              NOT VERIFIED)
+                echo "- The configured protected endpoint returned HTTP 404."
+                echo "- Authentication protection could not be verified for that route."
+                ;;
+
+              FAIL)
+                echo "- The protected endpoint returned a response consistent with unauthenticated access."
+                echo "- Authentication enforcement requires review."
+                ;;
+
+              NOT CONFIGURED)
+                echo "- No protected endpoint path is configured."
+                ;;
+
+              *)
+                echo "- Authentication control requires review."
+                ;;
+
+            esac
+
             echo ""
 
-            # ====================================================
-            # ZAP
-            # ====================================================
+            echo "## Security Headers"
+            echo ""
+            echo '```text'
 
-            echo "## Web Security Scan"
-            echo ""
-            echo "**OWASP ZAP Baseline:** $ZAP_DISPLAY"
-            echo ""
-            echo "Scan type: passive baseline scan."
+            cat security-baseline/security-headers.txt \
+              2>/dev/null \
+              || echo "No security header response available."
+
+            echo '```'
             echo ""
 
-            # ====================================================
-            # IMPORTANT INTERPRETATION
-            # ====================================================
-
-            echo "## Interpretation"
+            echo "## Scope"
             echo ""
-            echo "This workflow provides automated security baseline characterization through:"
+            echo "This workflow provides a security baseline through:"
             echo ""
-            echo "- dependency auditing"
-            echo "- secret scanning"
-            echo "- static analysis"
-            echo "- passive web scanning"
-            echo "- API authentication controls"
-            echo "- API health monitoring"
-            echo "- security-header observation"
+            echo "- Secret scanning"
+            echo "- Dependency auditing"
+            echo "- Static analysis"
+            echo "- Passive web security scanning"
+            echo "- API authentication control probing"
+            echo "- Security header observation"
             echo "- CORS observation"
             echo ""
-            echo "It is not a penetration test and does not establish the absence of security vulnerabilities."
+            echo "This is a baseline characterization and is not a penetration test."
             echo ""
-
-            # ====================================================
-            # CONFIGURATION
-            # ====================================================
-
-            echo "## Baseline Configuration"
-            echo ""
-            echo "| Setting | Value |"
-            echo "|---|---|"
-            echo "| Target | \`${SECURITY_TARGET_URL:-NOT CONFIGURED}\` |"
-            echo "| Health path | \`${SECURITY_HEALTH_PATH:-NOT CONFIGURED}\` |"
-            echo "| Protected path | \`${SECURITY_PROTECTED_PATH:-NOT CONFIGURED}\` |"
+            echo "A REVIEW or NOT VERIFIED result requires interpretation and does not by itself establish a vulnerability."
             echo ""
 
           } >> "$GITHUB_STEP_SUMMARY"
 
-          # ======================================================
-          # CONSOLE DASHBOARD
-          # ======================================================
+          # ------------------------------------------------------
+          # Console dashboard
+          # ------------------------------------------------------
 
           echo ""
           echo "=============================================================="
@@ -972,65 +856,66 @@ jobs:
 
           printf '%-30s %s\n' \
             "Target Connectivity" \
-            "$TARGET_DISPLAY"
+            "$TARGET_STATUS"
 
           printf '%-30s %s\n' \
             "Gitleaks" \
-            "$GITLEAKS_DISPLAY"
+            "$GITLEAKS_STATUS"
 
           printf '%-30s %s\n' \
             "Dependency Audit" \
-            "$DENO_DISPLAY"
+            "$DENO_STATUS"
 
           printf '%-30s %s\n' \
             "CodeQL" \
-            "$CODEQL_DISPLAY"
+            "$CODEQL_STATUS"
 
           printf '%-30s %s\n' \
             "OWASP ZAP" \
-            "$ZAP_DISPLAY"
+            "$ZAP_STATUS"
 
           printf '%-30s %s\n' \
             "API Security" \
-            "$API_DISPLAY"
-
-          echo "--------------------------------------------------------------"
-
-          printf '%-34s %-12s %-18s\n' \
-            "API CONTROL" \
-            "HTTP" \
-            "RESULT"
-
-          printf '%-34s %-12s %-18s\n' \
-            "----------------------------------" \
-            "------------" \
-            "------------------"
-
-          printf '%-34s %-12s %-18s\n' \
-            "Health endpoint" \
-            "${HEALTH_STATUS:-N/A}" \
-            "${HEALTH_RESULT:-NOT RUN}"
-
-          printf '%-34s %-12s %-18s\n' \
-            "Protected endpoint / no auth" \
-            "${PROTECTED_STATUS:-N/A}" \
-            "${AUTH_RESULT:-NOT RUN}"
-
-          printf '%-34s %-12s %-18s\n' \
-            "Security headers" \
-            "N/A" \
-            "${HEADER_RESULT:-NOT RUN}"
-
-          printf '%-34s %-12s %-18s\n' \
-            "CORS observation" \
-            "N/A" \
-            "${CORS_RESULT:-NOT RUN}"
+            "$API_STATUS"
 
           echo "=============================================================="
+
           echo ""
+          echo "API SECURITY CONTROL"
+          echo "=============================================================="
+
+          printf '%-34s %-10s %-18s\n' \
+            "CONTROL" "HTTP" "RESULT"
+
+          printf '%-34s %-10s %-18s\n' \
+            "----------------------------------" \
+            "----------" \
+            "------------------"
+
+          printf '%-34s %-10s %-18s\n' \
+            "Health / public endpoint" \
+            "$HEALTH_STATUS" \
+            "$HEALTH_RESULT"
+
+          printf '%-34s %-10s %-18s\n' \
+            "Protected endpoint / no auth" \
+            "$PROTECTED_STATUS" \
+            "$AUTH_RESULT"
+
+          printf '%-34s %-10s %-18s\n' \
+            "Security headers" \
+            "N/A" \
+            "$HEADER_RESULT"
+
+          printf '%-34s %-10s %-18s\n' \
+            "CORS observation" \
+            "N/A" \
+            "$CORS_RESULT"
+
+          echo "=============================================================="
 
       # ==========================================================
-      # UPLOAD BASELINE ARTIFACTS
+      # UPLOAD ARTIFACTS
       # ==========================================================
 
       - name: Upload security baseline artifacts
