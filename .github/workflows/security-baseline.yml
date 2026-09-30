@@ -226,35 +226,11 @@ jobs:
         with:
           target: ${{ env.SECURITY_TARGET_URL }}
           cmd_options: "-m 2"
+          # Disable automatic GitHub Issue creation on scan findings
+          issue_title: ""
+          allow_issue_writing: false
 
-      - name: Record ZAP result
-        shell: bash
-        run: |
-          set -u
-
-          ZAP_OUTCOME="${{ steps.zap.outcome }}"
-
-          if [ "$ZAP_OUTCOME" = "success" ]; then
-            RESULT="PASS"
-          else
-            RESULT="REVIEW"
-          fi
-
-          sed -i "s/^ZAP_RESULT=.*/ZAP_RESULT=$RESULT/" \
-            security-baseline/results.env
-
-          {
-            echo
-            echo "## Passive Web/API Security Assessment"
-            echo
-            echo "| Assessment | Tool / Method | Result |"
-            echo "|---|---|---|"
-            echo "| Passive API/web scan | OWASP ZAP Baseline | $RESULT |"
-            echo
-            echo "OWASP ZAP Baseline performs passive analysis. Its findings require interpretation according to the deployed API and application context."
-          } >> "$GITHUB_STEP_SUMMARY"
-
-            # ------------------------------------------------------------
+      # ------------------------------------------------------------
       # 10. API security profile
       # ------------------------------------------------------------
       - name: Run API security profile
