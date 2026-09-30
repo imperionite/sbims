@@ -7,28 +7,6 @@ permissions:
   contents: read
   security-events: write
 
-# ==============================================================
-# REQUIRED GITHUB SECRETS
-#
-# SECURITY_TARGET_URL
-#   https://api.sbims.me
-#
-# SECURITY_PROTECTED_PATH
-#   /api/v1/students
-#
-# SECURITY_TEST_EMAIL
-#   Dedicated security-baseline test account email
-#
-# SECURITY_TEST_PASSWORD
-#   Dedicated security-baseline test account password
-#
-# All are stored under:
-# Repository → Settings → Secrets and variables → Actions
-#
-# The test credentials are used only to establish an authenticated
-# API session during the manually triggered security baseline.
-# ==============================================================
-
 jobs:
   security-baseline:
     name: Security Baseline
@@ -37,21 +15,20 @@ jobs:
     env:
       SECURITY_TARGET_URL: ${{ secrets.SECURITY_TARGET_URL }}
       SECURITY_PROTECTED_PATH: ${{ secrets.SECURITY_PROTECTED_PATH }}
+      SECURITY_TEST_EMAIL: ${{ secrets.SECURITY_TEST_EMAIL }}
+      SECURITY_TEST_PASSWORD: ${{ secrets.SECURITY_TEST_PASSWORD }}
 
     steps:
-      # ==========================================================
-      # CHECKOUT
-      # ==========================================================
+      # ------------------------------------------------------------
+      # 1. Checkout
+      # ------------------------------------------------------------
       - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v4
 
-      # ==========================================================
-      # INITIALIZE
-      # ==========================================================
-
-      - name: Initialize security baseline
+      # ------------------------------------------------------------
+      # 2. Initialize results
+      # ------------------------------------------------------------
+      - name: Initialize security results
         shell: bash
         run: |
           set -u
@@ -59,282 +36,233 @@ jobs:
           mkdir -p security-baseline
 
           cat > security-baseline/results.env <<'EOF'
-          TARGET_STATUS=NOT_RUN
-          GITLEAKS_STATUS=NOT_RUN
-          DENO_STATUS=NOT_RUN
-          CODEQL_STATUS=NOT_RUN
-          ZAP_STATUS=NOT_RUN
-          API_STATUS=NOT_RUN
-          API_HEALTH_STATUS=NOT_RUN
-          API_AUTH_STATUS=NOT_RUN
-          API_HEADERS_STATUS=NOT_RUN
-          API_CORS_STATUS=NOT_RUN
+          GITLEAKS_RESULT=NOT_VERIFIED
+          DENO_AUDIT_RESULT=NOT_VERIFIED
+          CODEQL_RESULT=NOT_VERIFIED
+          ZAP_RESULT=NOT_VERIFIED
+
+          HEALTH_RESULT=NOT_VERIFIED
+          AUTH_ME_NO_TOKEN_RESULT=NOT_VERIFIED
+          LOGIN_RESULT=NOT_VERIFIED
+          AUTH_ME_RESULT=NOT_VERIFIED
+          PROTECTED_NO_AUTH_RESULT=NOT_VERIFIED
+          PROTECTED_AUTH_RESULT=NOT_VERIFIED
+          INVALID_TOKEN_RESULT=NOT_VERIFIED
+          HEADERS_RESULT=NOT_VERIFIED
+          CORS_RESULT=NOT_VERIFIED
+
+          API_RESULT=NOT_VERIFIED
           EOF
 
-      # ==========================================================
-      # RUN INFORMATION
-      # ==========================================================
-
+      # ------------------------------------------------------------
+      # 3. Run information
+      # ------------------------------------------------------------
       - name: Record run information
         shell: bash
         run: |
           {
             echo "# Security Baseline"
-            echo ""
+            echo
             echo "| Property | Value |"
             echo "|---|---|"
-            echo "| Repository | ${GITHUB_REPOSITORY} |"
-            echo "| Commit | ${GITHUB_SHA} |"
-            echo "| Branch | ${GITHUB_REF_NAME} |"
-            echo "| Run ID | ${GITHUB_RUN_ID} |"
-            echo "| Trigger | ${GITHUB_EVENT_NAME} |"
-            echo "| Target configured | $([ -n "${SECURITY_TARGET_URL:-}" ] && echo "YES" || echo "NO") |"
-            echo ""
+            echo "| Repository | $GITHUB_REPOSITORY |"
+            echo "| Commit | $GITHUB_SHA |"
+            echo "| Branch | $GITHUB_REF_NAME |"
+            echo "| Run ID | $GITHUB_RUN_ID |"
+            echo "| Trigger | $GITHUB_EVENT_NAME |"
+            echo "| Target configured | $([ -n "$SECURITY_TARGET_URL" ] && echo "YES" || echo "NO") |"
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # ==========================================================
-      # TARGET CONNECTIVITY
-      # ==========================================================
-
-      - name: Verify security target
-        id: target
-        continue-on-error: true
+      # ------------------------------------------------------------
+      # 4. Target connectivity
+      # ------------------------------------------------------------
+      - name: Check target connectivity
         shell: bash
         run: |
-          set +e
+          set -u
 
           if [ -z "${SECURITY_TARGET_URL:-}" ]; then
             echo "SECURITY_TARGET_URL is not configured."
-            sed -i 's/^TARGET_STATUS=.*/TARGET_STATUS=FAIL/' \
-              security-baseline/results.env
             exit 1
           fi
 
-          echo "Checking security target..."
+          echo "Security target configured."
+          echo "Target host: $(printf '%s' "$SECURITY_TARGET_URL" | sed -E 's#https?://([^/]+).*#\1#')"
 
-          HTTP_STATUS="$(
-            curl \
-              --location \
-              --silent \
-              --show-error \
-              --output security-baseline/target-body.txt \
-              --dump-header security-baseline/target-headers.txt \
-              --write-out "%{http_code}" \
-              --max-time 20 \
-              "$SECURITY_TARGET_URL"
-          )"
+          if curl \
+            --silent \
+            --show-error \
+            --location \
+            --output /dev/null \
+            --write-out '%{http_code}' \
+            --max-time 20 \
+            "$SECURITY_TARGET_URL" > security-baseline/target-status.txt; then
 
-          CURL_STATUS=$?
-
-          echo "HTTP status: $HTTP_STATUS"
-          echo "curl exit code: $CURL_STATUS"
-
-          if [ "$CURL_STATUS" -eq 0 ] &&
-             [ "$HTTP_STATUS" -ge 200 ] &&
-             [ "$HTTP_STATUS" -lt 500 ]; then
-
-            sed -i 's/^TARGET_STATUS=.*/TARGET_STATUS=PASS/' \
-              security-baseline/results.env
-
-            exit 0
+            echo "Target connectivity check completed."
+          else
+            echo "Target connectivity check failed."
+            exit 1
           fi
 
-          sed -i 's/^TARGET_STATUS=.*/TARGET_STATUS=FAIL/' \
-            security-baseline/results.env
-
-          exit 1
-
-      # ==========================================================
-      # GITLEAKS
-      # ==========================================================
-
+      # ------------------------------------------------------------
+      # 5. Gitleaks
+      # ------------------------------------------------------------
       - name: Run Gitleaks
         id: gitleaks
+        uses: gitleaks/gitleaks-action@v2
         continue-on-error: true
-        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_CONFIG: .gitleaks.toml
 
       - name: Record Gitleaks result
-        if: always()
         shell: bash
         run: |
+          set -u
+
+          # The action exit code is exposed through the step outcome.
           if [ "${{ steps.gitleaks.outcome }}" = "success" ]; then
-            sed -i 's/^GITLEAKS_STATUS=.*/GITLEAKS_STATUS=PASS/' \
-              security-baseline/results.env
+            RESULT="PASS"
           else
-            sed -i 's/^GITLEAKS_STATUS=.*/GITLEAKS_STATUS=REVIEW/' \
-              security-baseline/results.env
+            RESULT="REVIEW"
           fi
 
-      # ==========================================================
-      # DENO
-      # ==========================================================
+          sed -i "s/^GITLEAKS_RESULT=.*/GITLEAKS_RESULT=$RESULT/" \
+            security-baseline/results.env
 
+          {
+            echo
+            echo "## Secret Exposure Assessment"
+            echo
+            echo "| Assessment | Tool / Method | Result |"
+            echo "|---|---|---|"
+            echo "| Secret exposure | Gitleaks | $RESULT |"
+            echo
+            if [ "$RESULT" = "PASS" ]; then
+              echo "Gitleaks reported no detected secret leaks according to its configured rules."
+            else
+              echo "Gitleaks requires review. Inspect the Gitleaks findings before interpreting the result."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # ------------------------------------------------------------
+      # 6. Deno setup
+      # ------------------------------------------------------------
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: v2.9.7
+          deno-version: v2.x
 
+      # ------------------------------------------------------------
+      # 7. Deno audit
+      # ------------------------------------------------------------
       - name: Run Deno dependency audit
         id: deno-audit
+        shell: bash
         continue-on-error: true
-        shell: bash
         run: |
-          set +e
+          set -o pipefail
 
-          deno audit > security-baseline/deno-audit.txt 2>&1
+          echo "Running Deno dependency audit..."
 
-          STATUS=$?
-
-          echo "$STATUS" > security-baseline/deno-audit.exit
-
-          cat security-baseline/deno-audit.txt
-
-          exit "$STATUS"
-
-      - name: Record Deno audit result
-        if: always()
-        shell: bash
-        run: |
-          STATUS="$(
-            cat security-baseline/deno-audit.exit 2>/dev/null || echo 1
-          )"
-
-          if [ "$STATUS" = "0" ]; then
-            sed -i 's/^DENO_STATUS=.*/DENO_STATUS=PASS/' \
-              security-baseline/results.env
+          if deno audit 2>&1 | tee security-baseline/deno-audit.txt; then
+            RESULT="PASS"
           else
-            sed -i 's/^DENO_STATUS=.*/DENO_STATUS=REVIEW/' \
-              security-baseline/results.env
+            RESULT="REVIEW"
           fi
 
-      # ==========================================================
-      # CODEQL
-      # ==========================================================
+          sed -i "s/^DENO_AUDIT_RESULT=.*/DENO_AUDIT_RESULT=$RESULT/" \
+            security-baseline/results.env
 
+          echo "Deno Audit Result: $RESULT"
+
+      # ------------------------------------------------------------
+      # 8. CodeQL initialization
+      # ------------------------------------------------------------
       - name: Initialize CodeQL
-        id: codeql-init
-        continue-on-error: true
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@v3
         with:
           languages: javascript-typescript
           queries: security-extended
 
-      - name: Analyze with CodeQL
-        id: codeql-analyze
-        if: always() && steps.codeql-init.outcome == 'success'
+      - name: Perform CodeQL analysis
+        id: codeql
+        uses: github/codeql-action/analyze@v3
         continue-on-error: true
-        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:javascript-typescript"
 
       - name: Record CodeQL result
-        if: always()
         shell: bash
         run: |
-          if [ "${{ steps.codeql-init.outcome }}" = "success" ] &&
-             [ "${{ steps.codeql-analyze.outcome }}" = "success" ]; then
+          set -u
 
-            sed -i 's/^CODEQL_STATUS=.*/CODEQL_STATUS=PASS/' \
-              security-baseline/results.env
-
+          if [ "${{ steps.codeql.outcome }}" = "success" ]; then
+            RESULT="PASS"
           else
-
-            sed -i 's/^CODEQL_STATUS=.*/CODEQL_STATUS=REVIEW/' \
-              security-baseline/results.env
-
+            RESULT="REVIEW"
           fi
 
-      # ==========================================================
-      # ZAP TARGET CONNECTIVITY
-      # ==========================================================
+          sed -i "s/^CODEQL_RESULT=.*/CODEQL_RESULT=$RESULT/" \
+            security-baseline/results.env
 
-      - name: Verify ZAP target
-        id: zap-target
-        continue-on-error: true
-        shell: bash
-        run: |
-          set +e
+          {
+            echo
+            echo "## Static Security Assessment"
+            echo
+            echo "| Assessment | Tool / Method | Result |"
+            echo "|---|---|---|"
+            echo "| Static application security | GitHub CodeQL | $RESULT |"
+            echo
+            echo "CodeQL was executed using the security-extended query set for JavaScript/TypeScript."
+          } >> "$GITHUB_STEP_SUMMARY"
 
-          if [ -z "${SECURITY_TARGET_URL:-}" ]; then
-            echo "SECURITY_TARGET_URL is not configured."
-            exit 1
-          fi
-
-          HTTP_STATUS="$(
-            curl \
-              --location \
-              --silent \
-              --show-error \
-              --output /dev/null \
-              --write-out "%{http_code}" \
-              --max-time 30 \
-              "$SECURITY_TARGET_URL"
-          )"
-
-          CURL_STATUS=$?
-
-          echo "ZAP target HTTP status: $HTTP_STATUS"
-          echo "curl exit code: $CURL_STATUS"
-
-          if [ "$CURL_STATUS" -eq 0 ] &&
-             [ "$HTTP_STATUS" -ge 200 ] &&
-             [ "$HTTP_STATUS" -lt 500 ]; then
-            exit 0
-          fi
-
-          exit 1
-
-      # ==========================================================
-      # OWASP ZAP BASELINE
-      # ==========================================================
-
-      - name: OWASP ZAP Baseline Scan
+      # ------------------------------------------------------------
+      # 9. OWASP ZAP Baseline
+      # ------------------------------------------------------------
+      - name: Run OWASP ZAP Baseline
         id: zap
-        if: always() && steps.zap-target.outcome == 'success'
-        continue-on-error: true
         uses: zaproxy/action-baseline@v0.15.0
+        continue-on-error: true
         with:
-          target: ${{ secrets.SECURITY_TARGET_URL }}
-          fail_action: false
-          allow_issue_writing: false
-          artifact_name: zap-baseline-report
+          target: ${{ env.SECURITY_TARGET_URL }}
+          cmd_options: "-m 2"
 
       - name: Record ZAP result
-        if: always()
         shell: bash
         run: |
-          if [ "${{ steps.zap-target.outcome }}" = "success" ] &&
-             [ "${{ steps.zap.outcome }}" = "success" ]; then
+          set -u
 
-            sed -i 's/^ZAP_STATUS=.*/ZAP_STATUS=PASS/' \
-              security-baseline/results.env
+          ZAP_OUTCOME="${{ steps.zap.outcome }}"
 
+          if [ "$ZAP_OUTCOME" = "success" ]; then
+            RESULT="PASS"
           else
-
-            sed -i 's/^ZAP_STATUS=.*/ZAP_STATUS=REVIEW/' \
-              security-baseline/results.env
-
+            RESULT="REVIEW"
           fi
 
-           # ==========================================================
-      # API SECURITY PROFILE
-      # ==========================================================
+          sed -i "s/^ZAP_RESULT=.*/ZAP_RESULT=$RESULT/" \
+            security-baseline/results.env
 
-      - name: API security profile
-        id: api-profile
-        if: always() && steps.target.outcome == 'success'
-        continue-on-error: true
+          {
+            echo
+            echo "## Passive Web/API Security Assessment"
+            echo
+            echo "| Assessment | Tool / Method | Result |"
+            echo "|---|---|---|"
+            echo "| Passive API/web scan | OWASP ZAP Baseline | $RESULT |"
+            echo
+            echo "OWASP ZAP Baseline performs passive analysis. Its findings require interpretation according to the deployed API and application context."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # ------------------------------------------------------------
+      # 10. API security profile
+      # ------------------------------------------------------------
+      - name: Run API security profile
         shell: bash
-        env:
-          SECURITY_TARGET_URL: ${{ secrets.SECURITY_TARGET_URL }}
-          SECURITY_PROTECTED_PATH: ${{ secrets.SECURITY_PROTECTED_PATH }}
-          SECURITY_TEST_EMAIL: ${{ secrets.SECURITY_TEST_EMAIL }}
-          SECURITY_TEST_PASSWORD: ${{ secrets.SECURITY_TEST_PASSWORD }}
         run: |
-          set +e
+          set -u
+
+          source security-baseline/results.env
 
           BASE_URL="${SECURITY_TARGET_URL%/}"
 
@@ -343,630 +271,469 @@ jobs:
           ME_URL="${BASE_URL}/api/v1/auth/me"
           PROTECTED_URL="${BASE_URL}/${SECURITY_PROTECTED_PATH#/}"
 
-          mkdir -p security-baseline
+          echo "Running API security profile..."
 
-          echo "=============================================================="
-          echo "API SECURITY PROFILE"
-          echo "=============================================================="
-          echo "Health:    $HEALTH_URL"
-          echo "Login:     $LOGIN_URL"
-          echo "Me:        $ME_URL"
-          echo "Protected: $PROTECTED_URL"
-          echo "=============================================================="
+          # ----------------------------------------------------------
+          # Helper
+          # ----------------------------------------------------------
+          check_status() {
+            local name="$1"
+            local actual="$2"
+            shift 2
 
-          # --------------------------------------------------------
-          # Initialize results
-          # --------------------------------------------------------
+            local expected
+            for expected in "$@"; do
+              if [ "$actual" = "$expected" ]; then
+                echo "$name: PASS ($actual)"
+                return 0
+              fi
+            done
 
-          HEALTH_STATUS="N/A"
-          HEALTH_RESULT="NOT RUN"
+            echo "$name: FAIL ($actual)"
+            return 1
+          }
 
-          AUTH_ME_NO_TOKEN_STATUS="N/A"
-          AUTH_ME_NO_TOKEN_RESULT="NOT RUN"
-
-          LOGIN_STATUS="N/A"
-          LOGIN_RESULT="NOT RUN"
-
-          AUTH_ME_STATUS="N/A"
-          AUTH_ME_RESULT="NOT RUN"
-
-          PROTECTED_NO_AUTH_STATUS="N/A"
-          PROTECTED_NO_AUTH_RESULT="NOT RUN"
-
-          PROTECTED_AUTH_STATUS="N/A"
-          PROTECTED_AUTH_RESULT="NOT RUN"
-
-          INVALID_TOKEN_STATUS="N/A"
-          INVALID_TOKEN_RESULT="NOT RUN"
-
-          HEADER_RESULT="NOT RUN"
-          CORS_RESULT="NOT RUN"
-
-          API_RESULT="REVIEW"
-
-          # --------------------------------------------------------
-          # 1. PUBLIC HEALTH ENDPOINT
-          # --------------------------------------------------------
-
-          echo ""
-          echo "[1/8] Public health endpoint"
-
+          # ----------------------------------------------------------
+          # 10.1 Public health endpoint
+          # ----------------------------------------------------------
           HEALTH_STATUS="$(
             curl \
-              --location \
               --silent \
               --show-error \
-              --output security-baseline/health-body.txt \
-              --dump-header security-baseline/health-headers.txt \
-              --write-out "%{http_code}" \
+              --location \
+              --output /dev/null \
+              --write-out '%{http_code}' \
               --max-time 20 \
               "$HEALTH_URL"
           )"
 
-          HEALTH_CURL_STATUS=$?
-
-          echo "HTTP status: $HEALTH_STATUS"
-
-          if [ "$HEALTH_CURL_STATUS" -eq 0 ] &&
-             [ "$HEALTH_STATUS" = "200" ]; then
-
+          if check_status "Public health endpoint" "$HEALTH_STATUS" 200; then
             HEALTH_RESULT="PASS"
-
           else
-
             HEALTH_RESULT="FAIL"
-
           fi
 
-          # --------------------------------------------------------
-          # 2. /auth/me WITHOUT TOKEN
-          # --------------------------------------------------------
-
-          echo ""
-          echo "[2/8] /auth/me without authentication"
-
+          # ----------------------------------------------------------
+          # 10.2 /auth/me without token
+          # ----------------------------------------------------------
           AUTH_ME_NO_TOKEN_STATUS="$(
             curl \
-              --location \
               --silent \
               --show-error \
-              --output security-baseline/auth-me-no-token-body.txt \
-              --write-out "%{http_code}" \
+              --location \
+              --output /dev/null \
+              --write-out '%{http_code}' \
               --max-time 20 \
               "$ME_URL"
           )"
 
-          AUTH_ME_NO_TOKEN_CURL_STATUS=$?
-
-          echo "HTTP status: $AUTH_ME_NO_TOKEN_STATUS"
-
-          if [ "$AUTH_ME_NO_TOKEN_CURL_STATUS" -eq 0 ] &&
-             [ "$AUTH_ME_NO_TOKEN_STATUS" = "401" ]; then
-
+          if check_status \
+            "/auth/me without token" \
+            "$AUTH_ME_NO_TOKEN_STATUS" \
+            401 403; then
             AUTH_ME_NO_TOKEN_RESULT="PASS"
-
-          elif [ "$AUTH_ME_NO_TOKEN_STATUS" = "403" ]; then
-
-            AUTH_ME_NO_TOKEN_RESULT="PASS"
-
           else
-
             AUTH_ME_NO_TOKEN_RESULT="FAIL"
-
           fi
 
-          # --------------------------------------------------------
-          # 3. LOGIN
-          # --------------------------------------------------------
-
-          echo ""
-          echo "[3/8] Authentication login"
+          # ----------------------------------------------------------
+          # 10.3 Login with dedicated security test account
+          # ----------------------------------------------------------
+          LOGIN_RESPONSE_FILE="security-baseline/login-response.json"
 
           if [ -z "${SECURITY_TEST_EMAIL:-}" ] ||
              [ -z "${SECURITY_TEST_PASSWORD:-}" ]; then
 
-            LOGIN_RESULT="NOT CONFIGURED"
-            AUTH_ME_RESULT="NOT VERIFIED"
-            PROTECTED_AUTH_RESULT="NOT VERIFIED"
-
+            echo "Security test credentials are not configured."
+            LOGIN_RESULT="NOT_VERIFIED"
+            AUTH_TOKEN=""
           else
-
-            LOGIN_RESPONSE="$(
+            LOGIN_STATUS="$(
               curl \
-                --location \
                 --silent \
                 --show-error \
-                --output security-baseline/login-response.json \
-                --write-out "%{http_code}" \
-                --max-time 20 \
-                -H "Content-Type: application/json" \
-                -X POST \
+                --location \
+                --request POST \
+                --header 'Content-Type: application/json' \
                 --data "$(jq -n \
                   --arg email "$SECURITY_TEST_EMAIL" \
                   --arg password "$SECURITY_TEST_PASSWORD" \
                   '{email: $email, password: $password}')" \
+                --output "$LOGIN_RESPONSE_FILE" \
+                --write-out '%{http_code}' \
+                --max-time 20 \
                 "$LOGIN_URL"
             )"
 
-            LOGIN_CURL_STATUS=$?
-
-            LOGIN_STATUS="$LOGIN_RESPONSE"
-
-            echo "Login HTTP status: $LOGIN_STATUS"
-
-            if [ "$LOGIN_CURL_STATUS" -eq 0 ] &&
-               [ "$LOGIN_STATUS" = "200" ]; then
-
+            if check_status "Login with test credentials" "$LOGIN_STATUS" 200; then
               LOGIN_RESULT="PASS"
 
-              ACCESS_TOKEN="$(
+              AUTH_TOKEN="$(
                 jq -r '.data.accessToken // empty' \
-                  security-baseline/login-response.json
+                  "$LOGIN_RESPONSE_FILE"
               )"
 
-              if [ -z "$ACCESS_TOKEN" ]; then
+              if [ -z "$AUTH_TOKEN" ]; then
+                echo "Login returned HTTP 200 but no access token was found."
                 LOGIN_RESULT="FAIL"
-                AUTH_ME_RESULT="NOT VERIFIED"
-                PROTECTED_AUTH_RESULT="NOT VERIFIED"
+              else
+                echo "Access token obtained: YES"
               fi
-
-            elif [ "$LOGIN_STATUS" = "401" ]; then
-
-              LOGIN_RESULT="FAIL"
-              AUTH_ME_RESULT="NOT VERIFIED"
-              PROTECTED_AUTH_RESULT="NOT VERIFIED"
-
             else
-
-              LOGIN_RESULT="REVIEW"
-              AUTH_ME_RESULT="NOT VERIFIED"
-              PROTECTED_AUTH_RESULT="NOT VERIFIED"
-
+              LOGIN_RESULT="FAIL"
+              AUTH_TOKEN=""
             fi
-
           fi
 
-          # --------------------------------------------------------
-          # 4. /auth/me WITH VALID TOKEN
-          # --------------------------------------------------------
+          # Never print the login response.
+          rm -f "$LOGIN_RESPONSE_FILE"
 
-          echo ""
-          echo "[4/8] /auth/me with authentication"
-
-          if [ -n "${ACCESS_TOKEN:-}" ]; then
-
+          # ----------------------------------------------------------
+          # 10.4 /auth/me with valid token
+          # ----------------------------------------------------------
+          if [ -n "${AUTH_TOKEN:-}" ]; then
             AUTH_ME_STATUS="$(
               curl \
-                --location \
                 --silent \
                 --show-error \
-                --output security-baseline/auth-me-body.txt \
-                --write-out "%{http_code}" \
+                --location \
+                --output /dev/null \
+                --write-out '%{http_code}' \
                 --max-time 20 \
-                -H "Authorization: Bearer $ACCESS_TOKEN" \
+                --header "Authorization: Bearer $AUTH_TOKEN" \
                 "$ME_URL"
             )"
 
-            AUTH_ME_CURL_STATUS=$?
-
-            echo "HTTP status: $AUTH_ME_STATUS"
-
-            if [ "$AUTH_ME_CURL_STATUS" -eq 0 ] &&
-               [ "$AUTH_ME_STATUS" = "200" ]; then
-
+            if check_status "/auth/me with valid token" "$AUTH_ME_STATUS" 200; then
               AUTH_ME_RESULT="PASS"
-
             else
-
               AUTH_ME_RESULT="FAIL"
-
             fi
-
           else
-
-            AUTH_ME_RESULT="NOT VERIFIED"
-
+            AUTH_ME_RESULT="NOT_VERIFIED"
           fi
 
-          # --------------------------------------------------------
-          # 5. PROTECTED ROUTE WITHOUT TOKEN
-          # --------------------------------------------------------
-
-          echo ""
-          echo "[5/8] Protected route without authentication"
-
+          # ----------------------------------------------------------
+          # 10.5 Protected route without authentication
+          # ----------------------------------------------------------
           PROTECTED_NO_AUTH_STATUS="$(
             curl \
-              --location \
               --silent \
               --show-error \
-              --output security-baseline/protected-no-auth-body.txt \
-              --write-out "%{http_code}" \
+              --location \
+              --output /dev/null \
+              --write-out '%{http_code}' \
               --max-time 20 \
               "$PROTECTED_URL"
           )"
 
-          PROTECTED_NO_AUTH_CURL_STATUS=$?
-
-          echo "HTTP status: $PROTECTED_NO_AUTH_STATUS"
-
-          if [ "$PROTECTED_NO_AUTH_CURL_STATUS" -ne 0 ]; then
-
-            PROTECTED_NO_AUTH_RESULT="REVIEW"
-
+          if check_status \
+            "Protected route without token" \
+            "$PROTECTED_NO_AUTH_STATUS" \
+            401 403; then
+            PROTECTED_NO_AUTH_RESULT="PASS"
           else
-
-            case "$PROTECTED_NO_AUTH_STATUS" in
-
-              401|403)
-                PROTECTED_NO_AUTH_RESULT="PASS"
-                ;;
-
-              404)
-                PROTECTED_NO_AUTH_RESULT="NOT VERIFIED"
-                ;;
-
-              200|201|202|204|301|302|307|308)
-                PROTECTED_NO_AUTH_RESULT="FAIL"
-                ;;
-
-              *)
-                PROTECTED_NO_AUTH_RESULT="REVIEW"
-                ;;
-
-            esac
-
+            if [ "$PROTECTED_NO_AUTH_STATUS" = "404" ]; then
+              echo "Protected route without token: NOT VERIFIED (404 route not established)"
+              PROTECTED_NO_AUTH_RESULT="NOT_VERIFIED"
+            else
+              PROTECTED_NO_AUTH_RESULT="FAIL"
+            fi
           fi
 
-          # --------------------------------------------------------
-          # 6. PROTECTED ROUTE WITH VALID TOKEN
-          # --------------------------------------------------------
-
-          echo ""
-          echo "[6/8] Protected route with authentication"
-
-          if [ -n "${ACCESS_TOKEN:-}" ]; then
-
+          # ----------------------------------------------------------
+          # 10.6 Protected route with valid authentication
+          # ----------------------------------------------------------
+          if [ -n "${AUTH_TOKEN:-}" ]; then
             PROTECTED_AUTH_STATUS="$(
               curl \
-                --location \
                 --silent \
                 --show-error \
-                --output security-baseline/protected-auth-body.txt \
-                --write-out "%{http_code}" \
+                --location \
+                --output /dev/null \
+                --write-out '%{http_code}' \
                 --max-time 20 \
-                -H "Authorization: Bearer $ACCESS_TOKEN" \
+                --header "Authorization: Bearer $AUTH_TOKEN" \
                 "$PROTECTED_URL"
             )"
 
-            PROTECTED_AUTH_CURL_STATUS=$?
-
-            echo "HTTP status: $PROTECTED_AUTH_STATUS"
-
-            if [ "$PROTECTED_AUTH_CURL_STATUS" -ne 0 ]; then
-
-              PROTECTED_AUTH_RESULT="REVIEW"
-
-            else
-
-              case "$PROTECTED_AUTH_STATUS" in
-
-                200|201|202|204)
-                  PROTECTED_AUTH_RESULT="PASS"
-                  ;;
-
-                401)
-                  PROTECTED_AUTH_RESULT="FAIL"
-                  ;;
-
-                403)
-                  PROTECTED_AUTH_RESULT="REVIEW"
-                  ;;
-
-                404)
-                  PROTECTED_AUTH_RESULT="NOT VERIFIED"
-                  ;;
-
-                *)
-                  PROTECTED_AUTH_RESULT="REVIEW"
-                  ;;
-
-              esac
-
-            fi
-
+            case "$PROTECTED_AUTH_STATUS" in
+              200|201|202|204)
+                echo "Protected route with valid token: PASS ($PROTECTED_AUTH_STATUS)"
+                PROTECTED_AUTH_RESULT="PASS"
+                ;;
+              401)
+                echo "Protected route with valid token: FAIL (401)"
+                PROTECTED_AUTH_RESULT="FAIL"
+                ;;
+              403)
+                echo "Protected route with valid token: REVIEW (403)"
+                echo "The test account may not have permission to access the selected protected route."
+                PROTECTED_AUTH_RESULT="REVIEW"
+                ;;
+              404)
+                echo "Protected route with valid token: NOT VERIFIED (404)"
+                PROTECTED_AUTH_RESULT="NOT_VERIFIED"
+                ;;
+              *)
+                echo "Protected route with valid token: REVIEW ($PROTECTED_AUTH_STATUS)"
+                PROTECTED_AUTH_RESULT="REVIEW"
+                ;;
+            esac
           else
-
-            PROTECTED_AUTH_RESULT="NOT VERIFIED"
-
+            PROTECTED_AUTH_RESULT="NOT_VERIFIED"
           fi
 
-          # --------------------------------------------------------
-          # 7. INVALID TOKEN
-          # --------------------------------------------------------
-
-          echo ""
-          echo "[7/8] Invalid bearer token"
-
+          # ----------------------------------------------------------
+          # 10.7 Invalid bearer token
+          # ----------------------------------------------------------
           INVALID_TOKEN_STATUS="$(
             curl \
-              --location \
               --silent \
               --show-error \
-              --output security-baseline/invalid-token-body.txt \
-              --write-out "%{http_code}" \
+              --location \
+              --output /dev/null \
+              --write-out '%{http_code}' \
               --max-time 20 \
-              -H "Authorization: Bearer invalid-security-baseline-token" \
+              --header 'Authorization: Bearer invalid.security.baseline.token' \
               "$ME_URL"
           )"
 
-          INVALID_TOKEN_CURL_STATUS=$?
-
-          echo "HTTP status: $INVALID_TOKEN_STATUS"
-
-          if [ "$INVALID_TOKEN_CURL_STATUS" -eq 0 ] &&
-             [ "$INVALID_TOKEN_STATUS" = "401" ]; then
-
+          if check_status \
+            "Invalid bearer token" \
+            "$INVALID_TOKEN_STATUS" \
+            401 403; then
             INVALID_TOKEN_RESULT="PASS"
-
-          elif [ "$INVALID_TOKEN_STATUS" = "403" ]; then
-
-            INVALID_TOKEN_RESULT="PASS"
-
           else
-
             INVALID_TOKEN_RESULT="FAIL"
-
           fi
 
-          # --------------------------------------------------------
-          # 8. SECURITY HEADERS
-          # --------------------------------------------------------
-
-          echo ""
-          echo "[8/8] Security headers"
+          # ----------------------------------------------------------
+          # 10.8 Security response headers
+          # ----------------------------------------------------------
+          HEADERS_FILE="security-baseline/headers.txt"
 
           curl \
-            --location \
             --silent \
             --show-error \
-            --dump-header security-baseline/security-headers.txt \
+            --location \
+            --dump-header "$HEADERS_FILE" \
             --output /dev/null \
             --max-time 20 \
             "$HEALTH_URL"
 
-          HEADER_CURL_STATUS=$?
+          HSTS_PRESENT="NO"
+          XCTO_PRESENT="NO"
 
-          if [ "$HEADER_CURL_STATUS" -ne 0 ]; then
-
-            HEADER_RESULT="REVIEW"
-
-          else
-
-            HSTS="ABSENT"
-            XCTO="ABSENT"
-
-            if grep -qi '^strict-transport-security:' \
-              security-baseline/security-headers.txt; then
-              HSTS="PRESENT"
-            fi
-
-            if grep -qi '^x-content-type-options:' \
-              security-baseline/security-headers.txt; then
-              XCTO="PRESENT"
-            fi
-
-            if [ "$HSTS" = "PRESENT" ] &&
-               [ "$XCTO" = "PRESENT" ]; then
-
-              HEADER_RESULT="PASS"
-
-            else
-
-              HEADER_RESULT="OBSERVED"
-
-            fi
-
+          if grep -qi '^strict-transport-security:' "$HEADERS_FILE"; then
+            HSTS_PRESENT="YES"
           fi
 
-          # --------------------------------------------------------
-          # CORS
-          # --------------------------------------------------------
+          if grep -qi '^x-content-type-options:' "$HEADERS_FILE"; then
+            XCTO_PRESENT="YES"
+          fi
+
+          if [ "$HSTS_PRESENT" = "YES" ] &&
+             [ "$XCTO_PRESENT" = "YES" ]; then
+            HEADERS_RESULT="PASS"
+          else
+            HEADERS_RESULT="OBSERVED"
+          fi
+
+          # ----------------------------------------------------------
+          # 10.9 CORS controlled observation
+          # ----------------------------------------------------------
+          CORS_RESPONSE_FILE="security-baseline/cors-response.txt"
 
           curl \
-            --location \
             --silent \
             --show-error \
-            --dump-header security-baseline/cors-headers.txt \
+            --location \
+            --dump-header "$CORS_RESPONSE_FILE" \
             --output /dev/null \
             --max-time 20 \
-            -H "Origin: https://security-baseline-invalid.example" \
+            --header 'Origin: https://security-baseline-invalid.example' \
             "$HEALTH_URL"
 
-          CORS_CURL_STATUS=$?
-
-          if [ "$CORS_CURL_STATUS" -ne 0 ]; then
-
-            CORS_RESULT="REVIEW"
-
-          elif grep -qi \
-            '^access-control-allow-origin: https://security-baseline-invalid.example' \
-            security-baseline/cors-headers.txt; then
+          if grep -Eiq \
+            '^access-control-allow-origin:[[:space:]]*(\*|https://security-baseline-invalid\.example)[[:space:]]*$' \
+            "$CORS_RESPONSE_FILE"; then
 
             CORS_RESULT="REVIEW"
-
-          elif grep -qi \
-            '^access-control-allow-origin: \*' \
-            security-baseline/cors-headers.txt; then
-
-            CORS_RESULT="REVIEW"
-
           else
-
             CORS_RESULT="OBSERVED"
-
           fi
 
-          # --------------------------------------------------------
-          # OVERALL API SECURITY RESULT
-          # --------------------------------------------------------
+          # ----------------------------------------------------------
+          # Save results
+          # ----------------------------------------------------------
+          cat > security-baseline/results.env <<EOF
+          GITLEAKS_RESULT=$GITLEAKS_RESULT
+          DENO_AUDIT_RESULT=$DENO_AUDIT_RESULT
+          CODEQL_RESULT=$CODEQL_RESULT
+          ZAP_RESULT=$ZAP_RESULT
 
+          HEALTH_RESULT=$HEALTH_RESULT
+          AUTH_ME_NO_TOKEN_RESULT=$AUTH_ME_NO_TOKEN_RESULT
+          LOGIN_RESULT=$LOGIN_RESULT
+          AUTH_ME_RESULT=$AUTH_ME_RESULT
+          PROTECTED_NO_AUTH_RESULT=$PROTECTED_NO_AUTH_RESULT
+          PROTECTED_AUTH_RESULT=$PROTECTED_AUTH_RESULT
+          INVALID_TOKEN_RESULT=$INVALID_TOKEN_RESULT
+          HEADERS_RESULT=$HEADERS_RESULT
+          CORS_RESULT=$CORS_RESULT
+          EOF
+
+          # ----------------------------------------------------------
+          # Overall API result
+          # ----------------------------------------------------------
           if [ "$HEALTH_RESULT" = "FAIL" ] ||
-            [ "$AUTH_ME_NO_TOKEN_RESULT" = "FAIL" ] ||
-            [ "$LOGIN_RESULT" = "FAIL" ] ||
-            [ "$AUTH_ME_RESULT" = "FAIL" ] ||
-            [ "$PROTECTED_NO_AUTH_RESULT" = "FAIL" ] ||
-            [ "$PROTECTED_AUTH_RESULT" = "FAIL" ] ||
-            [ "$INVALID_TOKEN_RESULT" = "FAIL" ]; then
+             [ "$AUTH_ME_NO_TOKEN_RESULT" = "FAIL" ] ||
+             [ "$LOGIN_RESULT" = "FAIL" ] ||
+             [ "$AUTH_ME_RESULT" = "FAIL" ] ||
+             [ "$PROTECTED_NO_AUTH_RESULT" = "FAIL" ] ||
+             [ "$PROTECTED_AUTH_RESULT" = "FAIL" ] ||
+             [ "$INVALID_TOKEN_RESULT" = "FAIL" ]; then
 
             API_RESULT="FAIL"
 
-          elif [ "$CORS_RESULT" = "REVIEW" ]; then
+          elif [ "$CORS_RESULT" = "REVIEW" ] ||
+               [ "$PROTECTED_AUTH_RESULT" = "REVIEW" ]; then
 
             API_RESULT="REVIEW"
 
           elif [ "$HEALTH_RESULT" = "PASS" ] &&
-              [ "$AUTH_ME_NO_TOKEN_RESULT" = "PASS" ] &&
-              [ "$LOGIN_RESULT" = "PASS" ] &&
-              [ "$AUTH_ME_RESULT" = "PASS" ] &&
-              [ "$PROTECTED_NO_AUTH_RESULT" = "PASS" ] &&
-              [ "$PROTECTED_AUTH_RESULT" = "PASS" ] &&
-              [ "$INVALID_TOKEN_RESULT" = "PASS" ]; then
+               [ "$AUTH_ME_NO_TOKEN_RESULT" = "PASS" ] &&
+               [ "$LOGIN_RESULT" = "PASS" ] &&
+               [ "$AUTH_ME_RESULT" = "PASS" ] &&
+               [ "$PROTECTED_NO_AUTH_RESULT" = "PASS" ] &&
+               [ "$PROTECTED_AUTH_RESULT" = "PASS" ] &&
+               [ "$INVALID_TOKEN_RESULT" = "PASS" ]; then
 
             API_RESULT="PASS"
 
           else
-
-            API_RESULT="REVIEW"
-
+            API_RESULT="NOT_VERIFIED"
           fi
 
-          # --------------------------------------------------------
-          # SAVE MACHINE-READABLE RESULTS
-          # --------------------------------------------------------
+          echo "API_RESULT=$API_RESULT" >> security-baseline/results.env
 
-          cat > security-baseline/api-results.env <<EOF
-          HEALTH_STATUS=$HEALTH_STATUS
-          HEALTH_RESULT=$HEALTH_RESULT
-          AUTH_ME_NO_TOKEN_STATUS=$AUTH_ME_NO_TOKEN_STATUS
-          AUTH_ME_NO_TOKEN_RESULT=$AUTH_ME_NO_TOKEN_RESULT
-          LOGIN_STATUS=$LOGIN_STATUS
-          LOGIN_RESULT=$LOGIN_RESULT
-          AUTH_ME_STATUS=$AUTH_ME_STATUS
-          AUTH_ME_RESULT=$AUTH_ME_RESULT
-          PROTECTED_NO_AUTH_STATUS=$PROTECTED_NO_AUTH_STATUS
-          PROTECTED_NO_AUTH_RESULT=$PROTECTED_NO_AUTH_RESULT
-          PROTECTED_AUTH_STATUS=$PROTECTED_AUTH_STATUS
-          PROTECTED_AUTH_RESULT=$PROTECTED_AUTH_RESULT
-          INVALID_TOKEN_STATUS=$INVALID_TOKEN_STATUS
-          INVALID_TOKEN_RESULT=$INVALID_TOKEN_RESULT
-          HEADER_RESULT=$HEADER_RESULT
-          CORS_RESULT=$CORS_RESULT
-          API_RESULT=$API_RESULT
-          EOF
+      # ------------------------------------------------------------
+      # 11. API security profile report
+      # ------------------------------------------------------------
+      - name: Publish API security profile
+        shell: bash
+        run: |
+          set -u
 
-          sed -i "s/^API_STATUS=.*/API_STATUS=$API_RESULT/" \
-            security-baseline/results.env
-
-          sed -i "s/^API_HEALTH_STATUS=.*/API_HEALTH_STATUS=$HEALTH_RESULT/" \
-            security-baseline/results.env
-
-          sed -i "s/^API_AUTH_STATUS=.*/API_AUTH_STATUS=$AUTH_ME_RESULT/" \
-            security-baseline/results.env
-
-          sed -i "s/^API_HEADERS_STATUS=.*/API_HEADERS_STATUS=$HEADER_RESULT/" \
-            security-baseline/results.env
-
-          sed -i "s/^API_CORS_STATUS=.*/API_CORS_STATUS=$CORS_RESULT/" \
-            security-baseline/results.env
-
-          # --------------------------------------------------------
-          # GITHUB STEP SUMMARY
-          # --------------------------------------------------------
+          source security-baseline/results.env
 
           {
-            echo ""
+            echo
+            echo "## Security Assessment Methods"
+            echo
+            echo "| Assessment Area | Tool / Method | Purpose |"
+            echo "|---|---|---|"
+            echo "| Secret exposure | Gitleaks | Detect committed secrets and credentials |"
+            echo "| Dependency vulnerabilities | Deno Audit | Identify reported dependency vulnerabilities |"
+            echo "| Static security analysis | GitHub CodeQL | Analyze JavaScript/TypeScript code for security-relevant patterns |"
+            echo "| Passive web/API analysis | OWASP ZAP Baseline | Identify passive web/API security observations |"
+            echo "| Runtime authentication | curl API probes | Verify authenticated and unauthenticated endpoint behavior |"
+            echo "| Authorization | curl API probes | Verify protected-resource access behavior |"
+            echo "| Invalid credential handling | curl API probes | Verify invalid bearer tokens are rejected |"
+            echo "| Security headers | curl | Observe HTTP security response headers |"
+            echo "| CORS behavior | curl with controlled Origin | Observe cross-origin response behavior |"
+            echo
+            echo "## Security Assessment Results"
+            echo
+            echo "| Assessment | Tool / Method | Result |"
+            echo "|---|---|---|"
+            echo "| Secret exposure | Gitleaks | $GITLEAKS_RESULT |"
+            echo "| Dependency audit | Deno Audit | $DENO_AUDIT_RESULT |"
+            echo "| Static application security | GitHub CodeQL | $CODEQL_RESULT |"
+            echo "| Passive API/web scan | OWASP ZAP Baseline | $ZAP_RESULT |"
+            echo "| Runtime API security | curl probes | $API_RESULT |"
+            echo
             echo "## API Security Profile"
-            echo ""
-            echo "| Security Control | HTTP | Result |"
-            echo "|---|---:|---|"
-            echo "| Public health endpoint | $HEALTH_STATUS | $HEALTH_RESULT |"
-            echo "| /auth/me without token | $AUTH_ME_NO_TOKEN_STATUS | $AUTH_ME_NO_TOKEN_RESULT |"
-            echo "| Login with test credentials | $LOGIN_STATUS | $LOGIN_RESULT |"
-            echo "| /auth/me with valid token | $AUTH_ME_STATUS | $AUTH_ME_RESULT |"
-            echo "| Protected route without token | $PROTECTED_NO_AUTH_STATUS | $PROTECTED_NO_AUTH_RESULT |"
-            echo "| Protected route with valid token | $PROTECTED_AUTH_STATUS | $PROTECTED_AUTH_RESULT |"
-            echo "| Invalid bearer token | $INVALID_TOKEN_STATUS | $INVALID_TOKEN_RESULT |"
-            echo "| Security headers | — | $HEADER_RESULT |"
-            echo "| CORS | — | $CORS_RESULT |"
-            echo ""
-            echo "### Endpoint Configuration"
-            echo ""
+            echo
+            echo "| Security Control | Tool / Method | Expected | Observed | Result |"
+            echo "|---|---|---|---|---|"
+            echo "| Public health endpoint | curl | HTTP 200 | $HEALTH_RESULT | $HEALTH_RESULT |"
+            echo "| /auth/me without token | curl | HTTP 401/403 | $AUTH_ME_NO_TOKEN_RESULT | $AUTH_ME_NO_TOKEN_RESULT |"
+            echo "| Login with test credentials | curl + test account | Successful authentication | $LOGIN_RESULT | $LOGIN_RESULT |"
+            echo "| /auth/me with valid token | curl + Bearer token | HTTP 200 | $AUTH_ME_RESULT | $AUTH_ME_RESULT |"
+            echo "| Protected route without token | curl | HTTP 401/403 | $PROTECTED_NO_AUTH_RESULT | $PROTECTED_NO_AUTH_RESULT |"
+            echo "| Protected route with valid token | curl + Bearer token | Authorized response | $PROTECTED_AUTH_RESULT | $PROTECTED_AUTH_RESULT |"
+            echo "| Invalid bearer token | curl | HTTP 401/403 | $INVALID_TOKEN_RESULT | $INVALID_TOKEN_RESULT |"
+            echo "| Security headers | curl response headers | Headers observed | HSTS=$HSTS_PRESENT; X-Content-Type-Options=$XCTO_PRESENT | $HEADERS_RESULT |"
+            echo "| CORS | curl with controlled Origin | No unauthorized origin reflection | $CORS_RESULT | $CORS_RESULT |"
+            echo
+            echo "## Endpoint Configuration"
+            echo
             echo "| Endpoint | Path |"
             echo "|---|---|"
             echo "| Health | /api/v1/health |"
             echo "| Login | /api/v1/auth/login |"
             echo "| Current user | /api/v1/auth/me |"
-            echo "| Protected test route | ${SECURITY_PROTECTED_PATH:-NOT CONFIGURED} |"
-            echo ""
-            echo "### Interpretation"
-            echo ""
-            echo "- Public health endpoint should return HTTP 200."
-            echo "- Unauthenticated /auth/me should return HTTP 401."
-            echo "- Valid test credentials should authenticate successfully."
-            echo "- Authenticated /auth/me should return HTTP 200."
-            echo "- Protected endpoint without a token should return HTTP 401/403."
-            echo "- Protected endpoint with a valid token should return an authorized response."
-            echo "- Invalid bearer tokens should be rejected with HTTP 401."
-            echo "- CORS is reported as an observation rather than a complete CORS assessment."
-            echo ""
+            echo "| Protected test route | ${SECURITY_PROTECTED_PATH} |"
+            echo
+            echo "## Result Semantics"
+            echo
+            echo "| Result | Meaning |"
+            echo "|---|---|"
+            echo "| PASS | Expected control behavior was observed |"
+            echo "| FAIL | Expected behavior was not observed |"
+            echo "| REVIEW | Observation requires contextual/manual interpretation |"
+            echo "| NOT VERIFIED | The test could not establish the control |"
+            echo "| OBSERVED | The behavior was recorded without assigning a security pass/fail judgment |"
+            echo
+            echo "## Interpretation"
+            echo
+            echo "- This workflow characterizes implemented security controls using complementary static, dependency, passive, and runtime checks."
+            echo "- Gitleaks reports detected secret exposure according to its configured detection rules; a PASS does not prove that no secret exists anywhere."
+            echo "- Deno Audit, CodeQL, and OWASP ZAP findings should be interpreted using their reported severity and the application context."
+            echo "- The API profile verifies selected authentication and authorization behaviors through deterministic HTTP probes."
+            echo "- Security headers and CORS are reported as observations unless the workflow has a deterministic expected result."
+            echo "- The workflow does not constitute a complete penetration test or a proof that the application is secure."
+            echo "- Rate-limit testing is intentionally not performed as an aggressive repeated probe against the evaluation target."
           } >> "$GITHUB_STEP_SUMMARY"
 
-          # --------------------------------------------------------
-          # CONSOLE OUTPUT
-          # --------------------------------------------------------
+      # ------------------------------------------------------------
+      # 12. Save raw security evidence
+      # ------------------------------------------------------------
+      - name: Upload security baseline evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-baseline-${{ github.run_id }}
+          path: security-baseline/
+          if-no-files-found: warn
 
-          echo ""
-          echo "=============================================================="
-          echo "API SECURITY PROFILE"
-          echo "=============================================================="
-          printf '%-38s %-10s %-18s\n' "CONTROL" "HTTP" "RESULT"
-          echo "--------------------------------------------------------------"
-          printf '%-38s %-10s %-18s\n' \
-            "Public health endpoint" \
-            "$HEALTH_STATUS" \
-            "$HEALTH_RESULT"
-          printf '%-38s %-10s %-18s\n' \
-            "/auth/me without token" \
-            "$AUTH_ME_NO_TOKEN_STATUS" \
-            "$AUTH_ME_NO_TOKEN_RESULT"
-          printf '%-38s %-10s %-18s\n' \
-            "Login" \
-            "$LOGIN_STATUS" \
-            "$LOGIN_RESULT"
-          printf '%-38s %-10s %-18s\n' \
-            "/auth/me with token" \
-            "$AUTH_ME_STATUS" \
-            "$AUTH_ME_RESULT"
-          printf '%-38s %-10s %-18s\n' \
-            "Protected route without token" \
-            "$PROTECTED_NO_AUTH_STATUS" \
-            "$PROTECTED_NO_AUTH_RESULT"
-          printf '%-38s %-10s %-18s\n' \
-            "Protected route with token" \
-            "$PROTECTED_AUTH_STATUS" \
-            "$PROTECTED_AUTH_RESULT"
-          printf '%-38s %-10s %-18s\n' \
-            "Invalid bearer token" \
-            "$INVALID_TOKEN_STATUS" \
-            "$INVALID_TOKEN_RESULT"
-          printf '%-38s %-10s %-18s\n' \
-            "Security headers" \
-            "N/A" \
-            "$HEADER_RESULT"
-          printf '%-38s %-10s %-18s\n' \
-            "CORS" \
-            "N/A" \
-            "$CORS_RESULT"
-          echo "=============================================================="
-          echo ""
+      # ------------------------------------------------------------
+      # 13. Final workflow status
+      # ------------------------------------------------------------
+      - name: Enforce security baseline failure conditions
+        if: always()
+        shell: bash
+        run: |
+          set -u
+
+          source security-baseline/results.env
+
+          echo "Security baseline results:"
+          echo "Gitleaks: $GITLEAKS_RESULT"
+          echo "Deno Audit: $DENO_AUDIT_RESULT"
+          echo "CodeQL: $CODEQL_RESULT"
+          echo "ZAP: $ZAP_RESULT"
+          echo "API: $API_RESULT"
+
+          # The baseline intentionally does not fail the entire workflow
+          # merely because a contextual REVIEW/OBSERVED result exists.
+          #
+          # Deterministic API failures are treated as workflow failures.
+          if [ "$API_RESULT" = "FAIL" ]; then
+            echo "Security baseline failed because a deterministic API security control failed."
+            exit 1
+          fi
+
+          echo "Security baseline completed."
