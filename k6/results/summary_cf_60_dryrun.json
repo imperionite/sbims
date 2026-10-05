@@ -1,0 +1,186 @@
+{
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {
+            "Student Representative Internship Workflow": {
+                "name": "Student Representative Internship Workflow",
+                "path": "::Student Representative Internship Workflow",
+                "id": "74eae60e4d045314a62be4e3aa812ec8",
+                "groups": {},
+                "checks": {
+                        "Step 1 auth/me - Status 200": {
+                            "name": "Step 1 auth/me - Status 200",
+                            "path": "::Student Representative Internship Workflow::Step 1 auth/me - Status 200",
+                            "id": "4e3eb6d225cde5583d9b5b7ee1bc8ed3",
+                            "passes": 873,
+                            "fails": 0
+                        },
+                        "Step 2 internships/me - Status 200/404": {
+                            "name": "Step 2 internships/me - Status 200/404",
+                            "path": "::Student Representative Internship Workflow::Step 2 internships/me - Status 200/404",
+                            "id": "f2517d4af1bcd013653ec2a80f00343c",
+                            "passes": 873,
+                            "fails": 0
+                        },
+                        "Step 3 attendance/me - Status 200": {
+                            "name": "Step 3 attendance/me - Status 200",
+                            "path": "::Student Representative Internship Workflow::Step 3 attendance/me - Status 200",
+                            "id": "126bed2160fa86b2a4928927cd9db353",
+                            "passes": 873,
+                            "fails": 0
+                        },
+                        "Step 4 rendered-hours - Status 200": {
+                            "name": "Step 4 rendered-hours - Status 200",
+                            "path": "::Student Representative Internship Workflow::Step 4 rendered-hours - Status 200",
+                            "id": "64d37b19552ce16b22d42ca64c6fb537",
+                            "passes": 873,
+                            "fails": 0
+                        }
+                    }
+            }
+        },
+        "checks": {}
+    },
+    "metrics": {
+        "http_req_duration{expected_response:true}": {
+            "max": 7826.369,
+            "p(90)": 2688.9382,
+            "p(95)": 2994.6710499999995,
+            "avg": 1720.70541614196,
+            "min": 193.124,
+            "med": 1693.2875
+        },
+        "http_req_sending": {
+            "med": 0.189,
+            "max": 20.65,
+            "p(90)": 0.231,
+            "p(95)": 0.268,
+            "avg": 0.19527504293073802,
+            "min": 0.048
+        },
+        "iteration_duration": {
+            "p(95)": 18572.3608808,
+            "avg": 14904.16257868383,
+            "min": 9078.829534,
+            "med": 14639.547703,
+            "max": 22075.75946,
+            "p(90)": 17777.6768402
+        },
+        "http_req_waiting": {
+            "avg": 1719.3048720663949,
+            "min": 192.873,
+            "med": 1692.931,
+            "max": 7819.797,
+            "p(90)": 2687.4665,
+            "p(95)": 2990.4886999999994
+        },
+        "iterations": {
+            "rate": 3.508764117058255,
+            "count": 873
+        },
+        "data_sent": {
+            "count": 336946,
+            "rate": 1354.2543346922232
+        },
+        "checks": {
+            "passes": 3492,
+            "fails": 0,
+            "value": 1
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 3494,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0
+        },
+        "http_req_connecting": {
+            "avg": 1.751761018889525,
+            "min": 0,
+            "med": 0,
+            "max": 153.767,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_duration": {
+            "p(90)": 2688.9382,
+            "p(95)": 2994.6710499999995,
+            "avg": 1720.70541614196,
+            "min": 193.124,
+            "med": 1693.2875,
+            "max": 7826.369,
+            "thresholds": {
+                "p(95)<5000": false
+            }
+        },
+        "vus": {
+            "value": 3,
+            "min": 0,
+            "max": 60
+        },
+        "data_received": {
+            "count": 10153273,
+            "rate": 40808.06411580346
+        },
+        "workflow_duration": {
+            "avg": 14904.43642611684,
+            "min": 9079,
+            "med": 14640,
+            "max": 22076,
+            "p(90)": 17777.8,
+            "p(95)": 18572.6
+        },
+        "http_reqs": {
+            "count": 3494,
+            "rate": 14.043094873999477
+        },
+        "http_req_tls_handshaking": {
+            "p(95)": 0,
+            "avg": 2.0448777904979965,
+            "min": 0,
+            "med": 0,
+            "max": 173.723,
+            "p(90)": 0
+        },
+        "vus_max": {
+            "min": 60,
+            "max": 60,
+            "value": 60
+        },
+        "http_req_blocked": {
+            "med": 0.001,
+            "max": 321.39,
+            "p(90)": 0.001,
+            "p(95)": 0.001,
+            "avg": 3.8024290211793086,
+            "min": 0
+        },
+        "http_req_receiving": {
+            "p(90)": 4.728100000000004,
+            "p(95)": 5.916,
+            "avg": 1.2052690326273627,
+            "min": 0.034,
+            "med": 0.193,
+            "max": 24.205
+        },
+        "workflow_completed": {
+            "count": 873,
+            "rate": 3.508764117058255
+        },
+        "group_duration": {
+            "p(90)": 17777.582995,
+            "p(95)": 18572.2244048,
+            "avg": 14904.01212065866,
+            "min": 9078.715301,
+            "med": 14639.363454,
+            "max": 22075.64451
+        }
+    },
+    "setup_data": {
+        "authToken": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI2NGQxMzVjMi04NjIwLTRmOTgtYmI2YS1lYzNkZjgzNzUyYjQiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzkxMTA1NTMxLCJpYXQiOjE3OTExMDE5MzEsImVtYWlsIjoic3R1ZGVudHNiaW1zNkBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiQmVhIEJpYW5jYSIsImxhc3RfbmFtZSI6Ik1hbGxhcmkiLCJtaWRkbGVfbmFtZSI6IlPDoW5jaGV6Iiwicm9sZSI6InN0dWRlbnQiLCJzZWVkX2tleSI6InN0dWRlbnQtMDYiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzkxMTAxOTMxfV0sInNlc3Npb25faWQiOiIyMWM2OGM5NC05N2UyLTQ3ZDctOWI2My01ZDIwNWRkMzMyODAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.heeJgFxzF2SK-sm_jeOA1YsFtsGXJcZDkHwkABN0FVCjSQRh3fU6qMLRZUoVNZvc169HGSj6IEvNyZBwsXk-ng",
+        "internshipId": "74620404-1ac8-4ef0-b9a5-8f24866e2692"
+    }
+}
