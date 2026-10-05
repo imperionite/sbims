@@ -10,12 +10,12 @@
     "jsr:@std/path@^1.1.5": "1.1.6",
     "jsr:@std/path@^1.1.6": "1.1.6",
     "jsr:@std/testing@^1.0.21": "1.0.21",
-    "npm:@hono/zod-validator@~0.9.1": "0.9.1_hono@4.13.10_zod@4.6.5",
+    "npm:@hono/zod-validator@~0.9.1": "0.9.1_hono@4.13.13_zod@4.6.5",
     "npm:@supabase/supabase-js@^2.117.2": "2.117.2",
     "npm:@upstash/redis@^1.39.0": "1.39.0",
-    "npm:hono-rate-limiter@~0.5.4": "0.5.4_hono@4.13.10",
-    "npm:hono@^4.13.10": "4.13.10",
-    "npm:wrangler@^4.143.0": "4.143.0",
+    "npm:hono-rate-limiter@~0.5.4": "0.5.4_hono@4.13.13",
+    "npm:hono@^4.13.13": "4.13.13",
+    "npm:wrangler@^4.147.0": "4.147.0",
     "npm:zod@^4.6.5": "4.6.5"
   },
   "jsr": {
@@ -62,7 +62,7 @@
     "@cloudflare/kv-asset-handler@0.5.0": {
       "integrity": "sha512-jxQYkj8dSIzc0cD6cMMNdOc1UVjqSqu8BZdor5s8cGjW2I8BjODt/kWPVdY+u9zj3ms75Q5qaZgnxUad83+eAg=="
     },
-    "@cloudflare/unenv-preset@2.16.2_unenv@2.0.0-rc.24_workerd@1.20260926.1": {
+    "@cloudflare/unenv-preset@2.16.2_unenv@2.0.0-rc.24_workerd@1.20261001.1": {
       "integrity": "sha512-JBP1+Z7ZSNG/d4mRP+y8VC5dka3tZVMLEZRvS+rzQ4DGV1EoxRFQckcJTTkXbHSQiTj0DtNI01Zwb/V2fX0mvQ==",
       "dependencies": [
         "unenv",
@@ -72,28 +72,28 @@
         "workerd"
       ]
     },
-    "@cloudflare/workerd-darwin-64@1.20260926.1": {
-      "integrity": "sha512-VCIpwgJu5Dm1o+VHLclNOKIdpttEqss7oDHS5DYxgVoonM9Dxxxr1xCQvJbh6IXFuQ1DDrbm5krjte5NsTgX3Q==",
+    "@cloudflare/workerd-darwin-64@1.20261001.1": {
+      "integrity": "sha512-4cgSgDf28JSw/P5Dj5GCS59hzVqS5XnmGAWNkvYHLI6ODU9idGaMMNEuhJXDkEG/lsABmlVlnCgsdh2VbKWepw==",
       "os": ["darwin"],
       "cpu": ["x64"]
     },
-    "@cloudflare/workerd-darwin-arm64@1.20260926.1": {
-      "integrity": "sha512-oVuLXfCnr1Xu9sBMNYrEPcFZQNMcviNcacz9l+oqQiLHc5UrVp++lpKbsuWstCfh+/c39Pp37TVeaNBLA8+ReA==",
+    "@cloudflare/workerd-darwin-arm64@1.20261001.1": {
+      "integrity": "sha512-8ulAWruEVouNmEIsQsy9WSSCS9zkLu93W2MTwp5esiFyoPp05BNSVFIFsYSPi1pkFmBBd7fsnwMpbLkaJLaVPQ==",
       "os": ["darwin"],
       "cpu": ["arm64"]
     },
-    "@cloudflare/workerd-linux-64@1.20260926.1": {
-      "integrity": "sha512-BjmiDvYBVBG5248gCHSZS3yONbcm3/3qKTu9RaQA8o7jQHJfXx9JnWbhkld2KsbXnRGEGHFwpLLidIpIGtQYUA==",
+    "@cloudflare/workerd-linux-64@1.20261001.1": {
+      "integrity": "sha512-kZbTZJGrhsMOdqZ2BIybjaBRLZjYsRLWj7mcNw/6Y3hodOhp5MrNzcz4iWGwNVWwyIV+7Pl+/LX5VcgnRqdHOg==",
       "os": ["linux"],
       "cpu": ["x64"]
     },
-    "@cloudflare/workerd-linux-arm64@1.20260926.1": {
-      "integrity": "sha512-28bdfQDIFcpaKXMPisADy8BchpIsX+tEAhD+bhfEBXukFGFr8F3ouyiG3HzN3CqAh/OYvifJizzFZtptUPCy7w==",
+    "@cloudflare/workerd-linux-arm64@1.20261001.1": {
+      "integrity": "sha512-oOk3Zj6k/8oP0FJgZBWDn7+BqbsqIMEMaV95pulHPVbwVu4wYoLfQq2hp0vkbCNsCFLqZb7cqixXdrwD54ZIow==",
       "os": ["linux"],
       "cpu": ["arm64"]
     },
-    "@cloudflare/workerd-windows-64@1.20260926.1": {
-      "integrity": "sha512-ehdL3ataKdEmlnW9oom6OZUR8n3XsTL/zl8+KGREpLi5sMSW0mek0PrF4wK9SX51f3Alnlu8tF8eKBg+mc3xFw==",
+    "@cloudflare/workerd-windows-64@1.20261001.1": {
+      "integrity": "sha512-uRxm5W4VyBkoSaoP1BfOuH0873tE+vxsknF4sab6/5YIRvIAufChq3QDp+zlAn67PuGPGcn7W8QraA0t4ucmOQ==",
       "os": ["win32"],
       "cpu": ["x64"]
     },
@@ -239,7 +239,7 @@
       "os": ["win32"],
       "cpu": ["x64"]
     },
-    "@hono/zod-validator@0.9.1_hono@4.13.10_zod@4.6.5": {
+    "@hono/zod-validator@0.9.1_hono@4.13.13_zod@4.6.5": {
       "integrity": "sha512-iiv6w0qrIc0arfvCtUqBWsvl4fXjzaTcQcCJTTtCnkawF9HHGE+KjEl0ox3gQJ6rKZEgE3mLExlQCF72M+mNuw==",
       "dependencies": [
         "hono",
@@ -551,14 +551,14 @@
       "os": ["darwin"],
       "scripts": true
     },
-    "hono-rate-limiter@0.5.4_hono@4.13.10": {
+    "hono-rate-limiter@0.5.4_hono@4.13.13": {
       "integrity": "sha512-P3/cscAmz1hA+MuM+Hn9gP/EyO2zWv2aXIFkVYuLZkPzrPa4oaWdVCS94vyDlsNBgeMnE/Hr2+LznIKQxrF0ng==",
       "dependencies": [
         "hono"
       ]
     },
-    "hono@4.13.10": {
-      "integrity": "sha512-dQuLsa5oO+47QVMVMaaD9cIv8ctmVtK1iRvwWngkfloFJMeFeuoUFDswIqZGxmGX3hrRzREgEArjkK9OgsQEhA=="
+    "hono@4.13.13": {
+      "integrity": "sha512-CQ46U0ZkAGmbT/4UxdzzGJpacP2IeKgY4a5/tOI9AABbpOMfK739wfDXmv1usCk+3RkKj1hQy4/fjhiwa2xlrA=="
     },
     "iceberg-js@0.8.1": {
       "integrity": "sha512-1dhVQZXhcHje7798IVM+xoo/1ZdVfzOMIc8/rgVSijRK38EDqOJoGula9N/8ZI5RD8QTxNQtK/Gozpr+qUqRRA=="
@@ -566,8 +566,8 @@
     "kleur@4.1.5": {
       "integrity": "sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ=="
     },
-    "miniflare@5.20260926.0-alpha": {
-      "integrity": "sha512-m/M3rpLnaouw6QSoKzylfw6Z1dnOwRM48idnZ7kc5ivRqBXANFQ8XqKCyQ/V+xqQ9Rg1L99j4WkZGVU9uT4L2w==",
+    "miniflare@5.20261001.0-alpha": {
+      "integrity": "sha512-GaimS5mSIOMyvd16ga+e1/QkI8cmp3z35QPHFex0DktqNQf2RVZQwMPQXdyoUreUiFP/0Gpe2MoQInTyMAD5xA==",
       "dependencies": [
         "@cspotcode/source-map-support",
         "sharp",
@@ -640,8 +640,8 @@
         "pathe"
       ]
     },
-    "workerd@1.20260926.1": {
-      "integrity": "sha512-YojhsWBuZwk3Jk9OC0QfTgVbLeQOD1tK1olC9ZXAUcmeip8z4NE/xtttpxCsuTvQBRqppvy7Tkac0kxPYMjIXA==",
+    "workerd@1.20261001.1": {
+      "integrity": "sha512-d/SIYHFO0PT/wiFZg8in4NpRIxYuFwslX1HdylOtWkBIIUmSpkGFhK820cV84XACFylwJ48xuRoWW/8DWDPsPQ==",
       "optionalDependencies": [
         "@cloudflare/workerd-darwin-64",
         "@cloudflare/workerd-darwin-arm64",
@@ -652,8 +652,8 @@
       "scripts": true,
       "bin": true
     },
-    "wrangler@4.143.0": {
-      "integrity": "sha512-c2lHXVr1uDzqrHLdB07zGloUI+AoCBPa06fk+JMrX5TfoydISdhfVAR1IK1Ry2eu2RJmsMsGJY3vJNykJWik2Q==",
+    "wrangler@4.147.0": {
+      "integrity": "sha512-pQYRoiq8PTAxphaG69z8+GC1DkSGd19EDZehQ8zxjo/Ko3mRB6Qs1mTrd8ZuKAarLklIjTqr1lUdCK9r4q2hUg==",
       "dependencies": [
         "@cloudflare/kv-asset-handler",
         "@cloudflare/unenv-preset",
@@ -701,7 +701,7 @@
       "npm:@supabase/supabase-js@^2.117.2",
       "npm:@upstash/redis@^1.39.0",
       "npm:hono-rate-limiter@~0.5.4",
-      "npm:hono@^4.13.10",
+      "npm:hono@^4.13.13",
       "npm:zod@^4.6.5"
     ],
     "packageJson": {
@@ -710,8 +710,8 @@
         "npm:@supabase/supabase-js@^2.117.2",
         "npm:@upstash/redis@^1.39.0",
         "npm:hono-rate-limiter@~0.5.4",
-        "npm:hono@^4.13.10",
-        "npm:wrangler@^4.143.0",
+        "npm:hono@^4.13.13",
+        "npm:wrangler@^4.147.0",
         "npm:zod@^4.6.5"
       ],
       "overrides": {

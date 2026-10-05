@@ -27,3 +27,7 @@ node_modules/
 worker-configuration.d.ts
 supabase/migrations/.DS_Store
 supabase/.DS_Store
+
+# Python
+__pycache__/
+venv/

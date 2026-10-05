@@ -28,6 +28,9 @@ GET {{denoDev}}/compute?work=5000
 
 
 ### Performance Compute - Maximum Work
+GET {{denoDev}}/compute?work=10000
+
+###
 GET {{deno}}/compute?work=10000
 
 

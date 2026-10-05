@@ -1,0 +1,4 @@
+File,VUs,Trial,Avg_Latency_ms,P50_ms,P95_ms,P99_ms,Throughput_req_s,Total_Requests,Error_Rate_pct,Workflows_Completed
+summary_vus_5_trial_3.json,5,3,1227.17,1077.06,1849.32,0.0,1.36,342,0.0,85
+summary_cf_60_dryrun.json,60,1,1720.71,1693.29,2994.67,0.0,14.04,3494,0.0,873
+summary_vus_75_trial_2.json,75,2,3198.11,2547.89,4709.29,0.0,11.74,3014,0.0,732
