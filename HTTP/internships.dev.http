@@ -114,11 +114,9 @@
 ### Paste a valid administrator access token here.
 
 @adminAccessToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
-@coordinatorAccessToken=
+@coordinatorAccessToken=PASTE_COORDINATOR_ACCESS_TOKEN_HERE
 @studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
-@facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
-@facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
-@studentAccessToken=
+@facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN
 ###############################################################
 
 # HEALTH
