@@ -16,7 +16,7 @@ const workflowDuration = new Trend("workflow_duration", true);
 
 const BASE_URL = __ENV.BASE_URL || "https://api.sbims.me/api/v1";
 
-const TARGET_VUS = Number.parseInt(__ENV.TEST_VUS || "55", 10);
+const TARGET_VUS = Number.parseInt(__ENV.TEST_VUS || "25", 10);
 
 const TEST_EMAIL = __ENV.STUDENT_EMAIL || "studentsbims6@grr.la";
 

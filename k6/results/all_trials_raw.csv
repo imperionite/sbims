@@ -1,6 +1,8 @@
 File,VUs,Trial,Avg_Latency_ms,P50_ms,P95_ms,P99_ms,Throughput_req_s,Total_Requests,Error_Rate_pct,Workflows_Completed
 summary_vus_5_trial_1.json,5,1,1003.75,1022.07,1111.07,0.0,1.48,362,0.0,90
+summary_vus_5_trial_2.json,5,2,1050.28,1063.19,1212.18,0.0,1.46,362,0.0,90
 summary_vus_5_trial_3.json,5,3,1227.17,1077.06,1849.32,0.0,1.36,342,0.0,85
+summary_vus_25_trial_1.json,25,1,1904.11,1159.65,2804.71,0.0,5.1,1408,0.0,343
 summary_vus_25_trial_2.json,25,2,1510.16,1155.31,2524.94,0.0,5.13,1322,0.0,318
 summary_vus_25_trial_3.json,25,3,4847.09,1049.08,1289.69,0.0,1.82,1388,0.0,324
 summary_vus_55_trial_1.json,55,1,1740.98,1550.96,3257.45,0.0,12.39,3178,0.0,794
