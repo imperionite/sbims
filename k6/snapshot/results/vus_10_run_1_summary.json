@@ -1,0 +1,1182 @@
+{
+  "options": {
+    "summaryTimeUnit": "",
+    "noColor": false,
+    "summaryTrendStats": [
+      "avg",
+      "min",
+      "med",
+      "max",
+      "p(90)",
+      "p(95)",
+      "p(99)"
+    ]
+  },
+  "state": {
+    "testRunDurationMs": 274133.002,
+    "isStdOutTTY": true,
+    "isStdErrTTY": true
+  },
+  "metrics": {
+    "http_req_connecting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "med": 0,
+        "max": 287.42,
+        "p(90)": 0,
+        "p(95)": 0,
+        "p(99)": 237.81887999999998,
+        "avg": 4.251422003284072,
+        "min": 0
+      }
+    },
+    "http_req_sending": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "max": 1.504,
+        "p(90)": 0.214,
+        "p(95)": 0.23060000000000003,
+        "p(99)": 0.30867999999999984,
+        "avg": 0.1697241379310346,
+        "min": 0.067,
+        "med": 0.158
+      }
+    },
+    "vus": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 1,
+        "min": 0,
+        "max": 10
+      }
+    },
+    "http_reqs": {
+      "values": {
+        "count": 609,
+        "rate": 2.2215493776995157
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "data_sent": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 62804,
+        "rate": 229.10047145655233
+      }
+    },
+    "data_received": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 2026580,
+        "rate": 7392.688896319021
+      }
+    },
+    "checks": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 0.9688269073010665,
+        "passes": 1181,
+        "fails": 38
+      }
+    },
+    "workflow_failed": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 11,
+        "rate": 0.0401265076431768
+      }
+    },
+    "workflow_duration": {
+      "values": {
+        "p(99)": 68188.07000000004,
+        "avg": 11014.178217821782,
+        "min": 5290,
+        "med": 6781,
+        "max": 92005,
+        "p(90)": 13100.6,
+        "p(95)": 42025.84999999999
+      },
+      "type": "trend",
+      "contains": "time"
+    },
+    "workflow_success_rate": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 0.9455445544554455,
+        "passes": 191,
+        "fails": 11
+      }
+    },
+    "http_req_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(95)": 13107.189600000038,
+        "p(99)": 30000.912760000003,
+        "avg": 3075.799477832512,
+        "min": 826.686,
+        "med": 1515.706,
+        "max": 30002.872,
+        "p(90)": 4123.872200000001
+      }
+    },
+    "iteration_duration": {
+      "contains": "time",
+      "values": {
+        "avg": 12014.924012272282,
+        "min": 6290.07792,
+        "med": 7782.008695,
+        "max": 93005.697249,
+        "p(90)": 14100.8070086,
+        "p(95)": 43027.6334734,
+        "p(99)": 69189.32988243003
+      },
+      "type": "trend"
+    },
+    "http_req_blocked": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(90)": 0.001,
+        "p(95)": 0.001,
+        "p(99)": 499.91471999999965,
+        "avg": 9.634280788177469,
+        "min": 0,
+        "med": 0.001,
+        "max": 975.468
+      }
+    },
+    "http_req_tls_handshaking": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(95)": 0,
+        "p(99)": 261.9425599999997,
+        "avg": 4.789779967159277,
+        "min": 0,
+        "med": 0,
+        "max": 329.362,
+        "p(90)": 0
+      }
+    },
+    "http_req_waiting": {
+      "contains": "time",
+      "values": {
+        "avg": 3072.3554991789806,
+        "min": 826.46,
+        "med": 1509.427,
+        "max": 30002.711,
+        "p(90)": 4123.697800000001,
+        "p(95)": 13106.920000000038,
+        "p(99)": 30000.78444
+      },
+      "type": "trend"
+    },
+    "http_req_duration{expected_response:true}": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(99)": 17958.904840000007,
+        "avg": 2208.723806779661,
+        "min": 826.686,
+        "med": 1502.359,
+        "max": 28379.677,
+        "p(90)": 3524.5127,
+        "p(95)": 5221.648799999997
+      }
+    },
+    "workflow_completed": {
+      "contains": "default",
+      "values": {
+        "count": 202,
+        "rate": 0.736868594901974
+      },
+      "type": "counter"
+    },
+    "iterations": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 202,
+        "rate": 0.736868594901974
+      }
+    },
+    "http_req_receiving": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 3.2742545155993446,
+        "min": 0,
+        "med": 0.087,
+        "max": 409.38,
+        "p(90)": 0.19820000000000004,
+        "p(95)": 0.48120000000000085,
+        "p(99)": 2.7406399999999755
+      }
+    },
+    "vus_max": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "min": 10,
+        "max": 10,
+        "value": 10
+      }
+    },
+    "http_req_failed": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 0.031198686371100164,
+        "passes": 19,
+        "fails": 590
+      }
+    }
+  },
+  "setup_data": {
+    "accessToken": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI4MDA4NDI2Yi0wN2Q4LTQwYjgtYTMwMS1lMDA3ZTJlY2ExMDIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzkxOTc2ODYzLCJpYXQiOjE3OTE5NzMyNjMsImVtYWlsIjoic3R1ZGVudHNiaW1zOUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiQ2hyaXN0aWFuIFBhb2xvIiwibGFzdF9uYW1lIjoiUml2ZXJhIiwibWlkZGxlX25hbWUiOiJHYXJjaWEiLCJyb2xlIjoic3R1ZGVudCIsInNlZWRfa2V5Ijoic3R1ZGVudC0wOSIsInN1ZmZpeCI6bnVsbH0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTE5NzMyNjN9XSwic2Vzc2lvbl9pZCI6ImJhYTQyYzA1LTI1ZTItNDQ1OS1iMTkwLTNkMDYwNzJkODJmOSIsImlzX2Fub255bW91cyI6ZmFsc2V9.6oTWGiX4EoJrEPNQKI2r5swu1TpORv-c-oHx6viSFHKHMqkRNH1-pCej4oFPldT85ZYU8EBrOkZNkYGt_ejxgw"
+  },
+  "root_group": {
+    "name": "",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": [
+      {
+        "checks": [
+          {
+            "fails": 0,
+            "name": "setup login returns 200",
+            "path": "::setup::setup login returns 200",
+            "id": "eeabfe2c9526190f31dfb557d40249d8",
+            "passes": 1
+          },
+          {
+            "id": "6da084ec9ca19526a13b3c1def0e2faf",
+            "passes": 1,
+            "fails": 0,
+            "name": "setup login response indicates success",
+            "path": "::setup::setup login response indicates success"
+          },
+          {
+            "name": "setup login response contains access token",
+            "path": "::setup::setup login response contains access token",
+            "id": "0887fb6fa32ee4507c87ca1930736b21",
+            "passes": 1,
+            "fails": 0
+          }
+        ],
+        "name": "setup",
+        "path": "::setup",
+        "id": "5c0f8025f7e0b6654089e5b00e950f1a",
+        "groups": []
+      }
+    ],
+    "checks": [
+      {
+        "id": "f5e2724b95cab6a118c26df5fddbbf62",
+        "passes": 194,
+        "fails": 9,
+        "name": "current-user endpoint returns 200",
+        "path": "::current-user endpoint returns 200"
+      },
+      {
+        "passes": 194,
+        "fails": 9,
+        "name": "current-user response indicates success",
+        "path": "::current-user response indicates success",
+        "id": "4e02bc5b82212dc94ef8a5753e6b16b4"
+      },
+      {
+        "name": "student profile endpoint returns 200",
+        "path": "::student profile endpoint returns 200",
+        "id": "1c24ac26074fe32637262442b33f1819",
+        "passes": 198,
+        "fails": 5
+      },
+      {
+        "name": "student profile response indicates success",
+        "path": "::student profile response indicates success",
+        "id": "986b7d5a16d3b637f833a7f75d89acdc",
+        "passes": 198,
+        "fails": 5
+      },
+      {
+        "id": "f06bf1ab5ae0165355137ee18a3daefc",
+        "passes": 197,
+        "fails": 5,
+        "name": "student attendance endpoint returns 200",
+        "path": "::student attendance endpoint returns 200"
+      },
+      {
+        "path": "::student attendance response indicates success",
+        "id": "c7d93df0acc9ecde15da2f643968a58d",
+        "passes": 197,
+        "fails": 5,
+        "name": "student attendance response indicates success"
+      }
+    ]
+  },
+  "metadata": {
+    "experiment_id": null,
+    "scenario_id": "student-workflow",
+    "trial": 1,
+    "configured_vus": 10,
+    "workload_model": "constant-vus",
+    "configured_duration": "4m",
+    "think_time_seconds": 1,
+    "target_origin": "https://api.sbims.me",
+    "api_base_path": "/api/v1",
+    "effective_api_base": "https://api.sbims.me/api/v1",
+    "k6_script_initialized_at_utc": "2026-10-14T10:25:34.720Z",
+    "wrapper_execution_started_at_utc": "2026-10-14T10:21:00.403Z",
+    "k6_summary_generated_at_utc": "2026-10-14T10:25:34.721Z",
+    "k6_measured_duration_ms": 274133.002,
+    "k6_version": null,
+    "git_commit": null,
+    "runner": null,
+    "script": "k6/student-workflow.js",
+    "script_version": "1.4",
+    "study_type": "characterization",
+    "token_persisted": false,
+    "authentication_model": "One login in setup() per test execution; setup data supplies the same student access token to all VUs. No per-VU or per-iteration login is performed.",
+    "metrics_scope": "workflow_duration measures the three authenticated reads and think time between them, excluding the final sleep. Built-in http_req_* metrics include the setup login and authenticated reads. workflow_completed counts workflows that attempted all three authenticated reads; workflow_failed counts those with at least one unsuccessful endpoint; workflow_success_rate records the proportion of workflows in which all three reads passed.",
+    "notes": "Run warm-up separately and exclude it from formal trial analysis. The wrapper records execution start/end timestamps and elapsed time. k6 measured duration is a separate measurement. The script initialization timestamp is not the wrapper process start time. Provider-side Deno Deploy and Supabase metrics and client environment samples must be collected separately.",
+    "run_started_at_utc": "2026-10-14T10:21:00.403Z",
+    "run_ended_at_utc": "2026-10-14T10:25:35.571Z",
+    "wrapper_elapsed_seconds": 275.169,
+    "run_exit_status": 0,
+    "environment_sampling_interval_seconds": 5.0,
+    "environment_metadata_included": true,
+    "environment_metadata_file": "k6/snapshot/results/vus_10_run_1_summary_environment.json"
+  },
+  "environment": {
+    "metadata_schema_version": 2,
+    "wrapper_execution_started_at_utc": "2026-10-14T10:21:00.403Z",
+    "wrapper_execution_ended_at_utc": "2026-10-14T10:25:35.571Z",
+    "wrapper_elapsed_seconds": 275.169,
+    "sampling_interval_seconds": 5.0,
+    "device": {
+      "device_label": null,
+      "os_system": "Darwin",
+      "os_release": "24.6.0",
+      "os_version": "Darwin Kernel Version 24.6.0: Sun Aug 23 20:30:56 PDT 2026; root:xnu-11417.140.69.712.69~1/RELEASE_X86_64",
+      "architecture": "x86_64",
+      "python_version": "3.14.7",
+      "cpu_model": "i386",
+      "logical_cpu_count": 12,
+      "physical_cpu_count": 6,
+      "total_memory_bytes": 17179869184,
+      "k6_version": null,
+      "load_generator_role": "client_load_generator_only"
+    },
+    "resource_summary": {
+      "system_cpu_percent_max_sampled": 66.7,
+      "system_memory_percent_max_sampled": 68.7,
+      "system_swap_percent_max_sampled": 81.9,
+      "k6_process_cpu_percent_max_sampled": 3.7,
+      "k6_process_rss_bytes_max_sampled": 38567936,
+      "sample_count": 57
+    },
+    "resource_samples": [
+      {
+        "timestamp_utc": "2026-10-14T10:21:00.402Z",
+        "phase": "before",
+        "system_cpu_percent": 66.7,
+        "system_memory_used_bytes": 8784814080,
+        "system_memory_available_bytes": 5758889984,
+        "system_memory_percent": 66.5,
+        "system_swap_used_bytes": 1696858112,
+        "system_swap_percent": 79.0
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:21:05.408Z",
+        "phase": "during",
+        "system_cpu_percent": 4.9,
+        "system_memory_used_bytes": 8912121856,
+        "system_memory_available_bytes": 5637660672,
+        "system_memory_percent": 67.2,
+        "system_swap_used_bytes": 1696858112,
+        "system_swap_percent": 79.0,
+        "k6_process_cpu_percent": 3.7,
+        "k6_process_rss_bytes": 33816576,
+        "k6_process_vms_bytes": 36505088000,
+        "k6_process_threads": 20
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:21:10.413Z",
+        "phase": "during",
+        "system_cpu_percent": 12.2,
+        "system_memory_used_bytes": 9048551424,
+        "system_memory_available_bytes": 5469814784,
+        "system_memory_percent": 68.2,
+        "system_swap_used_bytes": 1696858112,
+        "system_swap_percent": 79.0,
+        "k6_process_cpu_percent": 1.4,
+        "k6_process_rss_bytes": 34287616,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:21:15.414Z",
+        "phase": "during",
+        "system_cpu_percent": 13.6,
+        "system_memory_used_bytes": 9140092928,
+        "system_memory_available_bytes": 5385138176,
+        "system_memory_percent": 68.7,
+        "system_swap_used_bytes": 1696858112,
+        "system_swap_percent": 79.0,
+        "k6_process_cpu_percent": 1.5,
+        "k6_process_rss_bytes": 35069952,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:21:20.416Z",
+        "phase": "during",
+        "system_cpu_percent": 6.1,
+        "system_memory_used_bytes": 9139781632,
+        "system_memory_available_bytes": 5375889408,
+        "system_memory_percent": 68.7,
+        "system_swap_used_bytes": 1696858112,
+        "system_swap_percent": 79.0,
+        "k6_process_cpu_percent": 1.5,
+        "k6_process_rss_bytes": 35508224,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:21:25.420Z",
+        "phase": "during",
+        "system_cpu_percent": 7.7,
+        "system_memory_used_bytes": 9137688576,
+        "system_memory_available_bytes": 5411106816,
+        "system_memory_percent": 68.5,
+        "system_swap_used_bytes": 1742209024,
+        "system_swap_percent": 81.1,
+        "k6_process_cpu_percent": 1.5,
+        "k6_process_rss_bytes": 36278272,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:21:30.425Z",
+        "phase": "during",
+        "system_cpu_percent": 8.7,
+        "system_memory_used_bytes": 9129418752,
+        "system_memory_available_bytes": 5416148992,
+        "system_memory_percent": 68.5,
+        "system_swap_used_bytes": 1733296128,
+        "system_swap_percent": 80.7,
+        "k6_process_cpu_percent": 1.3,
+        "k6_process_rss_bytes": 36409344,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:21:35.426Z",
+        "phase": "during",
+        "system_cpu_percent": 3.8,
+        "system_memory_used_bytes": 8925937664,
+        "system_memory_available_bytes": 5629808640,
+        "system_memory_percent": 67.2,
+        "system_swap_used_bytes": 1741946880,
+        "system_swap_percent": 81.1,
+        "k6_process_cpu_percent": 1.4,
+        "k6_process_rss_bytes": 36552704,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:21:40.431Z",
+        "phase": "during",
+        "system_cpu_percent": 4.3,
+        "system_memory_used_bytes": 8957722624,
+        "system_memory_available_bytes": 5616214016,
+        "system_memory_percent": 67.3,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 1.1,
+        "k6_process_rss_bytes": 36560896,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:21:45.433Z",
+        "phase": "during",
+        "system_cpu_percent": 5.9,
+        "system_memory_used_bytes": 8925159424,
+        "system_memory_available_bytes": 5648035840,
+        "system_memory_percent": 67.1,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 1.2,
+        "k6_process_rss_bytes": 37146624,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:21:50.434Z",
+        "phase": "during",
+        "system_cpu_percent": 3.5,
+        "system_memory_used_bytes": 8925560832,
+        "system_memory_available_bytes": 5647880192,
+        "system_memory_percent": 67.1,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 0.9,
+        "k6_process_rss_bytes": 37158912,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:21:55.439Z",
+        "phase": "during",
+        "system_cpu_percent": 7.1,
+        "system_memory_used_bytes": 8936476672,
+        "system_memory_available_bytes": 5637623808,
+        "system_memory_percent": 67.2,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 1.2,
+        "k6_process_rss_bytes": 37474304,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:22:00.444Z",
+        "phase": "during",
+        "system_cpu_percent": 9.4,
+        "system_memory_used_bytes": 9175478272,
+        "system_memory_available_bytes": 5406482432,
+        "system_memory_percent": 68.5,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 0.8,
+        "k6_process_rss_bytes": 37474304,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:22:05.448Z",
+        "phase": "during",
+        "system_cpu_percent": 6.9,
+        "system_memory_used_bytes": 9202712576,
+        "system_memory_available_bytes": 5446103040,
+        "system_memory_percent": 68.3,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 0.9,
+        "k6_process_rss_bytes": 37556224,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:22:10.450Z",
+        "phase": "during",
+        "system_cpu_percent": 8.7,
+        "system_memory_used_bytes": 8980779008,
+        "system_memory_available_bytes": 5670916096,
+        "system_memory_percent": 67.0,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 1.0,
+        "k6_process_rss_bytes": 37859328,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:22:15.451Z",
+        "phase": "during",
+        "system_cpu_percent": 8.6,
+        "system_memory_used_bytes": 8993300480,
+        "system_memory_available_bytes": 5664088064,
+        "system_memory_percent": 67.0,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 0.8,
+        "k6_process_rss_bytes": 37871616,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:22:20.456Z",
+        "phase": "during",
+        "system_cpu_percent": 10.8,
+        "system_memory_used_bytes": 8995180544,
+        "system_memory_available_bytes": 5662904320,
+        "system_memory_percent": 67.0,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 1.2,
+        "k6_process_rss_bytes": 38461440,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:22:25.461Z",
+        "phase": "during",
+        "system_cpu_percent": 13.3,
+        "system_memory_used_bytes": 9119326208,
+        "system_memory_available_bytes": 5547675648,
+        "system_memory_percent": 67.7,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 0.7,
+        "k6_process_rss_bytes": 38502400,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:22:30.464Z",
+        "phase": "during",
+        "system_cpu_percent": 10.6,
+        "system_memory_used_bytes": 9272123392,
+        "system_memory_available_bytes": 5404884992,
+        "system_memory_percent": 68.5,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 1.1,
+        "k6_process_rss_bytes": 38506496,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:22:35.467Z",
+        "phase": "during",
+        "system_cpu_percent": 4.0,
+        "system_memory_used_bytes": 9222074368,
+        "system_memory_available_bytes": 5454835712,
+        "system_memory_percent": 68.2,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 1.0,
+        "k6_process_rss_bytes": 38518784,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:22:40.468Z",
+        "phase": "during",
+        "system_cpu_percent": 5.5,
+        "system_memory_used_bytes": 9216356352,
+        "system_memory_available_bytes": 5459984384,
+        "system_memory_percent": 68.2,
+        "system_swap_used_bytes": 1759248384,
+        "system_swap_percent": 81.9,
+        "k6_process_cpu_percent": 1.1,
+        "k6_process_rss_bytes": 38567936,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:22:45.471Z",
+        "phase": "during",
+        "system_cpu_percent": 18.7,
+        "system_memory_used_bytes": 9376460800,
+        "system_memory_available_bytes": 5391060992,
+        "system_memory_percent": 68.6,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.1,
+        "k6_process_rss_bytes": 34037760,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:22:50.474Z",
+        "phase": "during",
+        "system_cpu_percent": 4.6,
+        "system_memory_used_bytes": 9197395968,
+        "system_memory_available_bytes": 5569617920,
+        "system_memory_percent": 67.6,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.3,
+        "k6_process_rss_bytes": 34045952,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:22:55.478Z",
+        "phase": "during",
+        "system_cpu_percent": 8.1,
+        "system_memory_used_bytes": 9125761024,
+        "system_memory_available_bytes": 5640949760,
+        "system_memory_percent": 67.2,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.0,
+        "k6_process_rss_bytes": 34054144,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:23:00.479Z",
+        "phase": "during",
+        "system_cpu_percent": 8.2,
+        "system_memory_used_bytes": 9085239296,
+        "system_memory_available_bytes": 5681557504,
+        "system_memory_percent": 66.9,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.1,
+        "k6_process_rss_bytes": 34340864,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:23:05.484Z",
+        "phase": "during",
+        "system_cpu_percent": 12.0,
+        "system_memory_used_bytes": 9014149120,
+        "system_memory_available_bytes": 5752893440,
+        "system_memory_percent": 66.5,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.9,
+        "k6_process_rss_bytes": 34447360,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:23:10.485Z",
+        "phase": "during",
+        "system_cpu_percent": 29.4,
+        "system_memory_used_bytes": 9047101440,
+        "system_memory_available_bytes": 5743980544,
+        "system_memory_percent": 66.6,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.2,
+        "k6_process_rss_bytes": 34459648,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:23:15.489Z",
+        "phase": "during",
+        "system_cpu_percent": 23.4,
+        "system_memory_used_bytes": 9191936000,
+        "system_memory_available_bytes": 5721661440,
+        "system_memory_percent": 66.7,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.8,
+        "k6_process_rss_bytes": 34467840,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:23:20.494Z",
+        "phase": "during",
+        "system_cpu_percent": 10.7,
+        "system_memory_used_bytes": 9215590400,
+        "system_memory_available_bytes": 5708984320,
+        "system_memory_percent": 66.8,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.0,
+        "k6_process_rss_bytes": 34504704,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:23:25.499Z",
+        "phase": "during",
+        "system_cpu_percent": 9.9,
+        "system_memory_used_bytes": 9093144576,
+        "system_memory_available_bytes": 5831991296,
+        "system_memory_percent": 66.1,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.9,
+        "k6_process_rss_bytes": 34525184,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:23:30.501Z",
+        "phase": "during",
+        "system_cpu_percent": 4.8,
+        "system_memory_used_bytes": 9049219072,
+        "system_memory_available_bytes": 5874913280,
+        "system_memory_percent": 65.8,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.2,
+        "k6_process_rss_bytes": 34590720,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:23:35.503Z",
+        "phase": "during",
+        "system_cpu_percent": 5.1,
+        "system_memory_used_bytes": 8968355840,
+        "system_memory_available_bytes": 5956243456,
+        "system_memory_percent": 65.3,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.0,
+        "k6_process_rss_bytes": 34590720,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:23:40.505Z",
+        "phase": "during",
+        "system_cpu_percent": 5.3,
+        "system_memory_used_bytes": 8940199936,
+        "system_memory_available_bytes": 5985120256,
+        "system_memory_percent": 65.2,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.1,
+        "k6_process_rss_bytes": 34594816,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:23:45.506Z",
+        "phase": "during",
+        "system_cpu_percent": 4.4,
+        "system_memory_used_bytes": 8852787200,
+        "system_memory_available_bytes": 6072664064,
+        "system_memory_percent": 64.7,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.1,
+        "k6_process_rss_bytes": 34611200,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:23:50.510Z",
+        "phase": "during",
+        "system_cpu_percent": 3.7,
+        "system_memory_used_bytes": 8837984256,
+        "system_memory_available_bytes": 6087471104,
+        "system_memory_percent": 64.6,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.1,
+        "k6_process_rss_bytes": 34611200,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:23:55.511Z",
+        "phase": "during",
+        "system_cpu_percent": 6.8,
+        "system_memory_used_bytes": 8992612352,
+        "system_memory_available_bytes": 5932871680,
+        "system_memory_percent": 65.5,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.0,
+        "k6_process_rss_bytes": 34615296,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:24:00.514Z",
+        "phase": "during",
+        "system_cpu_percent": 4.9,
+        "system_memory_used_bytes": 9095864320,
+        "system_memory_available_bytes": 5830340608,
+        "system_memory_percent": 66.1,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.2,
+        "k6_process_rss_bytes": 34619392,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:24:05.519Z",
+        "phase": "during",
+        "system_cpu_percent": 10.5,
+        "system_memory_used_bytes": 9293455360,
+        "system_memory_available_bytes": 5633601536,
+        "system_memory_percent": 67.2,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.8,
+        "k6_process_rss_bytes": 34631680,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:24:10.523Z",
+        "phase": "during",
+        "system_cpu_percent": 6.8,
+        "system_memory_used_bytes": 9401188352,
+        "system_memory_available_bytes": 5525213184,
+        "system_memory_percent": 67.8,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.9,
+        "k6_process_rss_bytes": 34758656,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:24:15.528Z",
+        "phase": "during",
+        "system_cpu_percent": 4.0,
+        "system_memory_used_bytes": 9294684160,
+        "system_memory_available_bytes": 5631225856,
+        "system_memory_percent": 67.2,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.2,
+        "k6_process_rss_bytes": 35217408,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:24:20.530Z",
+        "phase": "during",
+        "system_cpu_percent": 3.7,
+        "system_memory_used_bytes": 9280110592,
+        "system_memory_available_bytes": 5646458880,
+        "system_memory_percent": 67.1,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.9,
+        "k6_process_rss_bytes": 35241984,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:24:25.535Z",
+        "phase": "during",
+        "system_cpu_percent": 3.6,
+        "system_memory_used_bytes": 9261072384,
+        "system_memory_available_bytes": 5665652736,
+        "system_memory_percent": 67.0,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.2,
+        "k6_process_rss_bytes": 35246080,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:24:30.538Z",
+        "phase": "during",
+        "system_cpu_percent": 4.9,
+        "system_memory_used_bytes": 8872763392,
+        "system_memory_available_bytes": 6053847040,
+        "system_memory_percent": 64.8,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.8,
+        "k6_process_rss_bytes": 35250176,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:24:35.544Z",
+        "phase": "during",
+        "system_cpu_percent": 5.6,
+        "system_memory_used_bytes": 8871702528,
+        "system_memory_available_bytes": 6054920192,
+        "system_memory_percent": 64.8,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.2,
+        "k6_process_rss_bytes": 35299328,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:24:40.546Z",
+        "phase": "during",
+        "system_cpu_percent": 3.4,
+        "system_memory_used_bytes": 8888147968,
+        "system_memory_available_bytes": 6038175744,
+        "system_memory_percent": 64.9,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.0,
+        "k6_process_rss_bytes": 35299328,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:24:45.548Z",
+        "phase": "during",
+        "system_cpu_percent": 3.1,
+        "system_memory_used_bytes": 8886800384,
+        "system_memory_available_bytes": 6039302144,
+        "system_memory_percent": 64.8,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.3,
+        "k6_process_rss_bytes": 35307520,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:24:50.549Z",
+        "phase": "during",
+        "system_cpu_percent": 3.3,
+        "system_memory_used_bytes": 8887050240,
+        "system_memory_available_bytes": 6039040000,
+        "system_memory_percent": 64.8,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.2,
+        "k6_process_rss_bytes": 35307520,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:24:55.549Z",
+        "phase": "during",
+        "system_cpu_percent": 4.3,
+        "system_memory_used_bytes": 8894636032,
+        "system_memory_available_bytes": 6029398016,
+        "system_memory_percent": 64.9,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.3,
+        "k6_process_rss_bytes": 35315712,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:25:00.554Z",
+        "phase": "during",
+        "system_cpu_percent": 4.0,
+        "system_memory_used_bytes": 8840998912,
+        "system_memory_available_bytes": 6079033344,
+        "system_memory_percent": 64.6,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.9,
+        "k6_process_rss_bytes": 35315712,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:25:05.558Z",
+        "phase": "during",
+        "system_cpu_percent": 3.2,
+        "system_memory_used_bytes": 8840110080,
+        "system_memory_available_bytes": 6080450560,
+        "system_memory_percent": 64.6,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 1.3,
+        "k6_process_rss_bytes": 35336192,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:25:10.562Z",
+        "phase": "during",
+        "system_cpu_percent": 8.8,
+        "system_memory_used_bytes": 9102553088,
+        "system_memory_available_bytes": 5817520128,
+        "system_memory_percent": 66.1,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.8,
+        "k6_process_rss_bytes": 35340288,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:25:15.565Z",
+        "phase": "during",
+        "system_cpu_percent": 8.7,
+        "system_memory_used_bytes": 9144508416,
+        "system_memory_available_bytes": 5775523840,
+        "system_memory_percent": 66.4,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.9,
+        "k6_process_rss_bytes": 35352576,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:25:20.566Z",
+        "phase": "during",
+        "system_cpu_percent": 10.6,
+        "system_memory_used_bytes": 9339731968,
+        "system_memory_available_bytes": 5584183296,
+        "system_memory_percent": 67.5,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.5,
+        "k6_process_rss_bytes": 35356672,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:25:25.566Z",
+        "phase": "during",
+        "system_cpu_percent": 9.1,
+        "system_memory_used_bytes": 9283776512,
+        "system_memory_available_bytes": 5640855552,
+        "system_memory_percent": 67.2,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.5,
+        "k6_process_rss_bytes": 35364864,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:25:30.567Z",
+        "phase": "during",
+        "system_cpu_percent": 7.3,
+        "system_memory_used_bytes": 9365884928,
+        "system_memory_available_bytes": 5558206464,
+        "system_memory_percent": 67.6,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_cpu_percent": 0.8,
+        "k6_process_rss_bytes": 35368960,
+        "k6_process_vms_bytes": 36504567808,
+        "k6_process_threads": 19
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:25:35.568Z",
+        "phase": "during",
+        "system_cpu_percent": 7.5,
+        "system_memory_used_bytes": 9348128768,
+        "system_memory_available_bytes": 5576912896,
+        "system_memory_percent": 67.5,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1,
+        "k6_process_sample_unavailable": true
+      },
+      {
+        "timestamp_utc": "2026-10-14T10:25:35.571Z",
+        "phase": "after",
+        "system_cpu_percent": 0.0,
+        "system_memory_used_bytes": 9348128768,
+        "system_memory_available_bytes": 5576912896,
+        "system_memory_percent": 67.5,
+        "system_swap_used_bytes": 1968963584,
+        "system_swap_percent": 61.1
+      }
+    ],
+    "run_exit_status": 0,
+    "launch_error": null,
+    "notes": "Resource values are sampled and describe the client/load generator only, not Deno Deploy, Supabase, or the database. Wrapper elapsed time includes k6 process startup and shutdown."
+  }
+}
