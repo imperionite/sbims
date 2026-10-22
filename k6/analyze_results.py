@@ -22,35 +22,59 @@ TREND_KEYS = {
     "Max_Latency_ms": "max",
 }
 
+EXPECTED_TRIALS = {1, 2, 3}
+
 
 def numeric(value: Any) -> float:
     """Convert a finite numeric value to float, otherwise NaN."""
     if value is None or isinstance(value, bool):
         return np.nan
+
     try:
         parsed = float(value)
     except (TypeError, ValueError):
         return np.nan
+
     return parsed if math.isfinite(parsed) else np.nan
 
 
-def metric_values(metrics: dict[str, Any], name: str) -> dict[str, Any]:
+def metric_values(
+    metrics: dict[str, Any],
+    name: str,
+) -> dict[str, Any]:
     metric = metrics.get(name)
+
     if not isinstance(metric, dict):
         return {}
+
     values = metric.get("values", {})
     return values if isinstance(values, dict) else {}
 
 
-def get_stat(metrics: dict[str, Any], metric_name: str, stat: str) -> float:
+def get_stat(
+    metrics: dict[str, Any],
+    metric_name: str,
+    stat: str,
+) -> float:
     return numeric(metric_values(metrics, metric_name).get(stat))
 
 
 def parse_filename(filename: str) -> tuple[float, float]:
-    vus_match = re.search(r"(?:^|[_-])vus[_-]?(\d+)", filename, re.IGNORECASE)
-    trial_match = re.search(r"(?:^|[_-])trial[_-]?(\d+)", filename, re.IGNORECASE)
+    """Extract VU and trial/run numbers from a filename."""
+    vus_match = re.search(
+        r"(?:^|[_-])vus[_-]?(\d+)",
+        filename,
+        re.IGNORECASE,
+    )
+    trial_match = re.search(
+        r"(?:^|[_-])(?:trial|run)[_-]?(\d+)",
+        filename,
+        re.IGNORECASE,
+    )
+
     vus = float(vus_match.group(1)) if vus_match else np.nan
     trial = float(trial_match.group(1)) if trial_match else np.nan
+
     return vus, trial
 
 
@@ -60,7 +84,12 @@ def pct(rate: float) -> float:
 
 def load_result(filepath: str) -> dict[str, Any] | None:
     filename = os.path.basename(filepath)
-    if re.search(r"dry[_-]?run|warm[_-]?up|warmup", filename, re.IGNORECASE):
+
+    if re.search(
+        r"dry[_-]?run|warm[_-]?up|warmup",
+        filename,
+        re.IGNORECASE,
+    ):
         print(f"[INFO] Excluding pilot/warm-up file: {filename}")
         return None
 
@@ -77,21 +106,25 @@ def load_result(filepath: str) -> dict[str, Any] | None:
 
     metrics = data["metrics"]
     metadata = data.get("metadata") if isinstance(data.get("metadata"), dict) else {}
+
     filename_vus, filename_trial = parse_filename(filename)
 
-    vus = numeric(metadata.get("configured_vus"))
-    if not np.isfinite(vus):
-        vus = filename_vus
-    trial = numeric(metadata.get("trial"))
-    if not np.isfinite(trial):
-        trial = filename_trial
+    metadata_vus = numeric(metadata.get("configured_vus"))
+    metadata_trial = numeric(metadata.get("trial"))
+
+    vus = metadata_vus if np.isfinite(metadata_vus) else filename_vus
+    trial = metadata_trial if np.isfinite(metadata_trial) else filename_trial
 
     scenario_id = str(metadata.get("scenario_id") or "")
-    # Trial 0 is reserved for dry runs/pilots in this project. Exclude it even
-    # when the filename itself does not contain "dryrun" or "warmup".
-    if re.search(r"dry[_-]?run|warm[_-]?up|warmup", scenario_id, re.IGNORECASE):
+
+    if re.search(
+        r"dry[_-]?run|warm[_-]?up|warmup",
+        scenario_id,
+        re.IGNORECASE,
+    ):
         print(f"[INFO] Excluding pilot/warm-up scenario: {filename}")
         return None
+
     if np.isfinite(trial) and int(trial) == 0:
         print(f"[INFO] Excluding trial 0 (pilot/dry run): {filename}")
         return None
@@ -151,8 +184,8 @@ def load_result(filepath: str) -> dict[str, Any] | None:
         "Run_Exit_Status": metadata.get("run_exit_status"),
     }
 
-    duration = metrics.get("http_req_duration", {})  # noqa: F841
     duration_values = metric_values(metrics, "http_req_duration")
+
     for column, key in TREND_KEYS.items():
         row[column] = numeric(duration_values.get(key))
 
@@ -164,16 +197,21 @@ def load_result(filepath: str) -> dict[str, Any] | None:
     vus_metric = metric_values(metrics, "vus")
     vus_max_metric = metric_values(metrics, "vus_max")
 
+    # k6 Rate metric semantics:
+    # passes = true samples; fails = false samples.
+    # http_req_failed is true when an HTTP request fails.
+    failed_rate = numeric(failed.get("rate"))
+
     row.update(
         {
             "Total_Requests": numeric(requests.get("count")),
             "RPS": numeric(requests.get("rate")),
-            "HTTP_Failed_Rate_pct": pct(numeric(failed.get("rate"))),
-            "HTTP_Success_Rate_pct": pct(1 - numeric(failed.get("rate")))
-            if np.isfinite(numeric(failed.get("rate")))
-            else np.nan,
-            "HTTP_Failed_Count": numeric(failed.get("fails")),
-            "HTTP_Passed_Count": numeric(failed.get("passes")),
+            "HTTP_Failed_Rate_pct": pct(failed_rate),
+            "HTTP_Success_Rate_pct": (
+                pct(1 - failed_rate) if np.isfinite(failed_rate) else np.nan
+            ),
+            "HTTP_Failed_Count": numeric(failed.get("passes")),
+            "HTTP_Passed_Count": numeric(failed.get("fails")),
             "Check_Success_Rate_pct": pct(numeric(checks.get("rate"))),
             "Check_Passed_Count": numeric(checks.get("passes")),
             "Check_Failed_Count": numeric(checks.get("fails")),
@@ -222,16 +260,50 @@ def load_result(filepath: str) -> dict[str, Any] | None:
         }
     )
 
-    # Missing p99 is a data-quality warning, not a measured zero.
+    # Record all detected issues separately so one warning does not
+    # silently overwrite another.
+    quality_flags: list[str] = []
+
     if not np.isfinite(row["P99_ms"]):
-        row["Run_Status"] = "check_missing_p99"
-        print(f"[WARNING] {filename}: p99 is missing; it will remain NA.")
+        quality_flags.append("missing_p99")
+
     if not np.isfinite(vus):
+        quality_flags.append("missing_vus")
+
+    total_requests = numeric(row["Total_Requests"])
+    if not np.isfinite(total_requests) or total_requests <= 0:
+        quality_flags.append("missing_or_zero_requests")
+
+    if not np.isfinite(trial):
+        quality_flags.append("missing_trial_id")
+
+    # Detect disagreement between metadata and filename identifiers.
+    if (
+        np.isfinite(metadata_vus)
+        and np.isfinite(filename_vus)
+        and metadata_vus != filename_vus
+    ):
+        quality_flags.append("metadata_filename_vus_mismatch")
+
+    if (
+        np.isfinite(metadata_trial)
+        and np.isfinite(filename_trial)
+        and metadata_trial != filename_trial
+    ):
+        quality_flags.append("metadata_filename_trial_mismatch")
+
+    # Preserve the original Run_Status field for compatibility.
+    if "missing_p99" in quality_flags:
+        row["Run_Status"] = "check_missing_p99"
+    elif "missing_vus" in quality_flags:
         row["Run_Status"] = "check_missing_vus"
-        print(f"[WARNING] {filename}: VU level unavailable from metadata/filename.")
-    if numeric(row["Total_Requests"]) <= 0:
+    elif "missing_or_zero_requests" in quality_flags:
         row["Run_Status"] = "check_no_requests"
-        print(f"[WARNING] {filename}: zero or missing HTTP request count.")
+
+    row["Data_Quality_Flags"] = ";".join(quality_flags) if quality_flags else ""
+
+    if quality_flags:
+        print(f"[WARNING] {filename}: " + ", ".join(quality_flags))
 
     return row
 
@@ -242,41 +314,86 @@ def sample_sd(series: pd.Series) -> float:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=(
+            "Export k6 summary JSON files and calculate "
+            "descriptive trial-level statistics."
+        )
+    )
     parser.add_argument(
         "--results-dir",
         default="k6/snapshot/results",
-        help="Directory containing FORMAL k6 summary JSON files (non-recursive; dryrun/ and warmup/ subfolders are not scanned)",
+        help=("Directory containing formal k6 summary JSON files (non-recursive)."),
     )
     parser.add_argument(
         "--baseline-vus",
         type=int,
         default=10,
-        help="Baseline VU level for descriptive relative-throughput indicators (default: 10)",
+        help=(
+            "Baseline VU level for descriptive relative-throughput "
+            "indicators (default: 10)."
+        ),
     )
     args = parser.parse_args()
 
+    if args.baseline_vus <= 0:
+        parser.error("--baseline-vus must be greater than zero")
+
     files = sorted(glob.glob(os.path.join(args.results_dir, "*_summary.json")))
-    # Backward compatibility: if no standardized summary names exist, try JSON files.
+
+    # Fallback for older result naming conventions.
     if not files:
+        print("[WARNING] No *_summary.json files found; falling back to *.json files.")
         files = sorted(glob.glob(os.path.join(args.results_dir, "*.json")))
+
     if not files:
         raise SystemExit(f"[ERROR] No JSON summary files found in {args.results_dir}/")
 
     rows = [row for path in files if (row := load_result(path)) is not None]
+
     if not rows:
         raise SystemExit("[ERROR] No usable k6 summary results found.")
 
-    df = pd.DataFrame(rows).sort_values(["VUs", "Trial", "File"], na_position="last")
+    df = pd.DataFrame(rows)
+
+    # Ensure expected columns exist even if all rows lack a value.
+    for column in ("VUs", "Trial", "File", "Run_Status"):
+        if column not in df.columns:
+            df[column] = np.nan
+
+    df = df.sort_values(
+        ["VUs", "Trial", "File"],
+        na_position="last",
+    )
+
+    # Detect duplicate VU/trial combinations before aggregation.
+    identifiable = df.dropna(subset=["VUs", "Trial"]).copy()
+    duplicate_mask = identifiable.duplicated(
+        subset=["VUs", "Trial"],
+        keep=False,
+    )
+
+    if duplicate_mask.any():
+        print("\n[WARNING] Duplicate VU/trial combinations found:")
+        print(
+            identifiable.loc[duplicate_mask, ["File", "VUs", "Trial"]].to_string(
+                index=False
+            )
+        )
+
+    # Export individual trial data.
     os.makedirs(args.results_dir, exist_ok=True)
     raw_path = os.path.join(args.results_dir, "all_trials.csv")
     df.to_csv(raw_path, index=False, na_rep="NA")
 
     valid = df.dropna(subset=["VUs"]).copy()
     valid["VUs"] = valid["VUs"].astype(int)
+
     if valid.empty:
         raise SystemExit(
-            "[ERROR] No runs have a recognized VU level; use metadata or filenames such as student_vus_10_trial_1_summary.json."
+            "[ERROR] No runs have a recognized VU level. "
+            "Provide configured_vus metadata or filenames such as "
+            "student_vus_10_trial_1_summary.json."
         )
 
     numeric_metrics = [
@@ -319,11 +436,15 @@ def main() -> int:
         "Data_Sent_bytes",
         "Data_Received_bytes",
     ]
+
     agg_spec: dict[str, tuple[str, Any]] = {}
+
     for column in numeric_metrics:
         if column in valid.columns:
             agg_spec[f"{column}_Mean"] = (column, "mean")
             agg_spec[f"{column}_SD"] = (column, sample_sd)
+
+    agg_spec["Rows_Included"] = ("File", "count")
     agg_spec["Trials_Included"] = ("Trial", "count")
     agg_spec["Distinct_Trial_IDs"] = ("Trial", "nunique")
 
@@ -333,22 +454,48 @@ def main() -> int:
         .reset_index()
         .sort_values("VUs")
     )
-    summary["Repeated_Trials_Expected"] = 3
-    summary["Trial_Count_Check"] = np.where(
-        summary["Distinct_Trial_IDs"] == 3,
-        "3 trials found",
-        "CHECK: expected 3 distinct trials",
-    )
 
-    # Descriptive indicators only. Baseline is the lowest approved workload (10 VUs),
-    # not the prior 5-VU pilot, unless explicitly overridden.
-    baseline_rows = summary.loc[summary["VUs"] == args.baseline_vus, "RPS_Mean"]
+    summary["Repeated_Trials_Expected"] = len(EXPECTED_TRIALS)
+
+    # Verify both the number of rows and the set of trial IDs.
+    trial_checks: list[str] = []
+
+    for _, group in valid.groupby("VUs", dropna=True):
+        trial_ids = set(group["Trial"].dropna().astype(int).tolist())
+        row_count = len(group)
+
+        if row_count != len(EXPECTED_TRIALS):
+            check = f"CHECK: expected 3 rows, found {row_count}"
+        elif trial_ids != EXPECTED_TRIALS:
+            check = f"CHECK: expected trial IDs 1, 2, 3; found {sorted(trial_ids)}"
+        else:
+            check = "3 expected trials found"
+
+        trial_checks.append(check)
+
+    check_by_vus = {
+        int(vus): check
+        for vus, check in zip(
+            sorted(valid["VUs"].unique()),
+            trial_checks,
+        )
+    }
+
+    summary["Trial_Count_Check"] = summary["VUs"].map(check_by_vus)
+
+    # Descriptive throughput indicators only.
+    baseline_rows = summary.loc[
+        summary["VUs"] == args.baseline_vus,
+        "RPS_Mean",
+    ]
+
     if (
         not baseline_rows.empty
         and np.isfinite(baseline_rows.iloc[0])
         and baseline_rows.iloc[0] > 0
     ):
         baseline_rps = float(baseline_rows.iloc[0])
+
         summary["Throughput_Scaling_Efficiency_pct"] = (
             (summary["RPS_Mean"] / baseline_rps)
             / (summary["VUs"] / args.baseline_vus)
@@ -358,36 +505,67 @@ def main() -> int:
         summary["Throughput_Gain_pct"] = summary["RPS_Mean"].pct_change() * 100
         summary["Baseline_VUs"] = args.baseline_vus
         summary["Baseline_RPS_Mean"] = baseline_rps
+
     else:
         summary["Throughput_Scaling_Efficiency_pct"] = np.nan
         summary["RPS_per_VU"] = summary["RPS_Mean"] / summary["VUs"]
         summary["Throughput_Gain_pct"] = summary["RPS_Mean"].pct_change() * 100
         summary["Baseline_VUs"] = args.baseline_vus
         summary["Baseline_RPS_Mean"] = np.nan
+
         print(
-            f"[WARNING] No positive RPS mean found at baseline {args.baseline_vus} VUs; scaling efficiency remains NA."
+            f"[WARNING] No positive RPS mean found at baseline "
+            f"{args.baseline_vus} VUs; scaling efficiency remains NA."
         )
 
     summary = summary.round(3)
-    summary_path = os.path.join(args.results_dir, "chapter4_summary.csv")
+
+    summary_path = os.path.join(
+        args.results_dir,
+        "chapter4_summary.csv",
+    )
     summary.to_csv(summary_path, index=False, na_rep="NA")
 
     print("\nINDIVIDUAL TRIAL RESULTS")
     print(df.to_string(index=False, na_rep="NA"))
+
     print("\nAGGREGATED CHARACTERIZATION SUMMARY (MEAN AND SAMPLE SD)")
     print(summary.to_string(index=False, na_rep="NA"))
+
     print(
-        "\nInterpretation note: relative-throughput indicators are descriptive only; they do not establish maximum capacity or prove scalability."
+        "\nInterpretation note: relative-throughput indicators are "
+        "descriptive only; they do not establish maximum capacity "
+        "or prove scalability."
     )
+
     print("\n[SUCCESS] Saved:")
     print(f" - {raw_path}")
     print(f" - {summary_path}")
 
-    missing = df[df["Run_Status"] != "summary_present"]
-    if not missing.empty:
+    flagged = df[df["Data_Quality_Flags"].fillna("").astype(str).ne("")]
+
+    if not flagged.empty:
         print(
-            f"\n[WARNING] {len(missing)} run(s) need data-quality review; see Run_Status in all_trials.csv."
+            f"\n[WARNING] {len(flagged)} run(s) have data-quality "
+            "flags. Review Data_Quality_Flags in all_trials.csv."
         )
+
+    if duplicate_mask.any():
+        print(
+            "[WARNING] Duplicate trial identifiers may affect "
+            "the aggregated statistics. Resolve them before "
+            "using the summary as final research evidence."
+        )
+
+    if (
+        "Trial_Count_Check" in summary.columns
+        and summary["Trial_Count_Check"].astype(str).str.startswith("CHECK:").any()
+    ):
+        print(
+            "[WARNING] One or more workload groups do not have "
+            "the expected three trials with IDs 1, 2, and 3."
+        )
+
     return 0
 
 

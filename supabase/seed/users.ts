@@ -471,13 +471,7 @@ async function reconcileExistingProfile(
     );
   }
 
-  console.log(
-    `  Existing state preserved: ` +
-      `is_active=${existingProfile.is_active}, ` +
-      `must_change_password=${existingProfile.must_change_password}, ` +
-      `last_password_changed_at=` +
-      `${existingProfile.last_password_changed_at ?? "null"}`,
-  );
+  console.log(`  Existing state preserved for user ID: ${existingProfile.id}`);
 }
 
 async function createSeedUser(user: SeedUser): Promise<void> {
@@ -510,10 +504,7 @@ async function createSeedUser(user: SeedUser): Promise<void> {
     }
 
     console.log(
-      `  ✓ Created ${normalizedEmail} ` +
-        `(seed_key=${user.seedKey}, ` +
-        `role=${user.role}, ` +
-        `must_change_password=${user.mustChangePassword})`,
+      `  ✓ Created ${normalizedEmail} (seed_key=${user.seedKey}, role=${user.role})`,
     );
 
     return;
