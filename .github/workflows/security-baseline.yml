@@ -717,12 +717,19 @@ jobs:
           if [ -f security-baseline/api.pid ]; then
             API_PID="$(cat security-baseline/api.pid)"
 
+          if kill -0 "$API_PID" 2>/dev/null; then
+            kill -TERM "$API_PID" 2>/dev/null || true
+            sleep 2
+
             if kill -0 "$API_PID" 2>/dev/null; then
-              kill "$API_PID"
-              sleep 2
-              kill -0 "$API_PID" 2>/dev/null && kill -9 "$API_PID"
+              kill -KILL "$API_PID" 2>/dev/null || true
+              fi
             fi
+
+            rm -f security-baseline/api.pid
           fi
+
+          exit 0
 
       # ------------------------------------------------------------
       # 17. Consolidated report

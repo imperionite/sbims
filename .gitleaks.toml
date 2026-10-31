@@ -4,9 +4,12 @@ title = "SBIMS Gitleaks Configuration"
 useDefault = true
 
 [allowlist]
-description = "Project documentation and development seed paths excluded from secret scanning"
+description = "Project documentation and development seed paths excluded from secret scanning and generated k6 performance evaluation results"
 
 paths = [
   '''(^|/)HTTP(/|$)''',
-  '''(^|/)supabase/seed(/|$)'''
+  '''(^|/)supabase/seed(/|$)''',
+  '''^k6/pilot_results/.*\.json$''',
+  '''^k6/results/.*\.json$'''
 ]
+
