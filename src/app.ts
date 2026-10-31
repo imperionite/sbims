@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { secureHeaders } from "hono/secure-headers";
 import { logger as honoLogger } from "hono/logger";
 
 import type { AppConfig } from "./config/env.ts";
@@ -26,7 +27,7 @@ export function createApp(env: AppConfig) {
     c.set("supabase", supabase);
     await next();
   });
-
+  app.use("*", secureHeaders());
   app.use("*", honoLogger());
 
   app.use(
