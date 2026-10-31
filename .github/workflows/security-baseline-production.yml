@@ -1,0 +1,428 @@
+name: Production Security Verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: production-security-baseline
+  cancel-in-progress: false
+
+jobs:
+  production-security:
+    name: Production Security Verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Configure required reviewers in GitHub:
+    # Settings -> Environments -> production-security
+    environment: production-security
+
+    env:
+      SECURITY_TARGET_URL: https://api.sbims.me
+      SECURITY_PROTECTED_PATH: /api/v1/auth/me
+      SECURITY_EXPECTED_ORIGIN: ${{ secrets.PROD_FRONTEND_ORIGIN }}
+
+    steps:
+      # ------------------------------------------------------------
+      # 1. Checkout
+      # ------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------------
+      # 2. Initialize results
+      # ------------------------------------------------------------
+      - name: Initialize production security results
+        shell: bash
+        run: |
+          set -eu
+
+          mkdir -p production-security
+
+          cat > production-security/results.env <<'EOF'
+          CONFIG_RESULT=NOT_VERIFIED
+          HTTPS_RESULT=NOT_VERIFIED
+          HEALTH_RESULT=NOT_VERIFIED
+          AUTH_ME_NO_TOKEN_RESULT=NOT_VERIFIED
+          INVALID_TOKEN_RESULT=NOT_VERIFIED
+          XCTO_RESULT=NOT_VERIFIED
+          HSTS_RESULT=NOT_VERIFIED
+          CORS_ALLOWED_ORIGIN=NOT_OBSERVED
+          CORS_INVALID_ORIGIN=NOT_OBSERVED
+          CORS_RESULT=NOT_VERIFIED
+          API_RESULT=NOT_VERIFIED
+          EOF
+
+      # ------------------------------------------------------------
+      # 3. Record run information
+      # ------------------------------------------------------------
+      - name: Record production assessment information
+        shell: bash
+        run: |
+          {
+            echo "# Production Security Verification"
+            echo
+            echo "| Property | Value |"
+            echo "|---|---|"
+            echo "| Repository | $GITHUB_REPOSITORY |"
+            echo "| Commit | $GITHUB_SHA |"
+            echo "| Branch | $GITHUB_REF_NAME |"
+            echo "| Run ID | $GITHUB_RUN_ID |"
+            echo "| Trigger | $GITHUB_EVENT_NAME |"
+            echo "| Target | $SECURITY_TARGET_URL |"
+            echo "| Frontend origin configured | $([ -n "$SECURITY_EXPECTED_ORIGIN" ] && echo YES || echo NO) |"
+            echo "| Assessment type | Read-only production verification |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # ------------------------------------------------------------
+      # 4. Validate production target and configuration
+      # ------------------------------------------------------------
+      - name: Validate production security configuration
+        id: config
+        shell: bash
+        run: |
+          set -eu
+
+          ERRORS=0
+
+          if [ "$SECURITY_TARGET_URL" != "https://api.sbims.me" ]; then
+            echo "::error::Production target does not match the approved API URL."
+            ERRORS=1
+          fi
+
+          if [ "$SECURITY_PROTECTED_PATH" != "/api/v1/auth/me" ]; then
+            echo "::error::Unexpected protected endpoint."
+            ERRORS=1
+          fi
+
+          if [ -z "$SECURITY_EXPECTED_ORIGIN" ]; then
+            echo "::error::PROD_FRONTEND_ORIGIN is missing."
+            ERRORS=1
+          elif [[ ! "$SECURITY_EXPECTED_ORIGIN" =~ ^https://[^/]+$ ]]; then
+            echo "::error::Production frontend origin must be an HTTPS origin without a path."
+            ERRORS=1
+          fi
+
+          if [ "$ERRORS" -ne 0 ]; then
+            sed -i 's/^CONFIG_RESULT=.*/CONFIG_RESULT=FAIL/' \
+              production-security/results.env
+            exit 1
+          fi
+
+          sed -i 's/^CONFIG_RESULT=.*/CONFIG_RESULT=PASS/' \
+            production-security/results.env
+
+      # ------------------------------------------------------------
+      # 5. Production API verification
+      # ------------------------------------------------------------
+      - name: Run read-only production API checks
+        id: production-probes
+        shell: bash
+        run: |
+          set -eu
+
+          BASE_URL="${SECURITY_TARGET_URL%/}"
+          HEALTH_URL="${BASE_URL}/api/v1/health"
+          ME_URL="${BASE_URL}${SECURITY_PROTECTED_PATH}"
+
+          INVALID_ORIGIN="https://security-baseline-invalid.example"
+
+          RESULTS_FILE="production-security/results.env"
+
+          # Do not follow redirects. Require the production API to
+          # respond directly over HTTPS.
+          HTTPS_STATUS="$(
+            curl --silent --show-error \
+              --output /dev/null \
+              --write-out '%{http_code}' \
+              --max-time 20 \
+              "$HEALTH_URL" || true
+          )"
+
+          if [[ "$HTTPS_STATUS" =~ ^2[0-9][0-9]$ ]]; then
+            HTTPS_RESULT="PASS"
+          else
+            HTTPS_RESULT="FAIL"
+          fi
+
+          # Health endpoint
+          if [ "$HTTPS_STATUS" = "200" ]; then
+            HEALTH_RESULT="PASS"
+          else
+            HEALTH_RESULT="FAIL"
+          fi
+
+          # Protected endpoint without credentials
+          NO_TOKEN_STATUS="$(
+            curl --silent --show-error \
+              --output /dev/null \
+              --write-out '%{http_code}' \
+              --max-time 20 \
+              "$ME_URL" || true
+          )"
+
+          case "$NO_TOKEN_STATUS" in
+            401|403) AUTH_ME_NO_TOKEN_RESULT="PASS" ;;
+            *) AUTH_ME_NO_TOKEN_RESULT="FAIL" ;;
+          esac
+
+          # Invalid bearer token
+          INVALID_TOKEN_STATUS="$(
+            curl --silent --show-error \
+              --output /dev/null \
+              --write-out '%{http_code}' \
+              --max-time 20 \
+              --header 'Authorization: Bearer invalid.security.baseline.token' \
+              "$ME_URL" || true
+          )"
+
+          case "$INVALID_TOKEN_STATUS" in
+            401|403) INVALID_TOKEN_RESULT="PASS" ;;
+            *) INVALID_TOKEN_RESULT="FAIL" ;;
+          esac
+
+          # Security headers
+          HEADER_FILE="production-security/headers.txt"
+
+          curl --silent --show-error \
+            --dump-header "$HEADER_FILE" \
+            --output /dev/null \
+            --max-time 20 \
+            "$HEALTH_URL"
+
+          XCTO_VALUE="$(
+            awk '
+              tolower($0) ~ /^x-content-type-options:/ {
+                sub(/^[^:]*:[[:space:]]*/, "")
+                sub(/\r$/, "")
+                value = tolower($0)
+              }
+              END { print value }
+            ' "$HEADER_FILE"
+          )"
+
+          HSTS_VALUE="$(
+            awk '
+              tolower($0) ~ /^strict-transport-security:/ {
+                sub(/^[^:]*:[[:space:]]*/, "")
+                sub(/\r$/, "")
+                value = tolower($0)
+              }
+              END { print value }
+            ' "$HEADER_FILE"
+          )"
+
+          if [ "$XCTO_VALUE" = "nosniff" ]; then
+            XCTO_RESULT="PASS"
+          else
+            XCTO_RESULT="FAIL"
+          fi
+
+          if [[ "$HSTS_VALUE" == *"max-age="* ]]; then
+            HSTS_RESULT="PASS"
+          else
+            HSTS_RESULT="FAIL"
+          fi
+
+          # CORS: allowed frontend origin
+          ALLOWED_CORS_FILE="production-security/cors-allowed.txt"
+
+          curl --silent --show-error \
+            --request OPTIONS \
+            --dump-header "$ALLOWED_CORS_FILE" \
+            --output /dev/null \
+            --max-time 20 \
+            --header "Origin: $SECURITY_EXPECTED_ORIGIN" \
+            --header 'Access-Control-Request-Method: GET' \
+            --header 'Access-Control-Request-Headers: authorization' \
+            "$HEALTH_URL"
+
+          CORS_ALLOWED_RAW="$(
+            awk '
+              tolower($0) ~ /^access-control-allow-origin:/ {
+                sub(/^[^:]*:[[:space:]]*/, "")
+                sub(/\r$/, "")
+                value = $0
+              }
+              END { print value }
+            ' "$ALLOWED_CORS_FILE"
+          )"
+
+          if [ "$CORS_ALLOWED_RAW" = "$SECURITY_EXPECTED_ORIGIN" ]; then
+            CORS_ALLOWED_ORIGIN="EXPECTED_ORIGIN"
+          elif [ -z "$CORS_ALLOWED_RAW" ]; then
+            CORS_ALLOWED_ORIGIN="NOT_PRESENT"
+          else
+            CORS_ALLOWED_ORIGIN="UNEXPECTED_VALUE"
+          fi
+
+          # CORS: invalid origin must not be granted access
+          INVALID_CORS_FILE="production-security/cors-invalid.txt"
+
+          curl --silent --show-error \
+            --request OPTIONS \
+            --dump-header "$INVALID_CORS_FILE" \
+            --output /dev/null \
+            --max-time 20 \
+            --header "Origin: $INVALID_ORIGIN" \
+            --header 'Access-Control-Request-Method: GET' \
+            --header 'Access-Control-Request-Headers: authorization' \
+            "$HEALTH_URL"
+
+          CORS_INVALID_RAW="$(
+            awk '
+              tolower($0) ~ /^access-control-allow-origin:/ {
+                sub(/^[^:]*:[[:space:]]*/, "")
+                sub(/\r$/, "")
+                value = $0
+              }
+              END { print value }
+            ' "$INVALID_CORS_FILE"
+          )"
+
+          if [ -z "$CORS_INVALID_RAW" ]; then
+            CORS_INVALID_ORIGIN="NOT_PRESENT"
+          elif [ "$CORS_INVALID_RAW" = "$INVALID_ORIGIN" ]; then
+            CORS_INVALID_ORIGIN="REFLECTED_ORIGIN"
+          elif [ "$CORS_INVALID_RAW" = "*" ]; then
+            CORS_INVALID_ORIGIN="WILDCARD"
+          else
+            CORS_INVALID_ORIGIN="OTHER_VALUE"
+          fi
+
+          if [ "$CORS_ALLOWED_ORIGIN" = "EXPECTED_ORIGIN" ] &&
+             [ "$CORS_INVALID_ORIGIN" = "NOT_PRESENT" ]; then
+            CORS_RESULT="PASS"
+          else
+            CORS_RESULT="FAIL"
+          fi
+
+          # Save only classified results, not raw response headers.
+          cat > "$RESULTS_FILE" <<EOF
+          CONFIG_RESULT=PASS
+          HTTPS_RESULT=$HTTPS_RESULT
+          HEALTH_RESULT=$HEALTH_RESULT
+          AUTH_ME_NO_TOKEN_RESULT=$AUTH_ME_NO_TOKEN_RESULT
+          INVALID_TOKEN_RESULT=$INVALID_TOKEN_RESULT
+          XCTO_RESULT=$XCTO_RESULT
+          HSTS_RESULT=$HSTS_RESULT
+          CORS_ALLOWED_ORIGIN=$CORS_ALLOWED_ORIGIN
+          CORS_INVALID_ORIGIN=$CORS_INVALID_ORIGIN
+          CORS_RESULT=$CORS_RESULT
+          EOF
+
+          if [ "$HTTPS_RESULT" = "PASS" ] &&
+             [ "$HEALTH_RESULT" = "PASS" ] &&
+             [ "$AUTH_ME_NO_TOKEN_RESULT" = "PASS" ] &&
+             [ "$INVALID_TOKEN_RESULT" = "PASS" ] &&
+             [ "$XCTO_RESULT" = "PASS" ] &&
+             [ "$HSTS_RESULT" = "PASS" ] &&
+             [ "$CORS_RESULT" = "PASS" ]; then
+            API_RESULT="PASS"
+          else
+            API_RESULT="FAIL"
+          fi
+
+          echo "API_RESULT=$API_RESULT" >> "$RESULTS_FILE"
+
+          echo "Production API result: $API_RESULT"
+
+      # ------------------------------------------------------------
+      # 6. Consolidated production report
+      # ------------------------------------------------------------
+      - name: Publish production security report
+        if: always()
+        shell: bash
+        run: |
+          set -eu
+
+          source production-security/results.env
+
+          {
+            echo
+            echo "## Production Security Assessment Results"
+            echo
+            echo "| Assessment | Expected behavior | Result |"
+            echo "|---|---|---|"
+            echo "| HTTPS connectivity | Valid HTTPS response | $HTTPS_RESULT |"
+            echo "| Health endpoint | HTTP 200 | $HEALTH_RESULT |"
+            echo "| Protected endpoint without token | HTTP 401 or 403 | $AUTH_ME_NO_TOKEN_RESULT |"
+            echo "| Invalid bearer token | HTTP 401 or 403 | $INVALID_TOKEN_RESULT |"
+            echo "| X-Content-Type-Options | nosniff | $XCTO_RESULT |"
+            echo "| Strict-Transport-Security | HSTS max-age directive present | $HSTS_RESULT |"
+            echo "| Allowed frontend origin | Exact configured origin | $CORS_ALLOWED_ORIGIN |"
+            echo "| Invalid origin | No Access-Control-Allow-Origin | $CORS_INVALID_ORIGIN |"
+            echo "| Overall CORS assessment | Allowed origin accepted; invalid origin rejected | $CORS_RESULT |"
+            echo
+            echo "**Overall production API result:** $API_RESULT"
+            echo
+            echo "## Assessment Scope and Limitations"
+            echo
+            echo "- This workflow performs read-only HTTP verification against the deployed production API."
+            echo "- No production accounts are created, modified, or deleted."
+            echo "- No production credentials are used."
+            echo "- No authenticated production session is established."
+            echo "- No RBAC integration tests or database mutations are performed."
+            echo "- No active vulnerability scanning or fuzzing is performed."
+            echo "- HTTPS connectivity is checked through normal certificate validation by curl."
+            echo "- HSTS verification checks for a max-age directive; it does not establish that the policy is optimally configured."
+            echo "- CORS checks inspect response headers; they do not replace browser-based testing."
+            echo "- This assessment does not constitute a complete penetration test."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # ------------------------------------------------------------
+      # 7. Upload production evidence
+      # ------------------------------------------------------------
+      - name: Upload production security evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-security-${{ github.run_id }}
+          path: |
+            production-security/results.env
+          if-no-files-found: warn
+          retention-days: 90
+
+      # ------------------------------------------------------------
+      # 8. Enforce production checks
+      # ------------------------------------------------------------
+      - name: Enforce production security verification
+        if: always()
+        shell: bash
+        run: |
+          set -eu
+
+          source production-security/results.env
+
+          FAILED=0
+
+          echo "Production security results:"
+          cat production-security/results.env
+
+          for RESULT in \
+            "$CONFIG_RESULT" \
+            "$HTTPS_RESULT" \
+            "$HEALTH_RESULT" \
+            "$AUTH_ME_NO_TOKEN_RESULT" \
+            "$INVALID_TOKEN_RESULT" \
+            "$XCTO_RESULT" \
+            "$HSTS_RESULT" \
+            "$CORS_RESULT" \
+            "$API_RESULT"
+          do
+            if [ "$RESULT" = "FAIL" ] ||
+               [ "$RESULT" = "NOT_VERIFIED" ]; then
+              FAILED=1
+            fi
+          done
+
+          if [ "$FAILED" -ne 0 ]; then
+            echo "::error::One or more required production security checks failed or could not be verified."
+            exit 1
+          fi
+
+          echo "Production security verification completed successfully."
