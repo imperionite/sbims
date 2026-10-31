@@ -127,6 +127,11 @@ function createMockSupabase() {
         is_active: true,
       },
       {
+        id: "student-2",
+        role: "student",
+        is_active: true,
+      },
+      {
         id: "coordinator-1",
         role: "internship_coordinator",
         is_active: true,
@@ -371,6 +376,18 @@ function createMockSupabase() {
               user: {
                 id: "student-1",
                 email: "student@example.com",
+              },
+            },
+            error: null,
+          };
+        }
+
+        if (token === "student-2-token") {
+          return {
+            data: {
+              user: {
+                id: "student-2",
+                email: "student2@example.com",
               },
             },
             error: null,
@@ -645,6 +662,78 @@ Deno.test(
   },
 );
 
+Deno.test(
+  "GET /attendance/internship/:id - denies another student access to attendance",
+  async () => {
+    const app = createIntegrationApp();
+
+    const response = await app.request(
+      `/attendance/internship/${INTERNSHIP_ID}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer student-2-token",
+        },
+      },
+    );
+
+    assertEquals(response.status, 403);
+    const body = await response.json();
+    assertEquals(body.success, false);
+    assertEquals(
+      body.message,
+      "You can only access attendance for your own internship.",
+    );
+  },
+);
+
+Deno.test(
+  "GET /attendance/internship/:id/rendered-hours - denies another student access to rendered hours",
+  async () => {
+    const app = createIntegrationApp();
+
+    const response = await app.request(
+      `/attendance/internship/${INTERNSHIP_ID}/rendered-hours`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer student-2-token",
+        },
+      },
+    );
+
+    assertEquals(response.status, 403);
+    const body = await response.json();
+    assertEquals(body.success, false);
+    assertEquals(
+      body.message,
+      "You can only access attendance for your own internship.",
+    );
+  },
+);
+
+Deno.test(
+  "GET /attendance/internship/:id - allows an internship coordinator to retrieve attendance",
+  async () => {
+    const app = createIntegrationApp();
+
+    const response = await app.request(
+      `/attendance/internship/${INTERNSHIP_ID}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer coordinator-token",
+        },
+      },
+    );
+
+    assertEquals(response.status, 200);
+    const body = await response.json();
+    assertEquals(body.success, true);
+    assertEquals(Array.isArray(body.data), true);
+  },
+);
+
 // ============================================================
 // Test 8 — Update attendance
 // ============================================================
@@ -686,15 +775,7 @@ Deno.test(
   async () => {
     const app = createIntegrationApp();
 
-    /*
-     * This endpoint requires internship_coordinator.
-     *
-     * The request deliberately uses student-token, so the
-     * production requireRole middleware may reject it with 401/403.
-     *
-     * If the middleware is not active in this test boundary and
-     * the route itself succeeds, 200 is also accepted.
-     */
+    // A valid student token must be rejected by coordinator-only authorization.
     const response = await app.request("/attendance/attendance-1/validation", {
       method: "PATCH",
 
@@ -708,7 +789,7 @@ Deno.test(
       }),
     });
 
-    assertEquals([200, 401, 403].includes(response.status), true);
+    assertEquals(response.status, 403);
   },
 );
 
@@ -725,7 +806,7 @@ Deno.test(
       method: "PATCH",
 
       headers: {
-        Authorization: "Bearer student-token",
+        Authorization: "Bearer coordinator-token",
         "Content-Type": "application/json",
       },
 
@@ -734,6 +815,6 @@ Deno.test(
       }),
     });
 
-    assertEquals([400, 401, 403].includes(response.status), true);
+    assertEquals(response.status, 400);
   },
 );

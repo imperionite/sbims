@@ -507,6 +507,8 @@ Deno.test(
   async () => {
     const { clients, tables } = createMockClients();
 
+    tables.internships = [{ id: "internship-1", student_id: "student-1" }];
+
     tables.attendance_records = [
       {
         id: "1",
@@ -536,7 +538,11 @@ Deno.test(
 
     const service = new AttendanceService(clients);
 
-    const result = await service.getRenderedHours("internship-1");
+    const result = await service.getRenderedHours(
+      "internship-1",
+      "student-1",
+      "student",
+    );
 
     assertEquals(result, 8);
   },
@@ -765,5 +771,97 @@ Deno.test(
       AppError,
       "You can only retrieve your own attendance.",
     );
+  },
+);
+
+Deno.test(
+  "AttendanceService - permits a student to retrieve attendance for their own internship",
+  async () => {
+    const { clients, tables } = createMockClients();
+    tables.internships = [{ id: "internship-1", student_id: "student-1" }];
+    tables.attendance_records = [
+      {
+        id: "attendance-1",
+        internship_id: "internship-1",
+        attendance_date: "2026-06-01",
+      },
+    ];
+
+    const service = new AttendanceService(clients);
+    const result = await service.getAttendanceByInternship(
+      "internship-1",
+      "student-1",
+      "student",
+    );
+
+    assertEquals(result.length, 1);
+    assertEquals(result[0].id, "attendance-1");
+  },
+);
+
+Deno.test(
+  "AttendanceService - denies a student access to another student's internship attendance",
+  async () => {
+    const { clients, tables } = createMockClients();
+    tables.internships = [{ id: "internship-1", student_id: "student-owner" }];
+    tables.attendance_records = [
+      {
+        id: "attendance-1",
+        internship_id: "internship-1",
+        attendance_date: "2026-06-01",
+      },
+    ];
+
+    const service = new AttendanceService(clients);
+
+    await assertRejects(
+      () =>
+        service.getAttendanceByInternship(
+          "internship-1",
+          "student-other",
+          "student",
+        ),
+      AppError,
+      "You can only access attendance for your own internship.",
+    );
+  },
+);
+
+Deno.test(
+  "AttendanceService - denies rendered-hours access to another student's internship",
+  async () => {
+    const { clients, tables } = createMockClients();
+    tables.internships = [{ id: "internship-1", student_id: "student-owner" }];
+
+    const service = new AttendanceService(clients);
+
+    await assertRejects(
+      () => service.getRenderedHours("internship-1", "student-other", "student"),
+      AppError,
+      "You can only access attendance for your own internship.",
+    );
+  },
+);
+
+Deno.test(
+  "AttendanceService - permits an internship coordinator to retrieve internship attendance",
+  async () => {
+    const { clients, tables } = createMockClients();
+    tables.attendance_records = [
+      {
+        id: "attendance-1",
+        internship_id: "internship-1",
+        attendance_date: "2026-06-01",
+      },
+    ];
+
+    const service = new AttendanceService(clients);
+    const result = await service.getAttendanceByInternship(
+      "internship-1",
+      "coordinator-1",
+      "internship_coordinator",
+    );
+
+    assertEquals(result.length, 1);
   },
 );

@@ -81,12 +81,18 @@ attendance.get(
     const attendanceService = new AttendanceService(c.get("supabase"));
 
     const internshipId = c.req.param("internshipId");
+    const user = c.get("user");
+    const userRole = c.get("userRole");
 
     if (!internshipId) {
       throw new AppError(400, "Internship ID is required.");
     }
 
-    const result = await attendanceService.getAttendanceByInternship(internshipId);
+    const result = await attendanceService.getAttendanceByInternship(
+      internshipId,
+      user.id,
+      userRole,
+    );
 
     return c.json({
       success: true,
@@ -108,12 +114,18 @@ attendance.get(
     const attendanceService = new AttendanceService(c.get("supabase"));
 
     const internshipId = c.req.param("internshipId");
+    const user = c.get("user");
+    const userRole = c.get("userRole");
 
     if (!internshipId) {
       throw new AppError(400, "Internship ID is required.");
     }
 
-    const totalHours = await attendanceService.getRenderedHours(internshipId);
+    const totalHours = await attendanceService.getRenderedHours(
+      internshipId,
+      user.id,
+      userRole,
+    );
 
     return c.json({
       success: true,

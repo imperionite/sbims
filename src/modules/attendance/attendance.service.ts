@@ -358,13 +358,68 @@ export class AttendanceService {
   }
 
   /**
+   * Verifies that the requester may access an internship's attendance.
+   *
+   * Route middleware restricts the allowed roles. This service-level
+   * check additionally enforces student ownership because the service
+   * uses the privileged Supabase client, which bypasses ordinary RLS.
+   */
+  private async assertInternshipAttendanceAccess(
+    internshipId: string,
+    requesterId: string,
+    requesterRole: AuthRole,
+  ): Promise<void> {
+    if (requesterRole === "internship_coordinator") {
+      return;
+    }
+
+    if (requesterRole !== "student") {
+      throw new AppError(
+        403,
+        "You are not allowed to access this internship's attendance.",
+      );
+    }
+
+    const { data: internship, error } = await this.clients.supabaseAdmin
+      .from("internships")
+      .select("student_id")
+      .eq("id", internshipId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("VERIFY INTERNSHIP ATTENDANCE ACCESS FAILED:", error);
+      throw new AppError(500, "Failed to verify internship access.");
+    }
+
+    if (!internship) {
+      throw new AppError(404, "Internship not found.");
+    }
+
+    if (internship.student_id !== requesterId) {
+      throw new AppError(
+        403,
+        "You can only access attendance for your own internship.",
+      );
+    }
+  }
+
+  /**
    * GET /attendance/internship/:internshipId
    *
-   * Retrieves all attendance records for an internship.
+   * Retrieves all attendance records for an internship after verifying
+   * that the requester is its owner or an authorized coordinator.
    */
   async getAttendanceByInternship(
     internshipId: string,
+    requesterId: string,
+    requesterRole: AuthRole,
   ): Promise<AttendanceRecord[]> {
+    await this.assertInternshipAttendanceAccess(
+      internshipId,
+      requesterId,
+      requesterRole,
+    );
+
     const { data, error } = await this.clients.supabaseAdmin
       .from("attendance_records")
       .select("*")
@@ -464,8 +519,16 @@ export class AttendanceService {
    * Pending and rejected records do not contribute
    * to rendered internship hours.
    */
-  async getRenderedHours(internshipId: string): Promise<number> {
-    const records = await this.getAttendanceByInternship(internshipId);
+  async getRenderedHours(
+    internshipId: string,
+    requesterId: string,
+    requesterRole: AuthRole,
+  ): Promise<number> {
+    const records = await this.getAttendanceByInternship(
+      internshipId,
+      requesterId,
+      requesterRole,
+    );
 
     return records
       .filter((record) => record.validation_status === "validated")
