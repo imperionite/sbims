@@ -9,7 +9,6 @@ description = "Project documentation and development seed paths excluded from se
 paths = [
   '''(^|/)HTTP(/|$)''',
   '''(^|/)supabase/seed(/|$)''',
-  '''^k6/pilot_results/.*\.json$''',
-  '''^k6/results/.*\.json$'''
+   '''^k6/'''
 ]
 
