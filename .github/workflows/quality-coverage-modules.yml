@@ -1,0 +1,92 @@
+name: Quality Check - Module Coverage
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  module-coverage:
+    name: Coverage - ${{ matrix.module }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # The integration suites mutate shared test fixtures; serialize them to avoid collisions.
+      max-parallel: 1
+      matrix:
+        include:
+          - module: auth
+            task: cov:auth
+          - module: users
+            task: cov:users
+          - module: students
+            task: cov:students
+          - module: htes
+            task: cov:htes
+          - module: internships
+            task: cov:internships
+          - module: attendance
+            task: cov:attendance
+          - module: evaluations
+            task: cov:evaluations
+          - module: documents
+            task: cov:documents
+          - module: reports
+            task: cov:reports
+          - module: audit
+            task: cov:audit
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      FRONTEND_URL: http://localhost:5173
+      ALLOWED_ORIGINS: http://localhost:5173
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+      RATE_LIMIT_ENABLED: "false"
+      ENVIRONMENT: test
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: 2.9.7
+          cache: true
+
+      - name: Create Test Environment File
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_PUBLISHABLE_KEY"
+          test -n "$SUPABASE_SECRET_KEY"
+          cat > .env.test <<EOF
+          SUPABASE_URL=$SUPABASE_URL
+          SUPABASE_PUBLISHABLE_KEY=$SUPABASE_PUBLISHABLE_KEY
+          SUPABASE_SECRET_KEY=$SUPABASE_SECRET_KEY
+          UPSTASH_REDIS_REST_URL=$UPSTASH_REDIS_REST_URL
+          UPSTASH_REDIS_REST_TOKEN=$UPSTASH_REDIS_REST_TOKEN
+          ENVIRONMENT=test
+          FRONTEND_URL=$FRONTEND_URL
+          ALLOWED_ORIGINS=$ALLOWED_ORIGINS
+          RATE_LIMIT_ENABLED=false
+          EOF
+
+      - name: Install Dependencies
+        run: deno install --frozen
+
+      - name: Run Module Coverage - ${{ matrix.module }}
+        run: deno task ${{ matrix.task }}
+
+      - name: Upload Module Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbims-coverage-${{ matrix.module }}
+          path: coverage/${{ matrix.module }}/
+          if-no-files-found: warn
+          retention-days: 14

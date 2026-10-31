@@ -10,7 +10,10 @@ export async function requireAuth(
     // allow setting a 'user' key on the context bindings
     Bindings: {
       // supabase binding provides both the regular client and an admin client
-      supabase: { supabaseClient: SupabaseClient; supabaseAdmin: SupabaseClient };
+      supabase: {
+        supabaseClient: SupabaseClient;
+        supabaseAdmin: SupabaseClient;
+      };
     };
   }>,
   next: Next,
@@ -21,11 +24,13 @@ export async function requireAuth(
     throw new AppError(401, "Missing authorization token.");
   }
 
-  const token = authorization.replace("Bearer ", "");
+  const match = /^Bearer\s+(\S+)$/i.exec(authorization.trim());
 
-  if (!token) {
+  if (!match) {
     throw new AppError(401, "Invalid authorization header.");
   }
+
+  const token = match[1];
 
   const { supabaseClient, supabaseAdmin } = c.get("supabase");
 

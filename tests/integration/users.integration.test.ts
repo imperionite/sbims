@@ -255,3 +255,42 @@ Deno.test("FR-02 student cannot update user role", async () => {
 
   assertEquals(response.status, 403);
 });
+
+Deno.test(
+  "FR-02 denied student role-change attempt leaves target role unchanged",
+  async () => {
+    await setupTestUsers();
+
+    const studentToken = await getStudentToken();
+    const adminToken = await getAdminToken();
+    const targetUserId = await getUserIdByEmail(TEST_USERS.coordinator.email);
+
+    const deniedResponse = await app.request(
+      `/api/v1/users/${targetUserId}/role`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${studentToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ role: "administrator" }),
+      },
+    );
+
+    assertEquals(deniedResponse.status, 403);
+
+    const verificationResponse = await app.request(
+      `/api/v1/users/${targetUserId}`,
+      { headers: { Authorization: `Bearer ${adminToken}` } },
+    );
+    const verificationBody = await verificationResponse.json();
+
+    assertEquals(verificationResponse.status, 200);
+    assertEquals(verificationBody.data.id, targetUserId);
+    assertEquals(
+      verificationBody.data.role,
+      "internship_coordinator",
+      "Denied role-change request must not mutate the target user's role",
+    );
+  },
+);

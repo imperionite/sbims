@@ -170,15 +170,21 @@ export class AuthService {
   }
 
   async completePasswordReset(request: CompletePasswordResetRequest) {
-    const { error } = await this.supabase.supabaseAdmin
+    const { data, error } = await this.supabase.supabaseAdmin
       .from("profiles")
       .update({
         must_change_password: false,
       })
-      .eq("id", request.userId);
+      .eq("id", request.userId)
+      .select("id")
+      .maybeSingle();
 
     if (error) {
-      throw new AppError(500, error.message);
+      throw new AppError(500, "Unable to complete password reset.");
+    }
+
+    if (!data) {
+      throw new AppError(404, "Profile not found.");
     }
 
     const user = await this.getCurrentUser(request.userId);
