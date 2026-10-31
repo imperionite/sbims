@@ -3,7 +3,7 @@ import { zValidator } from "@hono/zod-validator";
 
 import {
   changePasswordSchema,
-  completePasswordResetSchema,
+  // completePasswordResetSchema,
   forgotPasswordSchema,
   loginSchema,
   refreshTokenSchema,
@@ -101,18 +101,20 @@ export function createAuthRoutes(
 
   auth.post(
     "/reset-password/complete",
+    requireAuth,
     rateLimit(
       rateLimitConfig.completePasswordReset,
       rateLimitStore,
       "auth:reset-password",
     ),
-    zValidator("json", completePasswordResetSchema),
     async (c) => {
-      const body = c.req.valid("json");
+      const user = c.get("user");
 
       const authService = new AuthService(c.get("supabase"), frontendUrl);
 
-      const result = await authService.completePasswordReset(body);
+      const result = await authService.completePasswordReset({
+        userId: user.id,
+      });
 
       return c.json({
         success: true,

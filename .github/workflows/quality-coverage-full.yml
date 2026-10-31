@@ -1,0 +1,66 @@
+name: Quality Check - Full Test Coverage
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-coverage:
+    name: Full Backend Test Suite and Coverage
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      FRONTEND_URL: http://localhost:5173
+      ALLOWED_ORIGINS: http://localhost:5173
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+      RATE_LIMIT_ENABLED: "false"
+      ENVIRONMENT: test
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: 2.9.7
+          cache: true
+
+      - name: Create Test Environment File
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_PUBLISHABLE_KEY"
+          test -n "$SUPABASE_SECRET_KEY"
+          cat > .env.test <<EOF
+          SUPABASE_URL=$SUPABASE_URL
+          SUPABASE_PUBLISHABLE_KEY=$SUPABASE_PUBLISHABLE_KEY
+          SUPABASE_SECRET_KEY=$SUPABASE_SECRET_KEY
+          UPSTASH_REDIS_REST_URL=$UPSTASH_REDIS_REST_URL
+          UPSTASH_REDIS_REST_TOKEN=$UPSTASH_REDIS_REST_TOKEN
+          ENVIRONMENT=test
+          FRONTEND_URL=$FRONTEND_URL
+          ALLOWED_ORIGINS=$ALLOWED_ORIGINS
+          RATE_LIMIT_ENABLED=false
+          EOF
+
+      - name: Install Dependencies
+        run: deno install --frozen
+
+      - name: Run Full Test Suite and Coverage
+        run: deno task test:coverage
+
+      - name: Upload Full Coverage Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbims-full-coverage
+          path: coverage/
+          if-no-files-found: warn
+          retention-days: 14

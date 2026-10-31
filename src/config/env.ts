@@ -1,7 +1,19 @@
+// src/config/env.ts
 import { z } from "zod";
 
-// Lightweight RuntimeEnv type to avoid circular type-only import
+// Lightweight RuntimeEnv type to avoid circular type-only import.
 export type RuntimeEnv = Record<string, string | undefined>;
+
+const booleanFromEnv = z.preprocess((value) => {
+  if (typeof value !== "string") return value;
+
+  const normalized = value.trim().toLowerCase();
+
+  if (normalized === "true") return true;
+  if (normalized === "false") return false;
+
+  return value;
+}, z.boolean().default(true));
 
 const envSchema = z.object({
   SUPABASE_URL: z.string().url(),
@@ -10,7 +22,7 @@ const envSchema = z.object({
 
   SUPABASE_SECRET_KEY: z.string().min(1),
 
-  PORT: z.coerce.number().default(8000),
+  PORT: z.coerce.number().int().positive().default(8000),
 
   UPSTASH_REDIS_REST_URL: z.string().url(),
 
@@ -24,7 +36,7 @@ const envSchema = z.object({
 
   FRONTEND_URL: z.string().url(),
 
-  RATE_LIMIT_ENABLED: z.coerce.boolean().default(true),
+  RATE_LIMIT_ENABLED: booleanFromEnv,
 });
 
 export type AppConfig = Omit<z.infer<typeof envSchema>, "ALLOWED_ORIGINS"> & {
@@ -32,41 +44,30 @@ export type AppConfig = Omit<z.infer<typeof envSchema>, "ALLOWED_ORIGINS"> & {
 };
 
 export function loadEnv(source: RuntimeEnv): AppConfig {
-  const get = (name: string): string | undefined => {
-    return source[name];
-  };
+  const get = (name: string): string | undefined => source[name];
 
   const parsed = envSchema.parse({
     SUPABASE_URL: get("SUPABASE_URL"),
-
     SUPABASE_PUBLISHABLE_KEY: get("SUPABASE_PUBLISHABLE_KEY"),
-
     SUPABASE_SECRET_KEY: get("SUPABASE_SECRET_KEY"),
-
     UPSTASH_REDIS_REST_URL: get("UPSTASH_REDIS_REST_URL"),
-
     UPSTASH_REDIS_REST_TOKEN: get("UPSTASH_REDIS_REST_TOKEN"),
-
     PORT: get("PORT"),
-
     ENVIRONMENT: get("ENVIRONMENT"),
-
     ALLOWED_ORIGINS: get("ALLOWED_ORIGINS"),
-
     FRONTEND_URL: get("FRONTEND_URL"),
-
     RATE_LIMIT_ENABLED: get("RATE_LIMIT_ENABLED"),
   });
 
+  // Rate limiting is disabled in the test environment regardless
+  // of the configured value.
   const rateLimitEnabled = parsed.ENVIRONMENT !== "test" && parsed.RATE_LIMIT_ENABLED;
 
   return {
     ...parsed,
-
     ALLOWED_ORIGINS: parsed.ALLOWED_ORIGINS.split(",")
       .map((origin) => origin.trim())
       .filter(Boolean),
-
     RATE_LIMIT_ENABLED: rateLimitEnabled,
   };
 }
