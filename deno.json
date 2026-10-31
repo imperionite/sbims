@@ -55,6 +55,16 @@
     "test:integration:documents": "deno test --env-file=.env.test tests/integration/documents.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:reports": "deno test --env-file=.env.test tests/integration/reports.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:audit": "deno test --env-file=.env.test tests/integration/audit.integration.test.ts --allow-all",
+    "cov:auth": "deno test --env-file=.env.test --coverage=coverage/auth tests/unit/auth tests/integration/auth.integration.test.ts --allow-read --allow-env --allow-net && deno coverage coverage/auth --include='src/modules/auth/'",
+    "cov:users": "deno test --env-file=.env.test --coverage=coverage/users tests/unit/users tests/integration/users.integration.test.ts --allow-read --allow-env --allow-net && deno coverage coverage/users --include='src/modules/users/'",
+    "cov:students": "deno test --env-file=.env.test --coverage=coverage/students tests/unit/students tests/integration/students.integration.test.ts --allow-read --allow-env --allow-net && deno coverage coverage/students --include='src/modules/students/'",
+    "cov:htes": "deno test --env-file=.env.test --coverage=coverage/htes tests/unit/htes tests/integration/htes.integration.test.ts --allow-read --allow-env --allow-net && deno coverage coverage/htes --include='src/modules/htes/'",
+    "cov:internships": "deno test --env-file=.env.test --coverage=coverage/internships tests/unit/internships tests/integration/internships.integration.test.ts --allow-read --allow-env --allow-net && deno coverage coverage/internships --include='src/modules/internships/'",
+    "cov:attendance": "deno test --env-file=.env.test --coverage=coverage/attendance tests/unit/attendance tests/integration/attendance.integration.test.ts --allow-read --allow-env --allow-net && deno coverage coverage/attendance --include='src/modules/attendance/'",
+    "cov:evaluations": "deno test --env-file=.env.test --coverage=coverage/evaluations tests/unit/evaluations tests/integration/evaluations.integration.test.ts --allow-all && deno coverage coverage/evaluations --include='src/modules/evaluations/'",
+    "cov:documents": "deno test --env-file=.env.test --coverage=coverage/documents tests/unit/documents tests/integration/documents.integration.test.ts --allow-read --allow-env --allow-net && deno coverage coverage/documents --include='src/modules/documents/'",
+    "cov:reports": "deno test --env-file=.env.test --coverage=coverage/reports tests/unit/reports tests/integration/reports.integration.test.ts --allow-read --allow-env --allow-net && deno coverage coverage/reports --include='src/modules/reports/'",
+    "cov:audit": "deno test --env-file=.env.test --coverage=coverage/audit tests/unit/audit tests/integration/audit.integration.test.ts --allow-all && deno coverage coverage/audit --include='src/modules/audit/'",
     "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts"
   },
   "fmt": {
