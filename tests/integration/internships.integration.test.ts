@@ -1037,7 +1037,7 @@ Deno.test(
 // ============================================================
 
 Deno.test(
-  "FR-05 active internship can become completed after end date when validated rendered hours meet requirements",
+  "FR-06 active internship can become completed after end date when validated rendered hours meet requirements",
   async () => {
     await setupTestUsers();
 
@@ -1085,6 +1085,20 @@ Deno.test(
     assertEquals(completed.response.status, 200);
     assertEquals(completed.body.success, true);
     assertEquals(completed.body.data.status, "completed");
+
+    // FR-11: the successful status transition must be represented in the audit trail.
+    const { data: auditRows, error: auditError } = await supabaseAdmin
+      .from("audit_logs")
+      .select("id, user_id, action, resource_type, resource_id, details")
+      .eq("action", "CHANGE_INTERNSHIP_STATUS")
+      .eq("resource_id", internship.id)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (auditError) throw auditError;
+    assertExists(auditRows?.[0]);
+    assertEquals(auditRows[0].action, "CHANGE_INTERNSHIP_STATUS");
+    assertEquals(auditRows[0].resource_type, "INTERNSHIP");
+    assertEquals(auditRows[0].details.newStatus, "completed");
   },
 );
 

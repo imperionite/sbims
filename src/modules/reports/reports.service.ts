@@ -17,7 +17,7 @@ const REPORT_SELECT = `
   faculty_adviser_id,
   required_hours,
   status,
-  student_profiles (
+  student_profiles!inner (
     id,
     student_number,
     program,
@@ -43,7 +43,6 @@ const REPORT_SELECT = `
     status
   )
 `;
-
 interface ReportAttendanceRecord {
   time_in: string;
   time_out: string;

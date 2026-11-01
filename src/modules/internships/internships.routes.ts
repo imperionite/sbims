@@ -15,6 +15,7 @@ import {
 } from "./internships.schema.ts";
 
 import { InternshipService } from "./internships.service.ts";
+import { AuditService } from "../audit/audit.service.ts";
 
 const internships = new Hono<{
   Variables: AppVariables;
@@ -79,6 +80,15 @@ internships.post(
     const body = c.req.valid("json");
 
     const result = await internshipService.createInternship(body);
+
+    await new AuditService(c.get("supabase")).log({
+      userId: c.get("user").id,
+      action: "CREATE_INTERNSHIP",
+      resourceType: "INTERNSHIP",
+      resourceId: result.id,
+      details: { studentId: body.studentId, hteId: body.hteId },
+      ipAddress: c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+    });
 
     return c.json(
       {
@@ -192,6 +202,17 @@ internships.patch(
       body.status,
     );
 
+    // Record the successful lifecycle transition. Audit failure is
+    // intentionally non-blocking, consistent with AuditService.log().
+    await new AuditService(c.get("supabase")).log({
+      userId: c.get("user").id,
+      action: "CHANGE_INTERNSHIP_STATUS",
+      resourceType: "INTERNSHIP",
+      resourceId: internshipId,
+      details: { newStatus: body.status },
+      ipAddress: c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+    });
+
     return c.json({
       success: true,
       data: result,
@@ -234,6 +255,15 @@ internships.patch(
       body.facultyAdviserId,
     );
 
+    await new AuditService(c.get("supabase")).log({
+      userId: c.get("user").id,
+      action: "ASSIGN_FACULTY_ADVISER",
+      resourceType: "INTERNSHIP",
+      resourceId: internshipId,
+      details: { facultyAdviserId: body.facultyAdviserId },
+      ipAddress: c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+    });
+
     return c.json({
       success: true,
       data: result,
@@ -275,6 +305,15 @@ internships.patch(
     const body = c.req.valid("json");
 
     const result = await internshipService.updateInternship(internshipId, body);
+
+    await new AuditService(c.get("supabase")).log({
+      userId: c.get("user").id,
+      action: "UPDATE_INTERNSHIP",
+      resourceType: "INTERNSHIP",
+      resourceId: internshipId,
+      details: { updatedFields: Object.keys(body) },
+      ipAddress: c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+    });
 
     return c.json({
       success: true,

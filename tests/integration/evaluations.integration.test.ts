@@ -4,6 +4,7 @@ import type { User } from "@supabase/supabase-js";
 
 import { createApp } from "../../src/app.ts";
 import { createSupabaseClients } from "../../src/lib/supabase.ts";
+import { assertAuditEvent } from "../helpers/audit.assertions.ts";
 import { loadEnv } from "../../src/config/env.ts";
 import { getDenoEnv } from "../../src/config/runtime.ts";
 
@@ -220,14 +221,12 @@ async function createEligibleInternship(
   facultyAdviserId: string,
 ) {
   /*
-   * The current date is 2026-09-13.
+   * These are fixed historical fixture dates.
    *
-   * End date is 2026-09-12, so the internship period
-   * has already ended.
-   *
-   * One validated 08:00-17:00 record produces
-   * 8 rendered hours after the standard 1-hour
-   * meal break.
+   * The internship period has ended, and the completed
+   * internship has one validated 08:00-17:00 attendance
+   * record. After the standard 1-hour meal break, this
+   * produces 8 rendered hours.
    */
   const { data, error } = await supabaseAdmin
     .from("internships")
@@ -325,7 +324,7 @@ async function createEvaluation(
   internshipId: string,
   evaluationType: "hte_supervisor" | "faculty_adviser",
 ) {
-  return await authenticatedRequest("/api/v1/evaluations", token, {
+  const response = await authenticatedRequest("/api/v1/evaluations", token, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -346,8 +345,30 @@ async function createEvaluation(
       comments: "Good performance.",
     }),
   });
-}
 
+  // Verify persisted audit data whenever creation succeeds.
+  // Failed creation requests must not be expected to generate
+  // a CREATE_EVALUATION audit event.
+  if (response.status === 201) {
+    const result = await response.clone().json();
+
+    assertEquals(result.success, true);
+    assertExists(result.data?.id);
+
+    const actorId = evaluationType === "hte_supervisor"
+      ? await getTestUserId(TEST_USERS.hteSupervisor.email)
+      : await getTestUserId(FACULTY_ADVISER.email);
+
+    await assertAuditEvent(supabaseAdmin, {
+      actorId,
+      action: "CREATE_EVALUATION",
+      resourceType: "evaluation",
+      resourceId: result.data.id,
+    });
+  }
+
+  return response;
+}
 /*
  * =========================================================
  * AUTHORIZATION
@@ -525,77 +546,6 @@ Deno.test(
     });
   },
 );
-
-/* Deno.test(
-  "FR-08 evaluation cannot be created before internship eligibility",
-  async () => {
-    await setupTestUsers();
-
-    const studentId = await ensureTestStudent();
-
-    const hteSupervisorId = await getTestUserId(
-      TEST_USERS.hteSupervisor.email,
-    );
-
-    const facultyAdviserId = await ensureFacultyAdviser(FACULTY_ADVISER);
-
-    const hteId = await createTestHte();
-
-    await assignHteSupervisor(hteId, hteSupervisorId);
-
-    const { data: internship, error } = await supabaseAdmin
-      .from("internships")
-      .insert({
-        student_id: studentId,
-        hte_id: hteId,
-        faculty_adviser_id: facultyAdviserId,
-        start_date: "2026-08-01",
-        end_date: "2026-09-30",
-        required_hours: 8,
-        status: "active",
-      })
-      .select("id")
-      .single();
-
-    if (error || !internship) {
-      throw error ?? new Error("Unable to create test internship.");
-    }
-
-    try {
-      const { response, body } = await login(
-        TEST_USERS.hteSupervisor.email,
-        TEST_USERS.hteSupervisor.password,
-      );
-
-      assertEquals(response.status, 200);
-
-      const evaluationResponse = await createEvaluation(
-        body.data.accessToken,
-        internship.id,
-        "hte_supervisor",
-      );
-
-      assertEquals(evaluationResponse.status, 400);
-    } finally {
-      await supabaseAdmin
-        .from("internships")
-        .delete()
-        .eq("id", internship.id);
-
-      await supabaseAdmin
-        .from("hte_profiles")
-        .update({
-          supervisor_id: null,
-        })
-        .eq("id", hteId);
-
-      await supabaseAdmin
-        .from("hte_profiles")
-        .delete()
-        .eq("id", hteId);
-    }
-  },
-); */
 
 /*
  * =========================================================
@@ -793,6 +743,13 @@ Deno.test("FR-08 HTE Supervisor can update own draft", async () => {
     assertEquals(result.success, true);
     assertEquals(result.data.status, "draft");
     assertEquals(result.data.responses.criterion_1, 5);
+
+    await assertAuditEvent(supabaseAdmin, {
+      actorId: await getTestUserId(TEST_USERS.hteSupervisor.email),
+      action: "UPDATE_EVALUATION",
+      resourceType: "evaluation",
+      resourceId: createBody.data.id,
+    });
   });
 });
 
@@ -830,6 +787,18 @@ Deno.test("FR-08 Faculty Adviser can update own draft", async () => {
     );
 
     assertEquals(updateResponse.status, 200);
+
+    const updateResult = await updateResponse.json();
+
+    assertEquals(updateResult.success, true);
+    assertEquals(updateResult.data.status, "draft");
+
+    await assertAuditEvent(supabaseAdmin, {
+      actorId: await getTestUserId(FACULTY_ADVISER.email),
+      action: "UPDATE_EVALUATION",
+      resourceType: "evaluation",
+      resourceId: createBody.data.id,
+    });
   });
 });
 
@@ -872,6 +841,13 @@ Deno.test("FR-08 HTE Supervisor can submit eligible evaluation", async () => {
     assertEquals(result.success, true);
     assertEquals(result.data.status, "submitted");
     assertExists(result.data.submitted_at);
+
+    await assertAuditEvent(supabaseAdmin, {
+      actorId: await getTestUserId(TEST_USERS.hteSupervisor.email),
+      action: "SUBMIT_EVALUATION",
+      resourceType: "evaluation",
+      resourceId: createBody.data.id,
+    });
   });
 });
 
@@ -907,6 +883,13 @@ Deno.test("FR-08 Faculty Adviser can submit eligible evaluation", async () => {
     assertEquals(submitResponse.status, 200);
     assertEquals(result.success, true);
     assertEquals(result.data.status, "submitted");
+
+    await assertAuditEvent(supabaseAdmin, {
+      actorId: await getTestUserId(FACULTY_ADVISER.email),
+      action: "SUBMIT_EVALUATION",
+      resourceType: "evaluation",
+      resourceId: createBody.data.id,
+    });
   });
 });
 

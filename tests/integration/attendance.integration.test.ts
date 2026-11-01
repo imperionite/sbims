@@ -1,36 +1,22 @@
 // deno-lint-ignore-file no-explicit-any require-await
 import { assertEquals, assertExists } from "@std/assert";
 import { Hono } from "hono";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { AppVariables } from "../../src/types/context.ts";
 import attendance from "../../src/modules/attendance/attendance.routes.ts";
+import { assertAuditEvent } from "../helpers/audit.assertions.ts";
 
 // ============================================================
 // Test constants
 // ============================================================
 
-/*
- * Use a conventional RFC 4122 UUID v4.
- *
- * Some Zod UUID validators are stricter than simply checking the
- * UUID shape, so avoid placeholder UUIDs such as:
- *
- *   11111111-1111-1111-1111-111111111111
- *
- * This UUID is explicitly a valid version-4 UUID.
- */
 const INTERNSHIP_ID = "550e8400-e29b-41d4-a716-446655440000";
 
 // ============================================================
 // Test date helpers
 // ============================================================
 
-/**
- * Capture the date once when the test module loads.
- *
- * Attendance dates are date-only business values, so all generated
- * fixture dates are relative to this single captured date.
- */
 const TEST_TODAY = new Date();
 
 function dateOnly(date: Date): string {
@@ -60,17 +46,11 @@ function createIntegrationApp() {
     Variables: AppVariables;
   }>();
 
-  /*
-   * Integration-test authentication boundary.
-   *
-   * The attendance router expects the Supabase context to be
-   * provided by middleware. The test supplies a mock implementation.
-   */
+  // One mock instance is shared across all requests made to this app.
+  const mockSupabase = createMockSupabase();
+
   app.use("*", async (c, next) => {
-    const mockSupabase = createMockSupabase();
-
     c.set("supabase", mockSupabase as any);
-
     await next();
   });
 
@@ -88,7 +68,8 @@ function createIntegrationApp() {
     );
   });
 
-  return app;
+  // Expose the same mock instance so tests can inspect persisted audit rows.
+  return Object.assign(app, { mockSupabase });
 }
 
 // ============================================================
@@ -137,6 +118,8 @@ function createMockSupabase() {
         is_active: true,
       },
     ],
+
+    audit_logs: [] as any[],
   };
 
   // ----------------------------------------------------------
@@ -153,11 +136,6 @@ function createMockSupabase() {
 
       eq(column: string, value: unknown) {
         filtered = filtered.filter((row) => {
-          /*
-           * Support relationship filters such as:
-           *
-           * .eq("internships.student_id", "student-1")
-           */
           if (column.includes(".")) {
             const [relation, relationColumn] = column.split(".");
 
@@ -178,13 +156,11 @@ function createMockSupabase() {
 
       neq(column: string, value: unknown) {
         filtered = filtered.filter((row) => row[column] !== value);
-
         return builder;
       },
 
       in(column: string, values: unknown[]) {
         filtered = filtered.filter((row) => values.includes(row[column]));
-
         return builder;
       },
 
@@ -195,9 +171,7 @@ function createMockSupabase() {
           const left = a[column];
           const right = b[column];
 
-          if (left === right) {
-            return 0;
-          }
+          if (left === right) return 0;
 
           if (ascending) {
             return left < right ? -1 : 1;
@@ -211,16 +185,12 @@ function createMockSupabase() {
 
       limit(count: number) {
         filtered = filtered.slice(0, count);
-
         return builder;
       },
 
       async maybeSingle() {
         if (filtered.length === 0) {
-          return {
-            data: null,
-            error: null,
-          };
+          return { data: null, error: null };
         }
 
         if (filtered.length > 1) {
@@ -230,10 +200,7 @@ function createMockSupabase() {
           };
         }
 
-        return {
-          data: filtered[0],
-          error: null,
-        };
+        return { data: filtered[0], error: null };
       },
 
       async single() {
@@ -251,10 +218,7 @@ function createMockSupabase() {
           };
         }
 
-        return {
-          data: filtered[0],
-          error: null,
-        };
+        return { data: filtered[0], error: null };
       },
 
       then(resolve: (value: { data: any[]; error: null }) => any) {
@@ -407,9 +371,7 @@ function createMockSupabase() {
         }
 
         return {
-          data: {
-            user: null,
-          },
+          data: { user: null },
           error: new Error("Invalid token"),
         };
       },
@@ -417,7 +379,6 @@ function createMockSupabase() {
 
     from(table: keyof typeof data) {
       const rows = data[table] as any[];
-
       return makeBuilder(table, rows);
     },
   };
@@ -428,18 +389,19 @@ function createMockSupabase() {
     supabaseAdmin: {
       from(table: keyof typeof data) {
         const rows = data[table] as any[];
-
         return makeBuilder(table, rows);
       },
     },
 
     from(table: keyof typeof data) {
       const rows = data[table] as any[];
-
       return makeBuilder(table, rows);
     },
 
     auth: supabaseClient.auth,
+
+    // Expose mock data for direct inspection when needed.
+    __data: data,
   };
 }
 
@@ -447,49 +409,58 @@ function createMockSupabase() {
 // Test 1 — Create attendance
 // ============================================================
 
-Deno.test("POST /attendance - creates attendance", async () => {
-  const app = createIntegrationApp();
+Deno.test(
+  "POST /attendance - creates attendance and persists audit event",
+  async () => {
+    const app = createIntegrationApp();
+    const attendanceDate = today();
 
-  const attendanceDate = today();
+    const response = await app.request("/attendance", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer student-token",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        internship_id: INTERNSHIP_ID,
+        attendance_date: attendanceDate,
+        time_in: "08:00",
+        time_out: "17:00",
+      }),
+    });
 
-  const response = await app.request("/attendance", {
-    method: "POST",
+    const body = await response.json();
 
-    headers: {
-      Authorization: "Bearer student-token",
-      "Content-Type": "application/json",
-    },
+    assertEquals(
+      response.status,
+      201,
+      `Expected attendance creation to succeed. Response: ${
+        JSON.stringify(
+          body,
+        )
+      }`,
+    );
 
-    body: JSON.stringify({
-      internship_id: INTERNSHIP_ID,
-      attendance_date: attendanceDate,
-      time_in: "08:00",
-      time_out: "17:00",
-    }),
-  });
+    assertEquals(body.success, true);
+    assertExists(body.data);
+    assertExists(body.data.id);
+    assertEquals(body.data.internship_id, INTERNSHIP_ID);
+    assertEquals(body.data.attendance_date, attendanceDate);
+    assertEquals(body.data.time_in, "08:00");
+    assertEquals(body.data.time_out, "17:00");
+    assertEquals(body.data.validation_status, "pending");
 
-  const body = await response.json();
-
-  assertEquals(
-    response.status,
-    201,
-    `Expected attendance creation to succeed. Response: ${JSON.stringify(body)}`,
-  );
-
-  assertEquals(body.success, true);
-
-  assertExists(body.data);
-
-  assertEquals(body.data.internship_id, INTERNSHIP_ID);
-
-  assertEquals(body.data.attendance_date, attendanceDate);
-
-  assertEquals(body.data.time_in, "08:00");
-
-  assertEquals(body.data.time_out, "17:00");
-
-  assertEquals(body.data.validation_status, "pending");
-});
+    await assertAuditEvent(
+      app.mockSupabase.supabaseAdmin as unknown as SupabaseClient,
+      {
+        actorId: "student-1",
+        action: "CREATE_ATTENDANCE",
+        resourceType: "attendance",
+        resourceId: body.data.id,
+      },
+    );
+  },
+);
 
 // ============================================================
 // Test 2 — Invalid request body
@@ -500,12 +471,10 @@ Deno.test("POST /attendance - rejects invalid request body", async () => {
 
   const response = await app.request("/attendance", {
     method: "POST",
-
     headers: {
       Authorization: "Bearer student-token",
       "Content-Type": "application/json",
     },
-
     body: JSON.stringify({
       internship_id: "invalid",
       attendance_date: "invalid-date",
@@ -526,7 +495,6 @@ Deno.test("GET /attendance/me - returns student's attendance", async () => {
 
   const response = await app.request("/attendance/me", {
     method: "GET",
-
     headers: {
       Authorization: "Bearer student-token",
     },
@@ -537,11 +505,8 @@ Deno.test("GET /attendance/me - returns student's attendance", async () => {
   const body = await response.json();
 
   assertEquals(body.success, true);
-
   assertExists(body.data);
-
   assertEquals(Array.isArray(body.data), true);
-
   assertEquals(body.data.length, 1);
 });
 
@@ -554,7 +519,6 @@ Deno.test("GET /attendance/:id - returns attendance", async () => {
 
   const response = await app.request("/attendance/attendance-1", {
     method: "GET",
-
     headers: {
       Authorization: "Bearer student-token",
     },
@@ -565,7 +529,6 @@ Deno.test("GET /attendance/:id - returns attendance", async () => {
   const body = await response.json();
 
   assertEquals(body.success, true);
-
   assertEquals(body.data.id, "attendance-1");
 });
 
@@ -580,7 +543,6 @@ Deno.test(
 
     const response = await app.request("/attendance/missing-attendance", {
       method: "GET",
-
       headers: {
         Authorization: "Bearer student-token",
       },
@@ -589,7 +551,6 @@ Deno.test(
     assertEquals(response.status, 404);
 
     const body = await response.json();
-
     assertEquals(body.success, false);
   },
 );
@@ -607,7 +568,6 @@ Deno.test(
       `/attendance/internship/${INTERNSHIP_ID}`,
       {
         method: "GET",
-
         headers: {
           Authorization: "Bearer student-token",
         },
@@ -619,7 +579,6 @@ Deno.test(
     const body = await response.json();
 
     assertEquals(body.success, true);
-
     assertEquals(Array.isArray(body.data), true);
   },
 );
@@ -637,7 +596,6 @@ Deno.test(
       `/attendance/internship/${INTERNSHIP_ID}/rendered-hours`,
       {
         method: "GET",
-
         headers: {
           Authorization: "Bearer student-token",
         },
@@ -649,15 +607,10 @@ Deno.test(
     const body = await response.json();
 
     assertEquals(body.success, true);
-
     assertEquals(body.data.internshipId, INTERNSHIP_ID);
 
-    /*
-     * The existing fixture has time_in/time_out values, but the
-     * rendered-hours endpoint may intentionally calculate only
-     * validated records. The fixture record is pending, therefore
-     * the expected rendered hours are zero.
-     */
+    // The seeded record is pending, so it should not contribute
+    // to validated/rendered internship hours.
     assertEquals(body.data.totalHours, 0);
   },
 );
@@ -678,7 +631,9 @@ Deno.test(
     );
 
     assertEquals(response.status, 403);
+
     const body = await response.json();
+
     assertEquals(body.success, false);
     assertEquals(
       body.message,
@@ -703,7 +658,9 @@ Deno.test(
     );
 
     assertEquals(response.status, 403);
+
     const body = await response.json();
+
     assertEquals(body.success, false);
     assertEquals(
       body.message,
@@ -728,7 +685,9 @@ Deno.test(
     );
 
     assertEquals(response.status, 200);
+
     const body = await response.json();
+
     assertEquals(body.success, true);
     assertEquals(Array.isArray(body.data), true);
   },
@@ -738,52 +697,67 @@ Deno.test(
 // Test 8 — Update attendance
 // ============================================================
 
-Deno.test("PATCH /attendance/:id - updates pending attendance", async () => {
-  const app = createIntegrationApp();
-
-  const response = await app.request("/attendance/attendance-1", {
-    method: "PATCH",
-
-    headers: {
-      Authorization: "Bearer student-token",
-      "Content-Type": "application/json",
-    },
-
-    body: JSON.stringify({
-      time_in: "09:00",
-      time_out: "18:00",
-    }),
-  });
-
-  assertEquals(response.status, 200);
-
-  const body = await response.json();
-
-  assertEquals(body.success, true);
-
-  assertEquals(body.data.time_in, "09:00");
-
-  assertEquals(body.data.time_out, "18:00");
-});
-
-// ============================================================
-// Test 9 — Validation
-// ============================================================
-
 Deno.test(
-  "PATCH /attendance/:id/validation - validates attendance",
+  "PATCH /attendance/:id - updates pending attendance and persists audit event",
   async () => {
     const app = createIntegrationApp();
 
-    // A valid student token must be rejected by coordinator-only authorization.
-    const response = await app.request("/attendance/attendance-1/validation", {
+    const response = await app.request("/attendance/attendance-1", {
       method: "PATCH",
-
       headers: {
         Authorization: "Bearer student-token",
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        time_in: "09:00",
+        time_out: "18:00",
+      }),
+    });
 
+    const body = await response.json();
+
+    assertEquals(
+      response.status,
+      200,
+      `Expected attendance update to succeed. Response: ${
+        JSON.stringify(
+          body,
+        )
+      }`,
+    );
+
+    assertEquals(body.success, true);
+    assertEquals(body.data.id, "attendance-1");
+    assertEquals(body.data.time_in, "09:00");
+    assertEquals(body.data.time_out, "18:00");
+
+    await assertAuditEvent(
+      app.mockSupabase.supabaseAdmin as unknown as SupabaseClient,
+      {
+        actorId: "student-1",
+        action: "UPDATE_ATTENDANCE",
+        resourceType: "attendance",
+        resourceId: body.data.id,
+      },
+    );
+  },
+);
+
+// ============================================================
+// Test 9 — Validation authorization
+// ============================================================
+
+Deno.test(
+  "PATCH /attendance/:id/validation - rejects student validation attempt",
+  async () => {
+    const app = createIntegrationApp();
+
+    const response = await app.request("/attendance/attendance-1/validation", {
+      method: "PATCH",
+      headers: {
+        Authorization: "Bearer student-token",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         validation_status: "validated",
       }),
@@ -804,17 +778,112 @@ Deno.test(
 
     const response = await app.request("/attendance/attendance-1/validation", {
       method: "PATCH",
-
       headers: {
         Authorization: "Bearer coordinator-token",
         "Content-Type": "application/json",
       },
-
       body: JSON.stringify({
         validation_status: "pending",
       }),
     });
 
     assertEquals(response.status, 400);
+  },
+);
+
+// ============================================================
+// Test 11 — Successful coordinator validation and audit
+// ============================================================
+
+Deno.test(
+  "PATCH /attendance/:id/validation - coordinator validates attendance and persists audit event",
+  async () => {
+    const app = createIntegrationApp();
+
+    const response = await app.request("/attendance/attendance-1/validation", {
+      method: "PATCH",
+      headers: {
+        Authorization: "Bearer coordinator-token",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        validation_status: "validated",
+      }),
+    });
+
+    const body = await response.json();
+
+    assertEquals(
+      response.status,
+      200,
+      `Expected coordinator validation to succeed. Response: ${
+        JSON.stringify(
+          body,
+        )
+      }`,
+    );
+
+    assertEquals(body.success, true);
+    assertEquals(body.data.id, "attendance-1");
+    assertEquals(body.data.validation_status, "validated");
+    assertEquals(body.data.validated_by, "coordinator-1");
+
+    await assertAuditEvent(
+      app.mockSupabase.supabaseAdmin as unknown as SupabaseClient,
+      {
+        actorId: "coordinator-1",
+        action: "VALIDATE_ATTENDANCE",
+        resourceType: "attendance",
+        resourceId: body.data.id,
+      },
+    );
+  },
+);
+
+// ============================================================
+// Test 12 — Successful coordinator rejection and audit
+// ============================================================
+
+Deno.test(
+  "PATCH /attendance/:id/validation - coordinator rejects attendance and persists audit event",
+  async () => {
+    const app = createIntegrationApp();
+
+    const response = await app.request("/attendance/attendance-1/validation", {
+      method: "PATCH",
+      headers: {
+        Authorization: "Bearer coordinator-token",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        validation_status: "rejected",
+      }),
+    });
+
+    const body = await response.json();
+
+    assertEquals(
+      response.status,
+      200,
+      `Expected coordinator rejection to succeed. Response: ${
+        JSON.stringify(
+          body,
+        )
+      }`,
+    );
+
+    assertEquals(body.success, true);
+    assertEquals(body.data.id, "attendance-1");
+    assertEquals(body.data.validation_status, "rejected");
+
+    await assertAuditEvent(
+      app.mockSupabase.supabaseAdmin as unknown as SupabaseClient,
+      {
+        actorId: "coordinator-1",
+        action: "REJECT_ATTENDANCE",
+        resourceType: "attendance",
+        resourceId: body.data.id,
+      },
+    );
   },
 );

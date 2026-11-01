@@ -4,6 +4,7 @@ import { zValidator } from "@hono/zod-validator";
 import type { AppVariables } from "../../types/context.ts";
 
 import { AppError } from "../../errors/app-error.ts";
+import { AuditService } from "../audit/audit.service.ts";
 
 import { requireAuth } from "../auth/auth.middleware.ts";
 import { requireRole } from "../auth/role.middleware.ts";
@@ -39,6 +40,17 @@ attendance.post(
     const body = c.req.valid("json");
 
     const result = await attendanceService.createAttendance(user.id, body);
+
+    await new AuditService(c.get("supabase")).log({
+      userId: user.id,
+      action: "CREATE_ATTENDANCE",
+      resourceType: "attendance",
+      resourceId: result.id,
+      details: {
+        internshipId: result.internship_id,
+        attendanceDate: result.attendance_date,
+      },
+    });
 
     return c.json(
       {
@@ -195,6 +207,17 @@ attendance.patch(
 
     const result = await attendanceService.updateAttendance(id, user.id, body);
 
+    await new AuditService(c.get("supabase")).log({
+      userId: user.id,
+      action: "UPDATE_ATTENDANCE",
+      resourceType: "attendance",
+      resourceId: result.id,
+      details: {
+        internshipId: result.internship_id,
+        attendanceDate: result.attendance_date,
+      },
+    });
+
     return c.json({
       success: true,
       data: result,
@@ -229,6 +252,16 @@ attendance.patch(
       user.id,
       body.validation_status,
     );
+
+    await new AuditService(c.get("supabase")).log({
+      userId: user.id,
+      action: body.validation_status === "validated" ? "VALIDATE_ATTENDANCE" : "REJECT_ATTENDANCE",
+      resourceType: "attendance",
+      resourceId: result.id,
+      details: {
+        validationStatus: body.validation_status,
+      },
+    });
 
     return c.json({
       success: true,
