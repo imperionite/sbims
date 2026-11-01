@@ -1,4 +1,3 @@
-// tests/unit/internships/internships.test.ts
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
 
 import { z } from "zod";
@@ -955,6 +954,56 @@ Deno.test(
  * SERVICE - STATUS
  * ============================================================
  */
+
+Deno.test(
+  "FR-06 InternshipService.updateStatus activates a pending internship within its scheduled period",
+  async () => {
+    const updated = {
+      ...mockInternship,
+      start_date: "2020-01-01",
+      end_date: "2099-12-31",
+      status: "active",
+    };
+    const service = createService([
+      {
+        data: {
+          id: INTERNSHIP_ID,
+          status: "pending",
+          start_date: "2020-01-01",
+          end_date: "2099-12-31",
+          required_hours: 300,
+        },
+      },
+      { data: updated },
+    ]);
+
+    const result = await service.updateStatus(INTERNSHIP_ID, "active");
+    assertEquals(result.id, INTERNSHIP_ID);
+    assertEquals(result.status, "active");
+  },
+);
+
+Deno.test(
+  "InternshipService.updateStatus rejects activation outside the internship period",
+  async () => {
+    const service = createService([
+      {
+        data: {
+          id: INTERNSHIP_ID,
+          status: "pending",
+          start_date: "2000-01-01",
+          end_date: "2000-12-31",
+          required_hours: 300,
+        },
+      },
+    ]);
+    await assertRejects(
+      () => service.updateStatus(INTERNSHIP_ID, "active"),
+      AppError,
+      "An internship can only be activated during its internship period.",
+    );
+  },
+);
 
 Deno.test(
   "InternshipService.updateStatus rejects pending to completed",

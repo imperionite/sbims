@@ -11,6 +11,7 @@ import {
   updateUserStatusSchema,
 } from "./users.schema.ts";
 import { UserService } from "./users.service.ts";
+import { AuditService } from "../audit/audit.service.ts";
 
 const users = new Hono<{
   Variables: AppVariables;
@@ -95,7 +96,24 @@ users.post(
   async (c) => {
     const userService = new UserService(c.get("supabase"));
     const body = c.req.valid("json");
+
     const result = await userService.createUser(body);
+    const resourceId = result &&
+        typeof result === "object" &&
+        "id" in result &&
+        typeof result.id === "string"
+      ? result.id
+      : c.req.param("id");
+
+    await new AuditService(c.get("supabase")).log({
+      userId: c.get("user").id,
+      action: "CREATE_USER",
+      resourceType: "user",
+      resourceId,
+      details: {
+        assignedRole: body.role,
+      },
+    });
 
     return c.json(
       {
@@ -116,6 +134,22 @@ users.patch(
     const userService = new UserService(c.get("supabase"));
     const body = c.req.valid("json");
     const result = await userService.updateUser(c.req.param("id"), body);
+    const resourceId = result &&
+        typeof result === "object" &&
+        "id" in result &&
+        typeof result.id === "string"
+      ? result.id
+      : c.req.param("id");
+
+    await new AuditService(c.get("supabase")).log({
+      userId: c.get("user").id,
+      action: "UPDATE_USER",
+      resourceType: "user",
+      resourceId,
+      details: {
+        updatedFields: Object.keys(body),
+      },
+    });
 
     return c.json({
       success: true,
@@ -132,7 +166,24 @@ users.patch(
   async (c) => {
     const userService = new UserService(c.get("supabase"));
     const body = c.req.valid("json");
+
     const result = await userService.updateUserRole(c.req.param("id"), body);
+    const resourceId = result &&
+        typeof result === "object" &&
+        "id" in result &&
+        typeof result.id === "string"
+      ? result.id
+      : c.req.param("id");
+
+    await new AuditService(c.get("supabase")).log({
+      userId: c.get("user").id,
+      action: "CHANGE_ROLE",
+      resourceType: "user",
+      resourceId,
+      details: {
+        newRole: result && typeof result === "object" && "role" in result ? result.role : body.role,
+      },
+    });
 
     return c.json({
       success: true,
@@ -149,8 +200,18 @@ users.patch(
   async (c) => {
     const userService = new UserService(c.get("supabase"));
     const body = c.req.valid("json");
+
     const result = await userService.updateStatus(c.req.param("id"), body);
 
+    await new AuditService(c.get("supabase")).log({
+      userId: c.get("user").id,
+      action: body.isActive === false ? "DEACTIVATE_USER" : "UPDATE_USER",
+      resourceType: "user",
+      resourceId: c.req.param("id"),
+      details: {
+        isActive: body.isActive,
+      },
+    });
     return c.json({
       success: true,
       data: result,

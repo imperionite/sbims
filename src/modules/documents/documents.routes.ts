@@ -5,6 +5,7 @@ import type { AppVariables } from "../../types/context.ts";
 
 import { requireAuth } from "../auth/auth.middleware.ts";
 import { requireRole } from "../auth/role.middleware.ts";
+import { AuditService } from "../audit/audit.service.ts";
 
 import { rejectDocumentSchema, uploadDocumentSchema } from "./documents.schema.ts";
 
@@ -90,6 +91,18 @@ documents.post(
       validation.data.document_type,
       file,
     );
+
+    await new AuditService(c.get("supabase")).log({
+      userId: user.id,
+      action: "UPLOAD_DOCUMENT",
+      resourceType: "document",
+      resourceId: result.id,
+      details: {
+        internshipId: result.internship_id,
+        documentType: result.document_type,
+        fileName: result.file_name,
+      },
+    });
 
     return c.json(
       {
@@ -241,6 +254,14 @@ documents.delete(
       c.get("userRole"),
     );
 
+    await new AuditService(c.get("supabase")).log({
+      userId: user.id,
+      action: "DELETE_DOCUMENT",
+      resourceType: "document",
+      resourceId: documentId,
+      details: {},
+    });
+
     return c.json({
       success: true,
       data: null,
@@ -286,6 +307,17 @@ documents.patch(
       c.get("userRole"),
       "approved",
     );
+
+    await new AuditService(c.get("supabase")).log({
+      userId: user.id,
+      action: "APPROVE_DOCUMENT",
+      resourceType: "document",
+      resourceId: result.id,
+      details: {
+        internshipId: result.internship_id,
+        status: "approved",
+      },
+    });
 
     return c.json({
       success: true,
@@ -341,6 +373,17 @@ documents.patch(
       "rejected",
       body.reason,
     );
+
+    await new AuditService(c.get("supabase")).log({
+      userId: user.id,
+      action: "REJECT_DOCUMENT",
+      resourceType: "document",
+      resourceId: result.id,
+      details: {
+        internshipId: result.internship_id,
+        status: "rejected",
+      },
+    });
 
     return c.json({
       success: true,

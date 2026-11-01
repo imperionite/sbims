@@ -6,6 +6,7 @@ import { AppError } from "../../errors/app-error.ts";
 
 import { requireAuth } from "../auth/auth.middleware.ts";
 import { requireRole } from "../auth/role.middleware.ts";
+import { AuditService } from "../audit/audit.service.ts";
 
 import { createEvaluationSchema, updateEvaluationSchema } from "./evaluations.schema.ts";
 
@@ -48,6 +49,18 @@ evaluations.post(
       role,
       body,
     );
+
+    await new AuditService(c.get("supabase")).log({
+      userId: user.id,
+      action: "CREATE_EVALUATION",
+      resourceType: "evaluation",
+      resourceId: result.id,
+      details: {
+        internshipId: result.internship_id,
+        evaluatorRole: role,
+        evaluationType: result.evaluation_type,
+      },
+    });
 
     return c.json(
       {
@@ -233,6 +246,17 @@ evaluations.patch(
       body,
     );
 
+    await new AuditService(c.get("supabase")).log({
+      userId: user.id,
+      action: "UPDATE_EVALUATION",
+      resourceType: "evaluation",
+      resourceId: result.id,
+      details: {
+        internshipId: result.internship_id,
+        evaluatorRole: role,
+      },
+    });
+
     return c.json({
       success: true,
       data: result,
@@ -272,6 +296,18 @@ evaluations.post(
     }
 
     const result = await evaluationService.submitEvaluation(id, user.id, role);
+
+    await new AuditService(c.get("supabase")).log({
+      userId: user.id,
+      action: "SUBMIT_EVALUATION",
+      resourceType: "evaluation",
+      resourceId: result.id,
+      details: {
+        internshipId: result.internship_id,
+        evaluatorRole: role,
+        status: result.status,
+      },
+    });
 
     return c.json({
       success: true,

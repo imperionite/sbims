@@ -7,6 +7,7 @@ import { getDenoEnv } from "../../src/config/runtime.ts";
 
 import { setupTestUsers } from "../helpers/test-user.setup.ts";
 import { TEST_USERS } from "../fixtures/test-users.ts";
+import { assertAuditEvent } from "../helpers/audit.assertions.ts";
 
 const env = loadEnv(getDenoEnv());
 const app = createApp(env);
@@ -261,7 +262,27 @@ async function uploadDocument(
     body: createMultipartBody(internshipId, documentType, file),
   });
 
-  return { response, body: await response.json() };
+  const body = await response.json();
+
+  if (response.status === 201) {
+    assertExists(
+      body.data?.id,
+      "Successful upload should return a document ID.",
+    );
+    assertExists(
+      body.data?.uploaded_by,
+      "Successful upload should identify the uploading user.",
+    );
+
+    await assertAuditEvent(supabaseAdmin, {
+      actorId: body.data.uploaded_by,
+      action: "UPLOAD_DOCUMENT",
+      resourceType: "document",
+      resourceId: body.data.id,
+    });
+  }
+
+  return { response, body };
 }
 
 async function getDocumentFromDatabase(
@@ -603,6 +624,13 @@ Deno.test(
       assertExists(approveBody.data.reviewed_by);
       assertExists(approveBody.data.reviewed_at);
 
+      await assertAuditEvent(supabaseAdmin, {
+        actorId: await getTestUserId(TEST_USERS.coordinator.email),
+        action: "APPROVE_DOCUMENT",
+        resourceType: "document",
+        resourceId: approveUpload.body.data.id,
+      });
+
       const rejectUpload = await uploadDocument(
         studentToken,
         internship.id,
@@ -626,6 +654,13 @@ Deno.test(
         rejectBody.data.rejection_reason,
         "Please submit the signed version.",
       );
+
+      await assertAuditEvent(supabaseAdmin, {
+        actorId: await getTestUserId(TEST_USERS.coordinator.email),
+        action: "REJECT_DOCUMENT",
+        resourceType: "document",
+        resourceId: rejectUpload.body.data.id,
+      });
     } finally {
       await cleanupFixture(internship.id, hteId);
     }
@@ -808,26 +843,6 @@ Deno.test(
   },
 );
 
-/* Deno.test("Documents - student cannot upload for completed internships", async () => {
-  const { internship, hteId } = await createTestFixture("completed");
-  try {
-    const token = await loginAs(TEST_USERS.student.email, TEST_USERS.student.password);
-    const result = await uploadDocument(
-      token,
-      internship.id,
-      "fit_to_work",
-      createTestFile("fit-to-work.pdf"),
-    );
-    assertEquals(result.response.status, 400);
-    assertEquals(
-      result.body.message,
-      "Students can only upload documents for pending or active internships.",
-    );
-  } finally {
-    await cleanupFixture(internship.id, hteId);
-  }
-}); */
-
 Deno.test("Documents - student can delete their own document", async () => {
   const { internship, hteId } = await createTestFixture();
   try {
@@ -854,6 +869,13 @@ Deno.test("Documents - student can delete their own document", async () => {
 
     const document = await getDocumentFromDatabase(upload.body.data.id);
     assertEquals(document, null);
+
+    await assertAuditEvent(supabaseAdmin, {
+      actorId: await getTestUserId(TEST_USERS.student.email),
+      action: "DELETE_DOCUMENT",
+      resourceType: "document",
+      resourceId: upload.body.data.id,
+    });
   } finally {
     await cleanupFixture(internship.id, hteId);
   }
