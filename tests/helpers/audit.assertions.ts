@@ -7,6 +7,7 @@ export interface ExpectedAuditEvent {
   resourceType: string;
   resourceId?: string | null;
   details?: Record<string, unknown>;
+  createdAfter?: string;
 }
 
 /**
@@ -27,13 +28,14 @@ export interface ExpectedAuditEvent {
  *
  * This function only reads audit_logs. It does not create audit events.
  */
+
 export async function assertAuditEvent(
   supabaseAdmin: SupabaseClient,
   expected: ExpectedAuditEvent,
 ): Promise<void> {
   let query = supabaseAdmin
     .from("audit_logs")
-    .select("user_id, action, resource_type, resource_id, details")
+    .select("user_id, action, resource_type, resource_id, details, created_at")
     .eq("user_id", expected.actorId)
     .eq("action", expected.action)
     .eq("resource_type", expected.resourceType);
@@ -44,13 +46,17 @@ export async function assertAuditEvent(
     query = query.eq("resource_id", expected.resourceId);
   }
 
+  if (expected.createdAfter !== undefined) {
+    query = query.gte("created_at", expected.createdAfter);
+  }
+
   const { data, error } = await query;
 
   if (error) {
     throw new Error(`Unable to retrieve audit event: ${error.message}`);
   }
 
-  assertExists(data, "Audit query should return a result.");
+  assertExists(data);
 
   assertEquals(
     data.length > 0,
@@ -58,27 +64,30 @@ export async function assertAuditEvent(
     `Expected a persisted audit event matching: ${JSON.stringify(expected)}`,
   );
 
-  const event = data[0];
+  const matchingEvent = data.find((event) => {
+    if (expected.details === undefined) {
+      return true;
+    }
 
-  assertEquals(event.user_id, expected.actorId);
-  assertEquals(event.action, expected.action);
-  assertEquals(event.resource_type, expected.resourceType);
-
-  if (expected.resourceId !== undefined) {
-    assertEquals(event.resource_id, expected.resourceId);
-  }
-
-  if (expected.details !== undefined) {
     const actualDetails = event.details as Record<string, unknown> | null;
 
-    assertExists(actualDetails, "Audit event details should exist.");
+    if (!actualDetails) return false;
 
-    for (const [key, expectedValue] of Object.entries(expected.details)) {
-      assertEquals(
-        actualDetails[key],
-        expectedValue,
-        `Unexpected audit detail value for "${key}".`,
-      );
-    }
+    return Object.entries(expected.details).every(
+      ([key, value]) => actualDetails[key] === value,
+    );
+  });
+
+  assertExists(
+    matchingEvent,
+    `No audit event matched the expected details: ${JSON.stringify(expected.details)}`,
+  );
+
+  assertEquals(matchingEvent.user_id, expected.actorId);
+  assertEquals(matchingEvent.action, expected.action);
+  assertEquals(matchingEvent.resource_type, expected.resourceType);
+
+  if (expected.resourceId !== undefined) {
+    assertEquals(matchingEvent.resource_id, expected.resourceId);
   }
 }
