@@ -10,6 +10,7 @@ jobs:
   authorization-tests:
     name: Authorization and RBAC Integration Tests
     runs-on: ubuntu-latest
+
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
@@ -38,6 +39,7 @@ jobs:
           test -n "$SUPABASE_URL"
           test -n "$SUPABASE_PUBLISHABLE_KEY"
           test -n "$SUPABASE_SECRET_KEY"
+
           cat > .env.test <<EOF
           SUPABASE_URL=$SUPABASE_URL
           SUPABASE_PUBLISHABLE_KEY=$SUPABASE_PUBLISHABLE_KEY
@@ -55,3 +57,12 @@ jobs:
 
       - name: Run Authorization and RBAC Integration Tests
         run: deno task test:integration:authorization
+
+      - name: Upload Authorization Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: authorization-test-results-${{ github.run_id }}
+          path: test-results/
+          if-no-files-found: error
+          retention-days: 90
