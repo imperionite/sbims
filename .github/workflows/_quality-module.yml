@@ -72,7 +72,6 @@ jobs:
       ENVIRONMENT: test
 
     steps:
-
       # ============================================================
       # INITIALIZE
       # ============================================================
@@ -558,6 +557,21 @@ jobs:
             fi
 
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # ============================================================
+      # UPLOAD TEST LOGS AS ARTIFACTS
+      # ============================================================
+      - name: Upload Test Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ inputs.module }}-${{ github.run_id }}
+          path: |
+            unit-output.txt
+            integration-output.txt
+            smoke-output.txt
+          if-no-files-found: ignore
+          retention-days: 14
 
       # ============================================================
       # ENFORCE QUALITY GATE
