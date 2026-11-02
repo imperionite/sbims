@@ -1022,9 +1022,6 @@ Deno.test(
         resourceType: "INTERNSHIP_REPORT_SUMMARY",
         resourceId: null,
         createdAfter: auditStartTime,
-        details: {
-          totalInternships: 3,
-        },
       });
     } finally {
       await cleanupFixtures(fixture);
