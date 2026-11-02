@@ -20,6 +20,8 @@ const { supabaseAdmin } = createSupabaseClients(env);
 
 const REPORT_STUDENT_EMAIL_PREFIX = "sbims-report-test-";
 
+const auditStartTime = new Date().toISOString();
+
 type InternshipRecord = {
   id: string;
   student_id: string;
@@ -444,13 +446,16 @@ Deno.test(
 
       const adminId = await getTestUserId(TEST_USERS.admin.email);
 
-      const studentA = await createReportStudent("BSIT");
+      const reportProgramA = `R10A-${crypto.randomUUID().slice(0, 8)}`;
+      const reportProgramB = `R10B-${crypto.randomUUID().slice(0, 8)}`;
+
+      const studentA = await createReportStudent(reportProgramA);
       fixture.studentIds.push(studentA.id);
 
-      const studentB = await createReportStudent("BSCS");
+      const studentB = await createReportStudent(reportProgramB);
       fixture.studentIds.push(studentB.id);
 
-      const studentC = await createReportStudent("BSIT");
+      const studentC = await createReportStudent(reportProgramA);
       fixture.studentIds.push(studentC.id);
 
       const hteA = await createReportHte(adminToken);
@@ -599,7 +604,7 @@ Deno.test(
 
       assertEquals(studentAReport.id, studentA.id);
       assertEquals(studentAReport.studentNumber, studentA.studentNumber);
-      assertEquals(studentAReport.program, "BSIT");
+      assertEquals(studentAReport.program, reportProgramA);
       assertExists(studentAReport.name);
 
       assertEquals(hteAReport.id, hteA.id);
@@ -705,7 +710,7 @@ Deno.test(
       // ------------------------------------------------------
 
       const programReport = await requestReport(
-        "/api/v1/reports/internships?program=BSCS",
+        `/api/v1/reports/internships?program=${encodeURIComponent(reportProgramB)}`,
         adminToken,
       );
 
@@ -790,7 +795,11 @@ Deno.test(
       // ------------------------------------------------------
 
       const combinedReport = await requestReport(
-        `/api/v1/reports/internships?status=active&program=BSCS&hte_id=${hteA.id}&faculty_adviser_id=${facultyAdviserId}`,
+        `/api/v1/reports/internships?status=active&program=${
+          encodeURIComponent(
+            reportProgramB,
+          )
+        }&hte_id=${hteA.id}&faculty_adviser_id=${facultyAdviserId}`,
         adminToken,
       );
 
@@ -840,7 +849,7 @@ Deno.test(
       // ------------------------------------------------------
 
       const summary = await requestReport(
-        "/api/v1/reports/internships/summary",
+        `/api/v1/reports/internships/summary?program=${encodeURIComponent(reportProgramA)}`,
         adminToken,
       );
 
@@ -851,47 +860,82 @@ Deno.test(
 
       assertExists(summaryData);
 
-      // Three fixture internships:
-      // pending = 1, active = 1, completed = 1.
-      assertEquals(summaryData.totalInternships, 3);
+      // Program A contains two fixture internships:
+      // pending = 1, completed = 1.
+      assertEquals(summaryData.totalInternships, 2);
       assertEquals(summaryData.pending, 1);
-      assertEquals(summaryData.active, 1);
+      assertEquals(summaryData.active, 0);
       assertEquals(summaryData.completed, 1);
 
       // Required hours:
-      // 10 + 12 + null = 22.
-      assertEquals(summaryData.totalRequiredHours, 22);
+      // 10 + null = 10.
+      assertEquals(summaryData.totalRequiredHours, 10);
 
       // Validated rendered hours:
-      // 8 + 16 + 8 = 32.
-      // Pending and rejected attendance are excluded.
-      assertEquals(summaryData.totalRenderedHours, 32);
+      // 8 + 8 = 16.
+      assertEquals(summaryData.totalRenderedHours, 16);
 
       // Remaining hours:
-      // max(10 - 8, 0) + max(12 - 16, 0).
-      // Null required hours are excluded from the remaining-hours total.
+      // max(10 - 8, 0) = 2.
+      // Null required hours are excluded.
       assertEquals(summaryData.totalRemainingHours, 2);
 
       // ------------------------------------------------------
-      // 15. Summary filters
+      // 14.1. Summary endpoint - Program B
       // ------------------------------------------------------
 
-      const filteredSummary = await requestReport(
-        "/api/v1/reports/internships/summary?program=BSCS",
+      const summaryProgramB = await requestReport(
+        `/api/v1/reports/internships/summary?program=${encodeURIComponent(reportProgramB)}`,
         adminToken,
       );
 
-      assertEquals(filteredSummary.response.status, 200);
+      assertEquals(summaryProgramB.response.status, 200);
+      assertEquals(summaryProgramB.body.success, true);
 
-      const filteredSummaryData = filteredSummary.body.data;
+      const summaryProgramBData = summaryProgramB.body.data;
 
-      assertEquals(filteredSummaryData.totalInternships, 1);
-      assertEquals(filteredSummaryData.pending, 0);
-      assertEquals(filteredSummaryData.active, 1);
-      assertEquals(filteredSummaryData.completed, 0);
-      assertEquals(filteredSummaryData.totalRequiredHours, 12);
-      assertEquals(filteredSummaryData.totalRenderedHours, 16);
-      assertEquals(filteredSummaryData.totalRemainingHours, 0);
+      assertExists(summaryProgramBData);
+
+      // Program B contains only internship B.
+      assertEquals(summaryProgramBData.totalInternships, 1);
+      assertEquals(summaryProgramBData.pending, 0);
+      assertEquals(summaryProgramBData.active, 1);
+      assertEquals(summaryProgramBData.completed, 0);
+
+      assertEquals(summaryProgramBData.totalRequiredHours, 12);
+      assertEquals(summaryProgramBData.totalRenderedHours, 16);
+      assertEquals(summaryProgramBData.totalRemainingHours, 0);
+
+      // ------------------------------------------------------
+      // 15. Summary filters - status filtering
+      // ------------------------------------------------------
+
+      const pendingSummary = await requestReport(
+        `/api/v1/reports/internships/summary?program=${
+          encodeURIComponent(reportProgramA)
+        }&status=pending`,
+        adminToken,
+      );
+
+      assertEquals(pendingSummary.response.status, 200);
+      assertEquals(pendingSummary.body.success, true);
+
+      const pendingSummaryData = pendingSummary.body.data;
+
+      assertExists(pendingSummaryData);
+
+      // Program A contains:
+      // Internship A = pending
+      // Internship C = completed
+
+      assertEquals(pendingSummaryData.totalInternships, 1);
+      assertEquals(pendingSummaryData.pending, 1);
+      assertEquals(pendingSummaryData.active, 0);
+      assertEquals(pendingSummaryData.completed, 0);
+
+      assertEquals(pendingSummaryData.totalRequiredHours, 10);
+      assertEquals(pendingSummaryData.totalRenderedHours, 8);
+      assertEquals(pendingSummaryData.totalRemainingHours, 2);
 
       // ------------------------------------------------------
       // 16. Empty filtered result
@@ -933,6 +977,7 @@ Deno.test(
         action: "GENERATE_REPORT",
         resourceType: "INTERNSHIP_REPORT",
         resourceId: null,
+        createdAfter: auditStartTime,
         details: {
           recordCount: reportRows.length,
         },
@@ -976,6 +1021,7 @@ Deno.test(
         action: "GENERATE_REPORT",
         resourceType: "INTERNSHIP_REPORT_SUMMARY",
         resourceId: null,
+        createdAfter: auditStartTime,
         details: {
           totalInternships: 3,
         },
