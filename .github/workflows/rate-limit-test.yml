@@ -141,7 +141,6 @@ jobs:
               while ((match = testcaseRegex.exec(xml)) !== null) {
                 const name = match[1] ?? match[4];
                 const time = match[2] ?? match[5];
-
                 const body = match[3] ?? "";
 
                 const isFailed =
@@ -157,13 +156,11 @@ jobs:
                 results.push({
                   name,
                   status,
-                  duration: `${(
-                    Number(time) * 1000
-                  ).toFixed(0)}ms`,
+                  duration: `${(Number(time) * 1000).toFixed(0)}ms`,
                 });
               }
             } catch {
-              // Test may not have generated a report.
+              // A test suite may not have generated a report.
             }
           }
 
@@ -192,9 +189,7 @@ jobs:
             `**${total} tests: ${passed} passed, ${failed} failed**`
           );
           lines.push("");
-          lines.push(
-            `Finished: ${new Date().toISOString()}`
-          );
+          lines.push(`Finished: ${new Date().toISOString()}`);
 
           await Deno.writeTextFile(
             summaryFile,
@@ -202,6 +197,23 @@ jobs:
             { append: true },
           );
           '
+
+      - name: Save workflow summary
+        if: always()
+        run: cp "$GITHUB_STEP_SUMMARY" rate-limit-test-summary.md
+
+      - name: Upload Rate Limit Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rate-limit-test-results-${{ github.run_id }}
+          path: |
+            infra.junit.xml
+            middleware.junit.xml
+            upstash.junit.xml
+            rate-limit-test-summary.md
+          if-no-files-found: warn
+          retention-days: 90
 
       - name: Determine final result
         if: always()

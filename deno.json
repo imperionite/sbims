@@ -55,7 +55,7 @@
     "test:integration:documents": "deno test --env-file=.env.test tests/integration/documents.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:reports": "deno test --env-file=.env.test tests/integration/reports.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:audit": "deno test --env-file=.env.test tests/integration/audit.integration.test.ts --allow-all",
-    "test:integration:authorization": "deno test --env-file=.env.test tests/integration/authorization-rbac.integration.test.ts --allow-read --allow-env --allow-net",
+    "test:integration:authorization": "deno test --env-file=.env.test tests/integration/authorization-rbac.integration.test.ts --allow-read --allow-env --allow-net --junit-path=test-results/authorization-rbac-junit.xml",
     "cov:auth": "deno test --env-file=.env.test --coverage=coverage/auth tests/unit/auth tests/integration/auth.integration.test.ts --allow-read --allow-env --allow-net && deno coverage coverage/auth --include='src/modules/auth/'",
     "cov:users": "deno test --env-file=.env.test --coverage=coverage/users tests/unit/users tests/integration/users.integration.test.ts --allow-read --allow-env --allow-net && deno coverage coverage/users --include='src/modules/users/'",
     "cov:students": "deno test --env-file=.env.test --coverage=coverage/students tests/unit/students tests/integration/students.integration.test.ts --allow-read --allow-env --allow-net && deno coverage coverage/students --include='src/modules/students/'",
