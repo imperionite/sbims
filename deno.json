@@ -67,6 +67,8 @@
     "cov:reports": "deno test --env-file=.env.test --coverage=coverage/reports tests/unit/reports tests/integration/reports.integration.test.ts --allow-all && deno coverage coverage/reports --include='src/modules/reports/'",
     "cov:audit": "deno test --env-file=.env.test --coverage=coverage/audit tests/unit/audit tests/integration/audit.integration.test.ts --allow-all && deno coverage coverage/audit --include='src/modules/audit/'",
     "cov:authorization": "deno test --env-file=.env.test --coverage=coverage/authorization tests/integration/authorization-rbac.integration.test.ts tests/integration/users.integration.test.ts tests/integration/students.integration.test.ts tests/integration/htes.integration.test.ts tests/integration/internships.integration.test.ts tests/integration/evaluations.integration.test.ts tests/integration/documents.integration.test.ts tests/integration/reports.integration.test.ts tests/integration/audit.integration.test.ts --allow-all && deno coverage coverage/authorization --include=\"src/modules/\"",
+    "test:unit:coverage": "deno test --env-file=.env.test tests/unit --coverage=coverage/unit --allow-read --allow-env --allow-net && deno coverage coverage/unit",
+    "test:integration:coverage": "deno test --env-file=.env.test tests/integration --coverage=coverage/integration --allow-read --allow-env --allow-net && deno coverage coverage/integration",
     "security:setup": "deno run --env-file=.env.test --allow-env --allow-net --allow-read .github/scripts/setup-security-test-users.ts",
     "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts"
   },
