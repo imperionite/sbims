@@ -20,6 +20,11 @@ export function createApp(env: AppConfig) {
     Variables: AppVariables;
   }>();
 
+  // Exploratory instrumentation
+  const applicationId = crypto.randomUUID();
+  const applicationInitializedAt = performance.now();
+  appLogger.info("application_initialized", { applicationId });
+
   const supabase = createSupabaseClients(env);
   const rateLimitStore = createRateLimitStore(env);
 
@@ -27,6 +32,19 @@ export function createApp(env: AppConfig) {
     c.set("supabase", supabase);
     await next();
   });
+
+  // Exploratory instrumentation
+  app.use("*", async (c, next) => {
+    c.header("X-Application-ID", applicationId);
+
+    c.header(
+      "X-Application-Initialization-Age-Ms",
+      String(Math.round(performance.now() - applicationInitializedAt)),
+    );
+
+    await next();
+  });
+
   app.use("*", secureHeaders());
   app.use("*", honoLogger());
 
