@@ -39,7 +39,6 @@ export function createApp(env: AppConfig) {
 
     c.header(
       "X-Application-Initialization-Age-Ms",
-
       String(Math.round(performance.now() - applicationInitializedAt)),
     );
 
