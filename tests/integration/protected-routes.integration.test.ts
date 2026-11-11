@@ -146,124 +146,24 @@ async function assertEndpointsRejectRequests(
   );
 }
 
- Deno.test("Protected endpoint authentication checks", async (t) => {
+Deno.test("Protected endpoint authentication checks", async (t) => {
   await t.step("Protected endpoints reject requests without tokens", async () => {
-  await assertEndpointsRejectRequests("Missing-token check");
+    await assertEndpointsRejectRequests("Missing-token check");
   });
 
   await t.step("Protected endpoints reject invalid tokens", async () => {
-  let passed = 0;
-  const failures: string[] = [];
+    let passed = 0;
+    const failures: string[] = [];
 
-  for (const endpoint of protectedEndpoints) {
-    const response = await app.request(endpoint.path, {
-      method: endpoint.method,
-      headers: {
-        Authorization: "Bearer invalid-token",
-      },
-    });
-
-    if (response.status === 401) {
-      passed++;
-    } else {
-      failures.push(
-        `${endpoint.method} ${endpoint.path} returned ${response.status}`,
-      );
-    }
-  }
-
-  console.log(
-    `Invalid-token check: ${protectedEndpoints.length} endpoints tested, ${passed} passed, ${failures.length} failed.`,
-  );
-  checkSummaries.push({
-    scenario: "Invalid-token check",
-    tested: protectedEndpoints.length,
-    passed,
-    failed: failures.length,
-  });
-  assertEquals(
-    failures.length,
-    0,
-    failures.length > 0 ? `Unexpected responses:\n${failures.join("\n")}` : "",
-  );
-  });
-
-  await t.step("Protected endpoints reject expired tokens", async () => {
-  let passed = 0;
-  const failures: string[] = [];
-
-  for (const endpoint of protectedEndpoints) {
-    const response = await app.request(endpoint.path, {
-      method: endpoint.method,
-      headers: {
-        Authorization: "Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3OGUxNDVkMi1hN2M3LTRkM2MtOWMzZS04MDI2YTc2NGM1NGUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzMwNzE3LCJpYXQiOjE3OTQzMjcxMTcsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczJAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkdhYnJpZWwiLCJsYXN0X25hbWUiOiJWaWxsYW51ZXZhIiwibWlkZGxlX25hbWUiOiJTYW50b3MiLCJyb2xlIjoiaW50ZXJuc2hpcF9jb29yZGluYXRvciIsInNlZWRfa2V5IjoiaW50ZXJuc2hpcC1jb29yZGluYXRvci0wMiIsInN1ZmZpeCI6bnVsbH0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQzMjcxMTd9XSwic2Vzc2lvbl9pZCI6ImFjMDkyODcxLTkwZmEtNDJhNi1hMjhmLWRiNjA1MWJjZjc2NCIsImlzX2Fub255bW91cyI6ZmFsc2V9.-X8wmJrilz7qpHL4WtpaQ-g7EXUFl8VXCxE-lR8h6OwVOww3Ec6newIRUm75lBNKuvMS8EUui27jICNukFiUfQ",
-      },
-    });
-
-    if (response.status === 401) {
-      passed++;
-    } else {
-      failures.push(
-        `${endpoint.method} ${endpoint.path} returned ${response.status}`,
-      );
-    }
-  }
-
-  console.log(
-    `Expired-token check: ${protectedEndpoints.length} endpoints tested, ${passed} passed, ${failures.length} failed.`,
-  );
-  checkSummaries.push({
-    scenario: "Expired-token check",
-    tested: protectedEndpoints.length,
-    passed,
-    failed: failures.length,
-  });
-  assertEquals(
-    failures.length,
-    0,
-    failures.length > 0 ? `Unexpected responses:\n${failures.join("\n")}` : "",
-  );
-  });
-
-  await t.step(
-    "Protected endpoints reject sessions for deactivated accounts",
-    async () => {
-  await setupTestUsers();
-
-  const loginResponse = await app.request("/api/v1/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: TEST_USERS.student.email,
-      password: TEST_USERS.student.password,
-    }),
-  });
-  assertEquals(loginResponse.status, 200, "Test account should be able to log in");
-
-  const loginBody = await loginResponse.json();
-  assertExists(loginBody.data?.accessToken);
-  const accessToken: string = loginBody.data.accessToken;
-
-  const { error: deactivateError } = await supabaseAdmin
-    .from("profiles")
-    .update({ is_active: false })
-    .eq("email", TEST_USERS.student.email);
-
-  if (deactivateError) {
-    throw deactivateError;
-  }
-
-  let passed = 0;
-  const failures: string[] = [];
-
-  try {
     for (const endpoint of protectedEndpoints) {
       const response = await app.request(endpoint.path, {
         method: endpoint.method,
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: "Bearer invalid-token",
+        },
       });
 
-      if (response.status === 403) {
+      if (response.status === 401) {
         passed++;
       } else {
         failures.push(
@@ -273,10 +173,10 @@ async function assertEndpointsRejectRequests(
     }
 
     console.log(
-      `Deactivated-account check: ${protectedEndpoints.length} endpoints tested, ${passed} passed, ${failures.length} failed.`,
+      `Invalid-token check: ${protectedEndpoints.length} endpoints tested, ${passed} passed, ${failures.length} failed.`,
     );
     checkSummaries.push({
-      scenario: "Deactivated-account check",
+      scenario: "Invalid-token check",
       tested: protectedEndpoints.length,
       passed,
       failed: failures.length,
@@ -286,16 +186,117 @@ async function assertEndpointsRejectRequests(
       0,
       failures.length > 0 ? `Unexpected responses:\n${failures.join("\n")}` : "",
     );
-  } finally {
-    const { error: restoreError } = await supabaseAdmin
-      .from("profiles")
-      .update({ is_active: true })
-      .eq("email", TEST_USERS.student.email);
+  });
 
-    if (restoreError) {
-      throw restoreError;
+  await t.step("Protected endpoints reject expired tokens", async () => {
+    let passed = 0;
+    const failures: string[] = [];
+
+    for (const endpoint of protectedEndpoints) {
+      const response = await app.request(endpoint.path, {
+        method: endpoint.method,
+        headers: {
+          Authorization:
+            "Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3OGUxNDVkMi1hN2M3LTRkM2MtOWMzZS04MDI2YTc2NGM1NGUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzMwNzE3LCJpYXQiOjE3OTQzMjcxMTcsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczJAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkdhYnJpZWwiLCJsYXN0X25hbWUiOiJWaWxsYW51ZXZhIiwibWlkZGxlX25hbWUiOiJTYW50b3MiLCJyb2xlIjoiaW50ZXJuc2hpcF9jb29yZGluYXRvciIsInNlZWRfa2V5IjoiaW50ZXJuc2hpcC1jb29yZGluYXRvci0wMiIsInN1ZmZpeCI6bnVsbH0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQzMjcxMTd9XSwic2Vzc2lvbl9pZCI6ImFjMDkyODcxLTkwZmEtNDJhNi1hMjhmLWRiNjA1MWJjZjc2NCIsImlzX2Fub255bW91cyI6ZmFsc2V9.-X8wmJrilz7qpHL4WtpaQ-g7EXUFl8VXCxE-lR8h6OwVOww3Ec6newIRUm75lBNKuvMS8EUui27jICNukFiUfQ",
+        },
+      });
+
+      if (response.status === 401) {
+        passed++;
+      } else {
+        failures.push(
+          `${endpoint.method} ${endpoint.path} returned ${response.status}`,
+        );
+      }
     }
-  }
+
+    console.log(
+      `Expired-token check: ${protectedEndpoints.length} endpoints tested, ${passed} passed, ${failures.length} failed.`,
+    );
+    checkSummaries.push({
+      scenario: "Expired-token check",
+      tested: protectedEndpoints.length,
+      passed,
+      failed: failures.length,
+    });
+    assertEquals(
+      failures.length,
+      0,
+      failures.length > 0 ? `Unexpected responses:\n${failures.join("\n")}` : "",
+    );
+  });
+
+  await t.step(
+    "Protected endpoints reject sessions for deactivated accounts",
+    async () => {
+      await setupTestUsers();
+
+      const loginResponse = await app.request("/api/v1/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: TEST_USERS.student.email,
+          password: TEST_USERS.student.password,
+        }),
+      });
+      assertEquals(loginResponse.status, 200, "Test account should be able to log in");
+
+      const loginBody = await loginResponse.json();
+      assertExists(loginBody.data?.accessToken);
+      const accessToken: string = loginBody.data.accessToken;
+
+      const { error: deactivateError } = await supabaseAdmin
+        .from("profiles")
+        .update({ is_active: false })
+        .eq("email", TEST_USERS.student.email);
+
+      if (deactivateError) {
+        throw deactivateError;
+      }
+
+      let passed = 0;
+      const failures: string[] = [];
+
+      try {
+        for (const endpoint of protectedEndpoints) {
+          const response = await app.request(endpoint.path, {
+            method: endpoint.method,
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+
+          if (response.status === 403) {
+            passed++;
+          } else {
+            failures.push(
+              `${endpoint.method} ${endpoint.path} returned ${response.status}`,
+            );
+          }
+        }
+
+        console.log(
+          `Deactivated-account check: ${protectedEndpoints.length} endpoints tested, ${passed} passed, ${failures.length} failed.`,
+        );
+        checkSummaries.push({
+          scenario: "Deactivated-account check",
+          tested: protectedEndpoints.length,
+          passed,
+          failed: failures.length,
+        });
+        assertEquals(
+          failures.length,
+          0,
+          failures.length > 0 ? `Unexpected responses:\n${failures.join("\n")}` : "",
+        );
+      } finally {
+        const { error: restoreError } = await supabaseAdmin
+          .from("profiles")
+          .update({ is_active: true })
+          .eq("email", TEST_USERS.student.email);
+
+        if (restoreError) {
+          throw restoreError;
+        }
+      }
     },
   );
 
