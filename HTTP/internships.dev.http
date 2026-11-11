@@ -78,10 +78,10 @@
 
 ###############################################################
 @apiUrl=http://localhost:8000/api/v1
-@internshipId=40a25eb3-ce19-4530-abf9-b0dfd40814e0
-@studentId=fb0a078e-b6b8-4c8d-8f59-fce9329b728f
-@hteId=ecf97cb8-06e6-444e-b1f6-0afcf5784783
-@facultyAdviserId=42150282-0023-4aa7-86ea-acd0e2574395
+@internshipId=dae63ddc-5881-4fd2-9ea8-58507a8b9704
+@studentId=31c0501a-968a-4377-805a-f9ece1436412
+@hteId=9d6ff1d8-7dd2-436c-b597-726b172ea71f
+@facultyAdviserId=1a80845b-b72d-457b-a9cd-45116f1c37bc
 
 ###############################################################
 
@@ -113,10 +113,11 @@
 
 ### Paste a valid administrator access token here.
 
-@adminAccessToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
-@coordinatorAccessToken=PASTE_COORDINATOR_ACCESS_TOKEN_HERE
-@studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
-@facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN
+@adminAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkOGY3OWQ2Ni00YWUxLTRlODAtYWZkZi1lZjcxM2JhYWY0NDciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzM4Mjk4LCJpYXQiOjE3OTQzMzQ2OTgsImVtYWlsIjoiYWRtaW5zYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IklzYWFjIiwibGFzdF9uYW1lIjoiQ2xhcmtlIiwibWlkZGxlX25hbWUiOiJNYXJhZG9uYSIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic2VlZF9rZXkiOiJhZG1pbmlzdHJhdG9yLTAxIiwic3VmZml4IjpudWxsfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc5NDMzNDY5OH1dLCJzZXNzaW9uX2lkIjoiYjM0ZDRmNDgtYjFiOC00NDg0LTkzMTQtODllMjViNGMzNGZhIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.5nQfz3z7MBA2ZrYmIcn3S6ZKn1wLy2AEscs2p5ZD4Ivt-5T2bpF2LZqrwGLQ_kXhRIYAwJ76WQPorvke3vLy-g
+@studentAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIzMWMwNTAxYS05NjhhLTQzNzctODA1YS1mOWVjZTE0MzY0MTIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzM4MzUxLCJpYXQiOjE3OTQzMzQ3NTEsImVtYWlsIjoic3R1ZGVudHNiaW1zMTAwQGdyci5sYSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcnN0X25hbWUiOiJNaWxhZ3JvcyIsImxhc3RfbmFtZSI6IkNydXoiLCJyb2xlIjoic3R1ZGVudCJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzk0MzM0NzUxfV0sInNlc3Npb25faWQiOiIyOWI1M2EyMC0wMzVmLTQ5YWQtOTA3Mi1jNGQ2YjE4ZTQ5ZDIiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.9HfpiydsFpHacIUIHBx0DhGJODCrjSiqgNmxM3VwDDK45ojCF-wHsrxo2rlmgHobfRFKEaPOO8EgtB8q3G-tdQ
+@coordinatorAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1NDg3Y2IyNi04ZGM0LTQ5ZWYtOGZjYy05MmIyOTBhNTM5ODQiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzM0NDYxLCJpYXQiOjE3OTQzMzA4NjEsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzZWVkX2tleSI6ImludGVybnNoaXAtY29vcmRpbmF0b3ItMDEiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzk0MzMwODYxfV0sInNlc3Npb25faWQiOiI3Y2YzNTY5My1hMDcwLTRlYjMtOGRmZi05ODQ1YWViYTNkNjQiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.k181bPzha_g7dBTfEaS-yO-z3pJn2AxLea0bpapeuHU_FFc5VxZjDt-G9Yiczm28ZTZaaN8j8hCiXdI-6g3BsA
+@facultyAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIxOTRmZjUyMi01MGJmLTRjMGMtYTMwYy05NTk2NjAyM2MwOTgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzM4MzM0LCJpYXQiOjE3OTQzMzQ3MzQsImVtYWlsIjoiZmFjdWx0eXNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiTmF0aGFuaWVsIEFuZHJlcyIsImxhc3RfbmFtZSI6Ik5hY3BpbCIsIm1pZGRsZV9uYW1lIjoiU2FybWllbnRvIiwicm9sZSI6ImZhY3VsdHlfYWR2aXNlciIsInNlZWRfa2V5IjoiZmFjdWx0eS1hZHZpc2VyLTAxIiwic3VmZml4IjoiSnIuIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQzMzQ3MzR9XSwic2Vzc2lvbl9pZCI6ImZhNGQzZjUzLTc0ZjYtNDA0Ny1hYmE5LWI1MjlmMTVmOTVlNSIsImlzX2Fub255bW91cyI6ZmFsc2V9.EbxBYzNvOxkGHhS8LysFFmeD6QjcCIde6JDzFe7RsdkjktEE4qrfiVKAZe5lT_jZOtopSO_Ra2SsI640HrL9ow
+@hteToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZjQxMDgyNC01ZTEwLTQxYWItYTMyNC0xMjVjNGQ1NGUyMTgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzM4MzY3LCJpYXQiOjE3OTQzMzQ3NjcsImVtYWlsIjoiaHRlc2JpbXMxQGdyci5sYSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcnN0X25hbWUiOiJSb2JlcnRvIEx1aXMiLCJsYXN0X25hbWUiOiJWYWxkZXJhbWEiLCJtaWRkbGVfbmFtZSI6IkZlcm5hbmRleiIsInJvbGUiOiJodGVfc3VwZXJ2aXNvciIsInNlZWRfa2V5IjoiaHRlLXN1cGVydmlzb3ItMDEiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzk0MzM0NzY3fV0sInNlc3Npb25faWQiOiI5YTNlYzg2MS03NDk0LTRiMTMtYWE5NC0yNTFlMDBmYzFlYzYiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ._KNxOq53WjKnyeCrBO-iKsCxR7ZozgucFjjAxtDm4i9KIQp0JrUtJzui2DRDIN7V8YMIBqeU_PHiAS60EpnAdg
 ###############################################################
 
 # HEALTH
@@ -294,7 +295,10 @@ Content-Type: application/json
 {
 "studentId": "{{studentId}}",
 "hteId": "{{hteId}}",
-"required_hours": 550
+"requiredHours": 300,
+"startDate": "2026-10-05",
+"endDate": "2026-12-30",
+"facultyAdviserId": "{{facultyAdviserId}}"
 }
 
 ###
@@ -359,6 +363,11 @@ Content-Type: application/json
 ### FR-05 - Administrator Retrieve Internship
 
 GET {{apiUrl}}/internships/{{internshipId}}
+Authorization: Bearer {{adminAccessToken}}
+
+### FR-05 - Coordinator Retrieve Internship
+
+GET {{apiUrl}}/internships/{{internshipId}}
 Authorization: Bearer {{coordinatorAccessToken}}
 
 ###
@@ -420,6 +429,16 @@ Content-Type: application/json
 "status": "active"
 }
 
+### FR-05 - Administrator Activate Internship
+
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"status": "active"
+}
+
 ###
 
 ### Expected:
@@ -442,6 +461,16 @@ Content-Type: application/json
 
 PATCH {{apiUrl}}/internships/{{internshipId}}/status
 Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+"status": "completed"
+}
+
+### FR-05 - Coordinator Complete Internship
+
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{coordinatorAccessToken}}
 Content-Type: application/json
 
 {
@@ -752,6 +781,21 @@ Authorization: Bearer {{facultyAccessToken}}
 
 ###############################################################
 
+### HTE Supervisor Cannot List All Internships
+
+GET {{apiUrl}}/internships
+Authorization: Bearer {{hteToken}}
+
+###
+
+### Expected:
+
+### HTTP 403
+
+### Insufficient permissions.
+
+###############################################################
+
 # STUDENT - CREATE
 
 ###############################################################
@@ -907,6 +951,81 @@ Content-Type: application/json
 
 ### Insufficient permissions.
 
+
+###############################################################
+
+# OTHER AUTHORIZATION TESTS
+
+###############################################################
+
+### Adminstrator Cannot Access GET internships/me Endpoint
+GET {{apiUrl}}/internships/me
+Authorization: Bearer {{adminAccessToken}}
+
+### Coordinator Cannot Access GET internships/me Endpoint
+GET {{apiUrl}}/internships/me
+Authorization: Bearer {{coordinatorAccessToken}}
+
+### Faculty Adviser Cannot Access GET internships/me Endpoint
+GET {{apiUrl}}/internships/me
+Authorization: Bearer {{facultyAccessToken}}
+
+### Supervisor Cannot Access GET internships/me Endpoint
+GET {{apiUrl}}/internships/me
+Authorization: Bearer {{hteToken}}
+
+
+
+### Supervisor Cannot Retrieve Internship Profile by ID
+GET {{apiUrl}}/internships/{{internshipId}}
+Authorization: Bearer {{hteToken}}
+
+### Supervisor Cannot Create Internship Assignment
+POST {{apiUrl}}/internships
+Authorization: Bearer {{hteToken}}
+
+
+
+### Faculty Adviser Cannot Update Internship Record
+PATCH {{apiUrl}}/internships/{{internshipId}}
+Authorization: Bearer {{facultyAccessToken}}
+
+### Faculty Adviser Cannot Update Internship Status
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{facultyAccessToken}}
+
+### Faculty Adviser Cannot Assign Internship Adviser
+PATCH {{apiUrl}}/internships/{{internshipId}}/adviser
+Authorization: Bearer {{facultyAccessToken}}
+
+
+
+### Supervisor Cannot Update Internship Record
+PATCH {{apiUrl}}/internships/{{internshipId}}
+Authorization: Bearer {{hteToken}}
+
+### Supervisor Cannot Update Internship Status
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{hteToken}}
+
+### Supervisor Cannot Assign Internship Adviser
+PATCH {{apiUrl}}/internships/{{internshipId}}/adviser
+Authorization: Bearer {{hteToken}}
+
+
+
+### Student Cannot Update Internship Record
+PATCH {{apiUrl}}/internships/{{internshipId}}
+Authorization: Bearer {{studentAccessToken}}
+
+### Student Cannot Update Internship Status
+PATCH {{apiUrl}}/internships/{{internshipId}}/status
+Authorization: Bearer {{studentAccessToken}}
+
+### Student Cannot Assign Internship Adviser
+PATCH {{apiUrl}}/internships/{{internshipId}}/adviser
+Authorization: Bearer {{studentAccessToken}}
+
 ###############################################################
 
 ## Assign Faculty Adviser to Internship
@@ -922,6 +1041,15 @@ Content-Type: application/json
     "facultyAdviserId": "{{facultyAdviserId}}"
 }
 
+### Administrator Assign Faculty Adviser to Internship
+PATCH {{apiUrl}}/internships/{{internshipId}}/adviser
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+    "facultyAdviserId": "{{facultyAdviserId}}"
+}
+
 
 ###############################################################
 
@@ -929,8 +1057,23 @@ Content-Type: application/json
 
 ###############################################################
 
+### Coordinator Update Internship
 PATCH {{apiUrl}}/internships/{{internshipId}}
 Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{
+"requiredHours": 250,
+"startDate": "2026-09-13",
+"endDate": "2026-10-30",
+"hteId": "{{hteId}}",
+"facultyAdviserId": "{{facultyAdviserId}}"
+
+}
+
+### Administrator Update Internship
+PATCH {{apiUrl}}/internships/{{internshipId}}
+Authorization: Bearer {{adminAccessToken}}
 Content-Type: application/json
 
 {

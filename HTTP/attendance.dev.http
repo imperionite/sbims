@@ -53,12 +53,12 @@
 ### Internship ID
 ### Replace after creating the test internship.
 
-@internshipId=00000000-0000-0000-0000-000000000000
+@internshipId=35b22c63-b244-4235-8065-824826459bd3
 
 ### Attendance ID
 ### Replace after creating an attendance record.
 
-@attendanceId=00000000-0000-0000-0000-000000000000
+@attendanceId=e83946de-1335-4fc1-8be0-c0624f7de5a6
 
 ### Second Attendance ID
 ### Used for validation/rejection tests.
@@ -109,7 +109,7 @@
 
 ### Paste a valid student access token here.
 
-@studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
+@studentAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIzMWMwNTAxYS05NjhhLTQzNzctODA1YS1mOWVjZTE0MzY0MTIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzkwMDcwLCJpYXQiOjE3OTQzODY0NzAsImVtYWlsIjoic3R1ZGVudHNiaW1zMTAwQGdyci5sYSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcnN0X25hbWUiOiJNaWxhZ3JvcyIsImxhc3RfbmFtZSI6IkNydXoiLCJyb2xlIjoic3R1ZGVudCJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzk0Mzg2NDcwfV0sInNlc3Npb25faWQiOiIzOTg0YTM4Yy03NmRjLTQwOWItYjMzZS0yZDM1MTk4Y2Q3OGYiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.wlnLzHoEaZEDvuX1tASl08jf-qsJ69OASFlJZUYc_3cQ8wKNsws_CP0lhQiprDLxsq9FC0qH49iSRd674UAC0A
 
 ### Paste a valid faculty adviser access token here.
 
@@ -1142,6 +1142,28 @@ Content-Type: application/json
 ###
 ### You can only update your own attendance.
 
+
+### Student Cannot Retrieve Another Student's Attendance
+GET {{apiUrl}}/attendance/{{attendanceId}}
+Authorization: Bearer {{studentAccessToken}}
+### Expected:
+### HTTP 403
+###
+### You can only retrieve your own attendance.
+
+
+
+### Student Cannot Submit Attendance for Another Student's Internship
+POST {{apiUrl}}/attendance
+Authorization: Bearer {{studentAccessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "attendance_date": "2026-09-20",
+  "time_in": "08:00",
+  "time_out": "17:00"
+}
 
 ###############################################################
 # ACTIVE INTERNSHIP REQUIREMENT

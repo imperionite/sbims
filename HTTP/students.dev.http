@@ -79,7 +79,7 @@
 ###############################################################
 
 @adminUserId=ADD_HERE
-@studentUserId=fb0a078e-b6b8-4c8d-8f59-fce9329b728f
+@studentUserId=31c0501a-968a-4377-805a-f9ece1436412
 @facultyUserId=cd315baa-c628-4ff9-9f71-9caae86ed096
 @coordinatorUserId=01501d31-a58b-4034-8b5c-b0b6f9ece378
 
@@ -93,11 +93,11 @@
 
 ###############################################################
 
-@adminToken=
-@studentToken=
-@facultyToken=
-@coordinatorToken=
-@hteToken=PASTE_HTE_ACCESS_TOKEN
+@adminToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkOGY3OWQ2Ni00YWUxLTRlODAtYWZkZi1lZjcxM2JhYWY0NDciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzI0ODk4LCJpYXQiOjE3OTQzMjEyOTgsImVtYWlsIjoiYWRtaW5zYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IklzYWFjIiwibGFzdF9uYW1lIjoiQ2xhcmtlIiwibWlkZGxlX25hbWUiOiJNYXJhZG9uYSIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic2VlZF9rZXkiOiJhZG1pbmlzdHJhdG9yLTAxIiwic3VmZml4IjpudWxsfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc5NDMyMTI5OH1dLCJzZXNzaW9uX2lkIjoiZjY5MzUwZWMtYzBhNS00M2YxLTgyNzUtMzljNTI4OWE5OTUwIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.Nkmi-HGLCNT8yFuKiK1fE9y_7zruHTN6cKj9L6KIKdCp1Fqc25HH_K-JBqnFSXNSGM7oHZmi_8vsxUDC9z9nZg
+@studentToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJhOGZmYzUxYi02ZDFhLTQwOGUtYmJmZi02OGZhZTQxYjdiMmUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzI1Mjk2LCJpYXQiOjE3OTQzMjE2OTYsImVtYWlsIjoic3R1ZGVudHNiaW1zNkBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiQmVhIEJpYW5jYSIsImxhc3RfbmFtZSI6Ik1hbGxhcmkiLCJtaWRkbGVfbmFtZSI6IlPDoW5jaGV6Iiwicm9sZSI6InN0dWRlbnQiLCJzZWVkX2tleSI6InN0dWRlbnQtMDYiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzk0MzIxNjk2fV0sInNlc3Npb25faWQiOiI3N2I5YzIyNC04OTlmLTQ1OGUtODFiNC0xMWEyMDFkODc1YjQiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.FkREr6NhCq6_m12aJBfXpxuJphv4AZd7_2gG5GDn55tLQRowP_0MQic4v0BKQGIKMwrPUgq_G2-WPJgkySJvmg
+@coordinatorToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3OGUxNDVkMi1hN2M3LTRkM2MtOWMzZS04MDI2YTc2NGM1NGUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzI0OTE3LCJpYXQiOjE3OTQzMjEzMTcsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczJAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkdhYnJpZWwiLCJsYXN0X25hbWUiOiJWaWxsYW51ZXZhIiwibWlkZGxlX25hbWUiOiJTYW50b3MiLCJyb2xlIjoiaW50ZXJuc2hpcF9jb29yZGluYXRvciIsInNlZWRfa2V5IjoiaW50ZXJuc2hpcC1jb29yZGluYXRvci0wMiIsInN1ZmZpeCI6bnVsbH0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQzMjEzMTd9XSwic2Vzc2lvbl9pZCI6IjA5ZTcyNTBhLTYyMzctNGIxMi05NzAzLWExZTVhMjk3MGRkZCIsImlzX2Fub255bW91cyI6ZmFsc2V9.McipPVkp5hgN-0FOp87KpsAj-uVVkkMz9PTYPmzwdomG64dQp7r-GqqpIbMGfQwENXePEWKzfHJ-jjHy1xlaNA
+@facultyToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIxOTRmZjUyMi01MGJmLTRjMGMtYTMwYy05NTk2NjAyM2MwOTgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzI0OTMzLCJpYXQiOjE3OTQzMjEzMzMsImVtYWlsIjoiZmFjdWx0eXNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiTmF0aGFuaWVsIEFuZHJlcyIsImxhc3RfbmFtZSI6Ik5hY3BpbCIsIm1pZGRsZV9uYW1lIjoiU2FybWllbnRvIiwicm9sZSI6ImZhY3VsdHlfYWR2aXNlciIsInNlZWRfa2V5IjoiZmFjdWx0eS1hZHZpc2VyLTAxIiwic3VmZml4IjoiSnIuIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQzMjEzMzN9XSwic2Vzc2lvbl9pZCI6ImI4ZjcwMTllLTYxZTQtNGZlYy05ZDdkLTRiY2FlOWM5NDYzYiIsImlzX2Fub255bW91cyI6ZmFsc2V9.TZHClvJhZ1BDCgSApF7X2C-Up55Pa8bXmHJxW7A6DuKge6u6BExgFFH9Cqd0RrgL5a0ju0PEym3xP_qZh7cKJQ
+@hteToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1YjRiNjJiMi0xODYyLTQyZWEtYjA4MC01MGUwZWIyOGRhNjMiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzI0OTU3LCJpYXQiOjE3OTQzMjEzNTcsImVtYWlsIjoiaHRlc2JpbXMzQGdyci5sYSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcnN0X25hbWUiOiJNYXJjbyBMdWlzIiwibGFzdF9uYW1lIjoiQmF1dGlzdGEiLCJtaWRkbGVfbmFtZSI6IkNvcnB1eiIsInJvbGUiOiJodGVfc3VwZXJ2aXNvciIsInNlZWRfa2V5IjoiaHRlLXN1cGVydmlzb3ItMDMiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzk0MzIxMzU3fV0sInNlc3Npb25faWQiOiJiODY0ZThkZi00Y2ExLTQyOGMtODA0OS03MjNkMjNlZmZjNWEiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.lnURuPG_nzlWY5sZaYahweCrJTRw1qkuCeZA2BpLBZXHq-j74QZUFVr5mEh-MGIzrrRd2Gbd9ShuVtYGEC_6Kw
 
 ###############################################################
 
@@ -115,7 +115,7 @@
 
 ###############################################################
 
-@assignedStudentId={{studentUserId}}
+@assignedStudentId=4e22bdd6-0146-4356-99cb-f0c3f55bc35f
 
 ###############################################################
 
@@ -197,7 +197,7 @@ Content-Type: application/json
 
 ###############################################################
 
-### Coordinator Creates Student Profile
+### Coordinator and Administrator Creates Student Profile
 
 ###
 
@@ -225,19 +225,37 @@ Content-Type: application/json
 
 ### - profiles.role = student
 
+### Coordinator Creates Student Profile
 POST {{apiUrl}}/students
 Authorization: Bearer {{coordinatorToken}}
 Content-Type: application/json
 
 {
 "userId": "{{studentUserId}}",
-"studentNumber": "2023-00001",
+"studentNumber": "2026-00001",
 "program": "Bachelor of Science in Statistics",
 "yearLevel": 3,
 "section": "BSS-3E",
 "contactNumber": "09123456789",
 "address": "3494 Lucban Avenue, Makati City, Metro Manila",
-"emergencyContactName": "Juan Messi",
+"emergencyContactName": "Kylie Cruz",
+"emergencyContactNumber": "09987654321"
+}
+
+### Administrator Creates Student Profile
+POST {{apiUrl}}/students
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+"userId": "{{studentUserId}}",
+"studentNumber": "2026-00002",
+"program": "Bachelor of Science in Statistics",
+"yearLevel": 3,
+"section": "BSS-3E",
+"contactNumber": "09123456798",
+"address": "3494 Lucban Avenue, Makati City, Metro Manila",
+"emergencyContactName": "Ruru Cruz",
 "emergencyContactNumber": "09987654321"
 }
 
@@ -247,7 +265,7 @@ Content-Type: application/json
 
 ###############################################################
 
-### Internship Coordinator Retrieves Student Profile
+### Internship Coordinator and Administrator Retrieves Student Profile
 
 ###
 
@@ -277,6 +295,10 @@ Content-Type: application/json
 
 GET {{apiUrl}}/students/{{studentUserId}}
 Authorization: Bearer {{coordinatorToken}}
+
+###
+GET {{apiUrl}}/students/{{studentUserId}}
+Authorization: Bearer {{adminToken}}
 
 ###############################################################
 
@@ -331,6 +353,47 @@ Content-Type: application/json
 
 {
 "emergencyContactName": "Juan Dimalanta",
+"emergencyContactNumber": "09987654000"
+}
+
+
+###############################################################
+
+# COORDINATOR AND ADMIN UPDATE STUDENT INFORMATION
+
+###############################################################
+
+### Coordinator and Administrator Update Student Information
+
+###
+
+### Expected:
+
+### - HTTP 200
+
+### - contact_number updated
+
+### - address updated
+
+### - profiles relationship remains present
+
+### Coordinator Updates Student Information
+PATCH {{apiUrl}}/students/{{studentUserId}}
+Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
+
+{
+"emergencyContactName": "Ruru Cruz",
+"emergencyContactNumber": "09987654000"
+}
+
+### Administrator Updates Student Information
+PATCH {{apiUrl}}/students/{{studentUserId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+"emergencyContactName": "Ruru Cruz",
 "emergencyContactNumber": "09987654000"
 }
 
@@ -684,6 +747,103 @@ Authorization: Bearer {{studentToken}}
 GET {{apiUrl}}/students/assigned
 Authorization: Bearer {{studentToken}}
 
+###############################################################
+
+# OTHER UNAUTHORIZED ACCESS TESTS
+
+###############################################################
+
+### Expected for all tests below:
+
+### - HTTP 403 Forbidden
+
+### Faculty Cannot Retrieve All Student Profiles
+GET {{apiUrl}}/students
+Authorization: Bearer {{facultyToken}}
+
+### Supervisor Cannot Retrieve All Student Profiles
+GET {{apiUrl}}/students
+Authorization: Bearer {{hteToken}}
+
+
+
+### Administrator Cannot Access students/assigned Endpoint
+GET {{apiUrl}}/students/assigned
+Authorization: Bearer {{adminToken}}
+
+### Coordinator Cannot Access students/assigned Endpoint
+GET {{apiUrl}}/students/assigned
+Authorization: Bearer {{coordinatorToken}}
+
+### Supervisor Cannot Access students/assigned Endpoint
+GET {{apiUrl}}/students/assigned
+Authorization: Bearer {{hteToken}}
+
+
+
+### Administrator Cannot Access students/me Endpoint
+GET {{apiUrl}}/students/me
+Authorization: Bearer {{adminToken}}
+
+### Coordinator Cannot Access students/me Endpoint
+GET {{apiUrl}}/students/me
+Authorization: Bearer {{coordinatorToken}}
+
+### Faculty Cannot Access students/me Endpoint
+GET {{apiUrl}}/students/me
+Authorization: Bearer {{facultyToken}}
+
+### Supervisor Cannot Access students/me Endpoint
+GET {{apiUrl}}/students/me
+Authorization: Bearer {{hteToken}}
+
+
+
+### Supervisor Cannot Retrieve Student Profile By ID
+GET {{apiUrl}}/students/{{studentUserId}}
+Authorization: Bearer {{hteToken}}
+
+### Student Cannot Retrieve Student Profile By ID
+GET {{apiUrl}}/students/{{studentUserId}}
+Authorization: Bearer {{studentToken}}
+
+
+
+### Supervisor Cannot Create Student Profile
+POST {{apiUrl}}/students
+Authorization: Bearer {{hteToken}}
+
+
+
+### Administrator Cannot Access PATCH students/me Endpoint
+PATCH {{apiUrl}}/students/me
+Authorization: Bearer {{adminToken}}
+
+### Coordinator Cannot Access PATCH students/me Endpoint
+PATCH {{apiUrl}}/students/me
+Authorization: Bearer {{coordinatorToken}}
+
+### Faculty Cannot Access PATCH students/me Endpoint
+PATCH {{apiUrl}}/students/me
+Authorization: Bearer {{facultyToken}}
+
+### Supervisor Cannot Access PATCH students/me Endpoint
+PATCH {{apiUrl}}/students/me
+Authorization: Bearer {{hteToken}}
+
+
+
+### Faculty Cannot Update a Student Profile By ID
+PATCH {{apiUrl}}/students/{{studentUserId}}
+Authorization: Bearer {{facultyToken}}
+
+### Student Cannot Update a Student Profile By ID
+PATCH {{apiUrl}}/students/{{studentUserId}}
+Authorization: Bearer {{studentToken}}
+
+### Supervisor Cannot Update a Student Profile By ID
+PATCH {{apiUrl}}/students/{{studentUserId}}
+Authorization: Bearer {{hteToken}}
 ###############################################################
 
 # FR-03 UNAUTHENTICATED ACCESS - /students/me

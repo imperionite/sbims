@@ -48,12 +48,11 @@
 ###############################################################
 
 # Replace after login
-
-@adminToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkOGY3OWQ2Ni00YWUxLTRlODAtYWZkZi1lZjcxM2JhYWY0NDciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzkxMzgxMzIxLCJpYXQiOjE3OTEzNzc3MjEsImVtYWlsIjoiYWRtaW5zYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IklzYWFjIiwibGFzdF9uYW1lIjoiQ2xhcmtlIiwibWlkZGxlX25hbWUiOiJNYXJhZG9uYSIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic2VlZF9rZXkiOiJhZG1pbmlzdHJhdG9yLTAxIiwic3VmZml4IjpudWxsfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc5MTM3NzcyMX1dLCJzZXNzaW9uX2lkIjoiYjVhYmJlMzQtN2RmZS00ZDRkLThjYmYtY2U2MDkwZDI5YmMyIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.2G5uX8G36aP7PKPPK5xf2sq1rUTA1NorRrca98Da_Oi6idxgqsXPt1lsRxKVyoIkcoZslRHO2nlPPmr7wkmTRw
-@studentToken=
-@coordinatorToken=
-@facultyToken=PASTE_FACULTY_ACCESS_TOKEN
-@hteToken=PASTE_HTE_ACCESS_TOKEN
+@adminToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkOGY3OWQ2Ni00YWUxLTRlODAtYWZkZi1lZjcxM2JhYWY0NDciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzMwNjk5LCJpYXQiOjE3OTQzMjcwOTksImVtYWlsIjoiYWRtaW5zYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IklzYWFjIiwibGFzdF9uYW1lIjoiQ2xhcmtlIiwibWlkZGxlX25hbWUiOiJNYXJhZG9uYSIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic2VlZF9rZXkiOiJhZG1pbmlzdHJhdG9yLTAxIiwic3VmZml4IjpudWxsfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc5NDMyNzA5OX1dLCJzZXNzaW9uX2lkIjoiZDI5MWQ1Y2YtZGQwZC00Y2E5LTlmYWYtN2EyMzU3NTM4MmFlIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.PAauSeWFJI1H6ydGk5lhBlXQX1_7VVLWk2RLN8R1HNEUIh34946OaCC7L0qlG7atMt0wBtxT-mnKCMlLTXrl1A
+@studentToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJlNDVlMzczOS0wNGJlLTRiZWQtOWU0NS0zODBiNjE3Yjg3MzkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzMwNzQzLCJpYXQiOjE3OTQzMjcxNDMsImVtYWlsIjoic3R1ZGVudHNiaW1zMTdAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6Ikxpb25lbCIsImxhc3RfbmFtZSI6Ik1lc3NpIiwicm9sZSI6InN0dWRlbnQifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc5NDMyNzE0M31dLCJzZXNzaW9uX2lkIjoiYTcwOGRhNmEtOWIyOS00MTIyLThmMjEtZGRkZjI4NDFiYzc4IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.rrUKsMjDHbECQKBj7OnbNVMnnMLWM74K7pdnEy82kkkCjelt2FPXqq6c3n9IfKi46DThZbrUVaKIzuCng21Biw
+@coordinatorToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3OGUxNDVkMi1hN2M3LTRkM2MtOWMzZS04MDI2YTc2NGM1NGUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzMwNzE3LCJpYXQiOjE3OTQzMjcxMTcsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczJAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkdhYnJpZWwiLCJsYXN0X25hbWUiOiJWaWxsYW51ZXZhIiwibWlkZGxlX25hbWUiOiJTYW50b3MiLCJyb2xlIjoiaW50ZXJuc2hpcF9jb29yZGluYXRvciIsInNlZWRfa2V5IjoiaW50ZXJuc2hpcC1jb29yZGluYXRvci0wMiIsInN1ZmZpeCI6bnVsbH0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQzMjcxMTd9XSwic2Vzc2lvbl9pZCI6ImFjMDkyODcxLTkwZmEtNDJhNi1hMjhmLWRiNjA1MWJjZjc2NCIsImlzX2Fub255bW91cyI6ZmFsc2V9.-X8wmJrilz7qpHL4WtpaQ-g7EXUFl8VXCxE-lR8h6OwVOww3Ec6newIRUm75lBNKuvMS8EUui27jICNukFiUfQ
+@facultyToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIxOTRmZjUyMi01MGJmLTRjMGMtYTMwYy05NTk2NjAyM2MwOTgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzMwNzMxLCJpYXQiOjE3OTQzMjcxMzEsImVtYWlsIjoiZmFjdWx0eXNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiTmF0aGFuaWVsIEFuZHJlcyIsImxhc3RfbmFtZSI6Ik5hY3BpbCIsIm1pZGRsZV9uYW1lIjoiU2FybWllbnRvIiwicm9sZSI6ImZhY3VsdHlfYWR2aXNlciIsInNlZWRfa2V5IjoiZmFjdWx0eS1hZHZpc2VyLTAxIiwic3VmZml4IjoiSnIuIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQzMjcxMzF9XSwic2Vzc2lvbl9pZCI6IjliYTY0ZWM1LTM2NDUtNDA3Zi05OTM3LTc4YzQwZmI4YTg5MyIsImlzX2Fub255bW91cyI6ZmFsc2V9.vESv3blgRoH1CWmXSLRWVsm2IzY6qqrzs24lPsdJNPkC_Eh51GziFy2hJ_CDtmbRPGkAlCrAsDuPISR74s-8pQ
+@hteToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1YjRiNjJiMi0xODYyLTQyZWEtYjA4MC01MGUwZWIyOGRhNjMiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzMwNzY2LCJpYXQiOjE3OTQzMjcxNjYsImVtYWlsIjoiaHRlc2JpbXMzQGdyci5sYSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcnN0X25hbWUiOiJNYXJjbyBMdWlzIiwibGFzdF9uYW1lIjoiQmF1dGlzdGEiLCJtaWRkbGVfbmFtZSI6IkNvcnB1eiIsInJvbGUiOiJodGVfc3VwZXJ2aXNvciIsInNlZWRfa2V5IjoiaHRlLXN1cGVydmlzb3ItMDMiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzk0MzI3MTY2fV0sInNlc3Npb25faWQiOiJlYWQ2YWY5NS0yNWM2LTRjYjUtOTQ1NC1lMzRhOTRhNDNjNTMiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.-SxlRyDL90QHoyEDuxcxn5QFJwq5gwNPXcQ4D2mXFRvTkdk8lbH9hnzo7K-GtHoJxN5yQgRliBjNyUiRZjcLHQ
 ###############################################################
 
 # USER IDS
@@ -62,7 +61,7 @@
 
 # Replace after creating user
 
-@userId=8693901c-329b-4dcc-987d-c53edf125a1d
+@userId=edd8980b-0894-40fd-a587-b0fe3564b240
 
 
 
@@ -92,7 +91,7 @@ Content-Type: application/json
 
 {
   "email": "{{coordinator}}",
-  "password": "{{newPassword}}"
+  "password": "{{defaultPassword}}"
 }
 
 ###
@@ -124,9 +123,6 @@ Content-Type: application/json
 
 ### List Users
 
-### Permission:
-### administrator only
-
 ### Expected:
 ### - HTTP 200
 ### - Returns user list
@@ -153,6 +149,22 @@ Authorization: Bearer {{adminToken}}
 GET {{apiUrl}}/users/{{userId}}
 Authorization: Bearer {{coordinatorToken}}
 
+###############################################################
+
+# Fetch Users by Role (Administrator & Coordinator)
+# 
+
+###############################################################
+
+GET {{apiUrl}}/users/role/student
+Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
+
+###############################################################
+
+GET {{apiUrl}}/users/role/student
+Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
 
 
 ###############################################################
@@ -325,23 +337,134 @@ Content-Type: application/json
 
 ###############################################################
 
-### Student Login
 
-### Copy token response
 
-POST {{apiUrl}}/auth/login
+######################### Internship Coordinator #############################
+
+###############################################################
+
+# Coordinator Can Access User List
+
+###############################################################
+
+### Expected:
+### HTTP 200
+
+GET {{apiUrl}}/users
+Authorization: Bearer {{coordinatorToken}}
+
+
+
+###############################################################
+
+# Coordinator Cannot Access Single User
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+GET {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{coordinatorToken}}
+
+
+###############################################################
+
+# Coordinator Cannot Access Users by Role
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+GET {{apiUrl}}/users/role/faculty_adviser
+Authorization: Bearer {{coordinatorToken}}
+
+###############################################################
+
+# Coordinator Cannot Create User
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+POST {{apiUrl}}/users
+Authorization: Bearer {{coordinatorToken}}
 Content-Type: application/json
 
 {
-  "email": "{{student}}",
-  "password": "{{defaultPassword}}"
+  "email": "studentsbims17@grr.la",
+  "firstName": "Lionel",
+  "middleName": "Victor",
+  "lastName": "Messi",
+  "suffix": "III",
+  "role": "student",
+  "password": "Dev2026!"
+}
+
+
+###############################################################
+
+# Coordinator Cannot Update User
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+PATCH {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Unauthorized Update"
 }
 
 
 
 ###############################################################
 
-# Student Access User List
+# Coordinator Cannot Change Role
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+PATCH {{apiUrl}}/users/{{userId}}/role
+Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
+
+{
+  "role": "administrator"
+}
+
+
+###############################################################
+
+# Coordinator Cannot Change Status
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+PATCH {{apiUrl}}/users/{{userId}}/status
+Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+
+
+######################### STUDENT #############################
+
+###############################################################
+
+# Student Cannot Access User List
 
 ###############################################################
 
@@ -355,7 +478,7 @@ Authorization: Bearer {{studentToken}}
 
 ###############################################################
 
-# Student Access Single User
+# Student Cannot Access Single User
 
 ###############################################################
 
@@ -366,10 +489,45 @@ GET {{apiUrl}}/users/{{userId}}
 Authorization: Bearer {{studentToken}}
 
 
+###############################################################
+
+# Student Cannot Access Users by Role
 
 ###############################################################
 
-# Student Update User
+### Expected:
+### HTTP 403 Forbidden
+
+GET {{apiUrl}}/users/role/faculty_adviser
+Authorization: Bearer {{studentToken}}
+
+###############################################################
+
+# Student Cannot Create User
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+POST {{apiUrl}}/users
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "email": "studentsbims17@grr.la",
+  "firstName": "Lionel",
+  "middleName": "Victor",
+  "lastName": "Messi",
+  "suffix": "III",
+  "role": "student",
+  "password": "Dev2026!"
+}
+
+
+###############################################################
+
+# Student Cannot Update User
 
 ###############################################################
 
@@ -388,7 +546,7 @@ Content-Type: application/json
 
 ###############################################################
 
-# Student Change Role
+# Student Cannot Change Role
 
 ###############################################################
 
@@ -404,6 +562,265 @@ Content-Type: application/json
 }
 
 
+###############################################################
+
+# Student Cannot Change Status
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+PATCH {{apiUrl}}/users/{{userId}}/status
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+
+######################### Faculty Adviser #############################
+
+###############################################################
+
+# Faculty Cannot Access User List
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+GET {{apiUrl}}/users
+Authorization: Bearer {{facultyToken}}
+
+
+
+###############################################################
+
+# Faculty Cannot Access Single User
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+GET {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{facultyToken}}
+
+
+###############################################################
+
+# Faculty Cannot Access Users by Role
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+GET {{apiUrl}}/users/role/faculty_adviser
+Authorization: Bearer {{facultyToken}}
+
+###############################################################
+
+# Faculty Cannot Create User
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+POST {{apiUrl}}/users
+Authorization: Bearer {{facultyToken}}
+Content-Type: application/json
+
+{
+  "email": "studentsbims17@grr.la",
+  "firstName": "Lionel",
+  "middleName": "Victor",
+  "lastName": "Messi",
+  "suffix": "III",
+  "role": "student",
+  "password": "Dev2026!"
+}
+
+
+###############################################################
+
+# Faculty Cannot Update User
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+PATCH {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{facultyToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Unauthorized Update"
+}
+
+
+
+###############################################################
+
+# Faculty Cannot Change Role
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+PATCH {{apiUrl}}/users/{{userId}}/role
+Authorization: Bearer {{facultyToken}}
+Content-Type: application/json
+
+{
+  "role": "administrator"
+}
+
+
+###############################################################
+
+# Faculty Cannot Change Status
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+PATCH {{apiUrl}}/users/{{userId}}/status
+Authorization: Bearer {{facultyToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+
+
+######################### HTE Supervisor #############################
+
+###############################################################
+
+# HTE Supervisor Cannot Access User List
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+GET {{apiUrl}}/users
+Authorization: Bearer {{hteToken}}
+
+
+
+###############################################################
+
+# HTE Supervisor Cannot Access Single User
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+GET {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{hteToken}}
+
+
+###############################################################
+
+# HTE Supervisor Cannot Access Users by Role
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+GET {{apiUrl}}/users/role/faculty_adviser
+Authorization: Bearer {{hteToken}}
+
+###############################################################
+
+# HTE Supervisor Cannot Create User
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+POST {{apiUrl}}/users
+Authorization: Bearer {{hteToken}}
+Content-Type: application/json
+
+{
+  "email": "studentsbims17@grr.la",
+  "firstName": "Lionel",
+  "middleName": "Victor",
+  "lastName": "Messi",
+  "suffix": "III",
+  "role": "student",
+  "password": "Dev2026!"
+}
+
+
+###############################################################
+
+# HTE Supervisor Cannot Update User
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+PATCH {{apiUrl}}/users/{{userId}}
+Authorization: Bearer {{hteToken}}
+Content-Type: application/json
+
+{
+  "firstName": "Unauthorized Update"
+}
+
+
+
+###############################################################
+
+# HTE Supervisor Cannot Change Role
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+PATCH {{apiUrl}}/users/{{userId}}/role
+Authorization: Bearer {{hteToken}}
+Content-Type: application/json
+
+{
+  "role": "administrator"
+}
+
+
+###############################################################
+
+# HTE Supervisor Cannot Change Status
+
+###############################################################
+
+### Expected:
+### HTTP 403 Forbidden
+
+PATCH {{apiUrl}}/users/{{userId}}/status
+Authorization: Bearer {{hteToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+
 
 ###############################################################
 
@@ -415,20 +832,3 @@ Content-Type: application/json
 ### HTTP 401 Unauthorized
 
 GET {{apiUrl}}/users
-
-###############################################################
-
-# Fetch Users by Role (Administrator & Coordinator)
-# 
-
-###############################################################
-
-GET {{apiUrl}}/users/role/faculty_adviser
-Authorization: Bearer {{coordinatorToken}}
-Content-Type: application/json
-
-###############################################################
-
-GET {{apiUrl}}/users/role/student
-Authorization: Bearer {{coordinatorToken}}
-Content-Type: application/json
