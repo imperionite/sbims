@@ -256,6 +256,7 @@ Deno.test("Protected endpoint authentication checks", async (t) => {
 
       let passed = 0;
       const failures: string[] = [];
+      let restoreError: unknown;
 
       try {
         for (const endpoint of protectedEndpoints) {
@@ -288,14 +289,16 @@ Deno.test("Protected endpoint authentication checks", async (t) => {
           failures.length > 0 ? `Unexpected responses:\n${failures.join("\n")}` : "",
         );
       } finally {
-        const { error: restoreError } = await supabaseAdmin
+        const { error } = await supabaseAdmin
           .from("profiles")
           .update({ is_active: true })
           .eq("email", TEST_USERS.student.email);
 
-        if (restoreError) {
-          throw restoreError;
-        }
+        restoreError = error;
+      }
+
+      if (restoreError) {
+        throw restoreError;
       }
     },
   );
