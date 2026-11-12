@@ -31,8 +31,11 @@
 
 ### Replace these values with IDs from the active test database.
 @internshipId=032fac1c-ef68-4ebf-aac5-994fc6ddb087
+
+@otherInternshipId=bdcd7410-829b-47a7-bee4-bddf76a980c3
+
 @documentId=c315dfc4-6f8d-47d6-a17b-715d78c333e9
-@secondDocumentId=REPLACE_WITH_SECOND_DOCUMENT_UUID
+@secondDocumentId=e11b31f2-7cf4-45b5-9d0f-475d1acecd2f
 
 @testFile=./fixtures/sample-document.pdf
 
@@ -62,10 +65,12 @@
 
 ### These are populated manually after successful login.
 
-@studentToken=
+@studentToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIzMWMwNTAxYS05NjhhLTQzNzctODA1YS1mOWVjZTE0MzY0MTIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0NDA0MDIxLCJpYXQiOjE3OTQ0MDA0MjEsImVtYWlsIjoic3R1ZGVudHNiaW1zMTAwQGdyci5sYSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcnN0X25hbWUiOiJNaWxhZ3JvcyIsImxhc3RfbmFtZSI6IkNydXoiLCJyb2xlIjoic3R1ZGVudCJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzk0NDAwNDIxfV0sInNlc3Npb25faWQiOiIzYjA3MmY2Ni0wMGIzLTQ3Y2MtODQzZS01ODcwMDQ4MDZlNTUiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.JttXpncILxKrhqeqoq52uleWfC_UMKwSDM72_Ob3u3l-Asv3aPR0ZSyA0M0XWy5wMo46FFrtaqbfszvgxHzSnQ
 @adminToken=REPLACE_WITH_ADMIN_ACCESS_TOKEN
-@facultyToken=REPLACE_WITH_FACULTY_ACCESS_TOKEN
-@hteToken=REPLACE_WITH_HTE_ACCESS_TOKEN
+@facultyToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIxOTRmZjUyMi01MGJmLTRjMGMtYTMwYy05NTk2NjAyM2MwOTgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0NDAzOTczLCJpYXQiOjE3OTQ0MDAzNzMsImVtYWlsIjoiZmFjdWx0eXNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiTmF0aGFuaWVsIEFuZHJlcyIsImxhc3RfbmFtZSI6Ik5hY3BpbCIsIm1pZGRsZV9uYW1lIjoiU2FybWllbnRvIiwicm9sZSI6ImZhY3VsdHlfYWR2aXNlciIsInNlZWRfa2V5IjoiZmFjdWx0eS1hZHZpc2VyLTAxIiwic3VmZml4IjoiSnIuIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQ0MDAzNzN9XSwic2Vzc2lvbl9pZCI6IjllNDcyZDJhLWQ4Y2ItNDU3Zi1iNzEwLWRlNWU0NGZhZjBhMSIsImlzX2Fub255bW91cyI6ZmFsc2V9.4qQIOiCgGFbwvQyCJrbOpH0XPk4_reFmY2uiLc_Qb2n8TFONQFwVJ4mOCTJlsYpCTb_hkOHks8cI9vtNDyKioA
+@hteToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZjQxMDgyNC01ZTEwLTQxYWItYTMyNC0xMjVjNGQ1NGUyMTgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0NDA0MDM1LCJpYXQiOjE3OTQ0MDA0MzUsImVtYWlsIjoiaHRlc2JpbXMxQGdyci5sYSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcnN0X25hbWUiOiJSb2JlcnRvIEx1aXMiLCJsYXN0X25hbWUiOiJWYWxkZXJhbWEiLCJtaWRkbGVfbmFtZSI6IkZlcm5hbmRleiIsInJvbGUiOiJodGVfc3VwZXJ2aXNvciIsInNlZWRfa2V5IjoiaHRlLXN1cGVydmlzb3ItMDEiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzk0NDAwNDM1fV0sInNlc3Npb25faWQiOiI3MGZmZTAyOC1lMzhkLTQwMGUtOTkyZC00ZjlhZjZhNmU2NTUiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.IgGqkBvpfuhCNRgd2cyd9deQw87vm9w_L84HJ1Ge-mE8S8dwvFhKK6Zo0fpqe1hOgrNzd_K4FDBlcRFfa_9-Ww
+
+@coordinatorToken=REPLACE_WITH_COORDINATOR_ACCESS_TOKEN
 
 ###############################################################
 
@@ -807,6 +812,106 @@ Content-Type: application/pdf
 GET {{apiUrl}}/documents/internship/{{internshipId}}
 
 Authorization: Bearer {{studentToken}}
+
+###############################################################
+
+# RESOURCE-LEVEL TESTS
+
+###############################################################
+
+### Expected for all tests below: 403 Forbidden
+
+### Student Attempts to Access Another Student's Internship Documents
+GET {{apiUrl}}/documents/internship/{{otherInternshipId}}
+Authorization: Bearer {{studentToken}}
+
+### Faculty Adviser Attempts to Access Internship Documents Not Assigned to Them
+GET {{apiUrl}}/documents/internship/{{otherInternshipId}}
+Authorization: Bearer {{facultyToken}}
+
+### HTE Supervisor Attempts to Access Internship Documents Not Assigned to Them
+GET {{apiUrl}}/documents/internship/{{otherInternshipId}}
+Authorization: Bearer {{hteToken}}
+
+
+
+### Faculty Adviser Attempts to Access Specific Document for an Internship Assigned to Another Adviser
+GET {{apiUrl}}/documents/{{secondDocumentId}}
+Authorization: Bearer {{facultyToken}}
+
+### HTE Supervisor Attempts to Access Specific Document for an Internship Assigned to Another HTE Supervisor
+GET {{apiUrl}}/documents/{{secondDocumentId}}
+Authorization: Bearer {{hteToken}}
+
+
+
+### Student Attempts to Create Document for Another Student's Internship
+POST {{apiUrl}}/documents
+Authorization: Bearer {{studentToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+{{otherInternshipId}}
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+endorsement
+------SBIMSBoundary
+Content-Disposition: form-data; name="file"; filename="sample-document.pdf"
+Content-Type: application/pdf
+
+< ./fixtures/sample-document.pdf
+------SBIMSBoundary--
+
+### Faculty Attempts to Create Document for Internship Assigned to Another Faculty Adviser
+POST {{apiUrl}}/documents
+Authorization: Bearer {{facultyToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+{{otherInternshipId}}
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+endorsement
+------SBIMSBoundary
+Content-Disposition: form-data; name="file"; filename="sample-document.pdf"
+Content-Type: application/pdf
+
+< ./fixtures/sample-document.pdf
+------SBIMSBoundary--
+
+### HTE Supervisor Attempts to Create Document for Internship Assigned to Another HTE Supervisor
+POST {{apiUrl}}/documents
+Authorization: Bearer {{hteToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+{{otherInternshipId}}
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+endorsement
+------SBIMSBoundary
+Content-Disposition: form-data; name="file"; filename="sample-document.pdf"
+Content-Type: application/pdf
+
+< ./fixtures/sample-document.pdf
+------SBIMSBoundary--
+
+
+
+### Student Attempts to Delete Document for Another Student's Internship
+DELETE {{apiUrl}}/documents/{{secondDocumentId}}
+Authorization: Bearer {{studentToken}}
+
+
 
 ###############################################################
 # END FR-09 MANUAL TEST SUITE

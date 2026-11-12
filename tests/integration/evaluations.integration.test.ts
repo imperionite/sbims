@@ -547,6 +547,28 @@ Deno.test(
   },
 );
 
+Deno.test(
+  "FR-08 unrelated Faculty Adviser cannot create evaluation",
+  async () => {
+    await withScenario(async ({ internshipId }) => {
+      const { response, body } = await login(
+        TEST_USERS.otherFacultyAdviser.email,
+        TEST_USERS.otherFacultyAdviser.password,
+      );
+
+      assertEquals(response.status, 200);
+
+      const evaluationResponse = await createEvaluation(
+        body.data.accessToken,
+        internshipId,
+        "faculty_adviser",
+      );
+
+      assertEquals(evaluationResponse.status, 403);
+    });
+  },
+);
+
 /*
  * =========================================================
  * DUPLICATES

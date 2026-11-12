@@ -163,9 +163,7 @@ export class AttendanceService {
      * Ownership check.
      */
     if (internship.student_id !== userId) {
-      throw new Error(
-        "You can only create attendance for your own internship.",
-      );
+      throw new AppError(403, "You can only create attendance for your own internship.");
     }
 
     /*

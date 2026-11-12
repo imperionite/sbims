@@ -42,8 +42,8 @@
 ###############################################################
 
 @apiUrl=http://localhost:8000/api/v1
-@hteId=748e8f09-68c5-462d-8e21-d13e7784eeae
-@hteSupervisorUserId=2300ead7-6b42-4d29-a07d-cd91c4b4b4e8
+@hteId=fddc3332-5b14-461d-97da-88c62f6a1eb4
+@hteSupervisorUserId=66d763bb-758a-401f-9de1-857bccc2f964
 @studentUserId=bcfb4652-2a62-4383-a986-33e838ed3631
 ###############################################################
 # SEED USERS
@@ -65,11 +65,12 @@
 ###############################################################
 # ACCESS TOKENS
 ###############################################################
-@adminToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
-@coordinatorToken=
-@hteSupervisorToken=
-@facultyToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
-@studentToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
+
+@adminToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkOGY3OWQ2Ni00YWUxLTRlODAtYWZkZi1lZjcxM2JhYWY0NDciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzEzMzg0LCJpYXQiOjE3OTQzMDk3ODQsImVtYWlsIjoiYWRtaW5zYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IklzYWFjIiwibGFzdF9uYW1lIjoiQ2xhcmtlIiwibWlkZGxlX25hbWUiOiJNYXJhZG9uYSIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic2VlZF9rZXkiOiJhZG1pbmlzdHJhdG9yLTAxIiwic3VmZml4IjpudWxsfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc5NDMwOTc4NH1dLCJzZXNzaW9uX2lkIjoiN2Y0MGE4ZTAtOGRjZC00ZWFjLTljYjktMTQ0N2FiY2JiMWU4IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.wzr3L9CisJK2-DRXix_KCRRqZQ2IQok5_e6nHgOgL2ihf_lFjyAgDIxipF-JjGHYN8IUkxSKcfVvYk0XkKIvgw
+@studentToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJlNDVlMzczOS0wNGJlLTRiZWQtOWU0NS0zODBiNjE3Yjg3MzkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzEzNDYxLCJpYXQiOjE3OTQzMDk4NjEsImVtYWlsIjoic3R1ZGVudHNiaW1zMTdAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6Ikxpb25lbCIsImxhc3RfbmFtZSI6Ik1lc3NpIiwicm9sZSI6InN0dWRlbnQifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc5NDMwOTg2MX1dLCJzZXNzaW9uX2lkIjoiYzZkNmQ1YWEtOTM4NS00ZjI4LWFlYjQtNDkzOTZhNmZlY2RlIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.4RH9VlrbbMzJgt4ELAzvuJ3AscjXgfvCYB9Ee5SkYxrHcPsU0sPP9Mqn2PQOBfIarOSQbbvQ2GhJSIF-rqM2QQ
+@coordinatorToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3OGUxNDVkMi1hN2M3LTRkM2MtOWMzZS04MDI2YTc2NGM1NGUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzEzNDA1LCJpYXQiOjE3OTQzMDk4MDUsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczJAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkdhYnJpZWwiLCJsYXN0X25hbWUiOiJWaWxsYW51ZXZhIiwibWlkZGxlX25hbWUiOiJTYW50b3MiLCJyb2xlIjoiaW50ZXJuc2hpcF9jb29yZGluYXRvciIsInNlZWRfa2V5IjoiaW50ZXJuc2hpcC1jb29yZGluYXRvci0wMiIsInN1ZmZpeCI6bnVsbH0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQzMDk4MDV9XSwic2Vzc2lvbl9pZCI6ImZjNWU2OWVkLTAwN2UtNDkwNS04M2NlLTlmYjg4ODdkN2YzMSIsImlzX2Fub255bW91cyI6ZmFsc2V9.klnIyEMSerk0KTM_SfmCs9smLhx0g_6V-kIwZpPp0OEGsaLPS4Gr1EdLSusa41rRq1ldFu5HqEIekFavBds1Vg
+@facultyToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIxOTRmZjUyMi01MGJmLTRjMGMtYTMwYy05NTk2NjAyM2MwOTgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzEzNDIyLCJpYXQiOjE3OTQzMDk4MjIsImVtYWlsIjoiZmFjdWx0eXNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiTmF0aGFuaWVsIEFuZHJlcyIsImxhc3RfbmFtZSI6Ik5hY3BpbCIsIm1pZGRsZV9uYW1lIjoiU2FybWllbnRvIiwicm9sZSI6ImZhY3VsdHlfYWR2aXNlciIsInNlZWRfa2V5IjoiZmFjdWx0eS1hZHZpc2VyLTAxIiwic3VmZml4IjoiSnIuIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQzMDk4MjJ9XSwic2Vzc2lvbl9pZCI6ImJmYjBiNmQyLWYyMTctNDYzOC05Y2U0LWJiYmU5MTJiMTlhMiIsImlzX2Fub255bW91cyI6ZmFsc2V9.GmqwamcUGweTPDJ2t8H1MkEoK3pgRBNjfQbLPDCly_W8wXDVCGCaehka_GUQBqi0yzkCDhZAa-EEj4pl2u_eAA
+@hteSupervisorToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1YjRiNjJiMi0xODYyLTQyZWEtYjA4MC01MGUwZWIyOGRhNjMiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzEzNTQxLCJpYXQiOjE3OTQzMDk5NDEsImVtYWlsIjoiaHRlc2JpbXMzQGdyci5sYSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcnN0X25hbWUiOiJNYXJjbyBMdWlzIiwibGFzdF9uYW1lIjoiQmF1dGlzdGEiLCJtaWRkbGVfbmFtZSI6IkNvcnB1eiIsInJvbGUiOiJodGVfc3VwZXJ2aXNvciIsInNlZWRfa2V5IjoiaHRlLXN1cGVydmlzb3ItMDMiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzk0MzA5OTQxfV0sInNlc3Npb25faWQiOiI4OGQ0ZGI4Ny00N2Q4LTRiMjQtYWZjMi1jNDkxMzY1Y2E0NmIiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.XcLEWOQKGbYR6c7oYofK_lL8XSHNFTUT7SrVjCXi6Q5Nbg_dcYTlAmwOeFyqmTHm1mbDOpYhptMOoOLCZm35KA
 
 ###############################################################
 # HEALTH
@@ -93,7 +94,7 @@ Content-Type: application/json
 
 {
   "email": "{{admin}}",
-  "password": "{{newPassword}}"
+  "password": "{{defaultPassword}}"
 }
 
 ### Expected:
@@ -242,9 +243,19 @@ Authorization: Bearer {{coordinatorToken}}
 # HTE UPDATE
 ###############################################################
 
-### FR-04 - Update HTE Profile
+### FR-04 - Coordinator Update HTE Profile
 PATCH {{apiUrl}}/htes/{{hteId}}
 Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
+
+{
+  "companyName": "ABC Industries Inc.",
+  "contactPerson": "Roberto Luis F. Valderama"
+}
+
+### FR-04 - Admin Update HTE Profile
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
@@ -261,7 +272,16 @@ Content-Type: application/json
 ### Existing address remains unchanged
 
 
-### FR-04 - Partial HTE Update
+### FR-04 - Coordinator Partial HTE Update
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
+
+{
+  "address": "Updated HTE Address, Bulacan"
+}
+
+### FR-04 - Admin Partial HTE Update
 PATCH {{apiUrl}}/htes/{{hteId}}
 Authorization: Bearer {{adminToken}}
 Content-Type: application/json
@@ -280,12 +300,24 @@ Content-Type: application/json
 # HTE SUPERVISOR ASSIGNMENT
 ###############################################################
 
-### Assign HTE Supervisor
+### Coordinator Assign HTE Supervisor
 ### The selected profile must have role = "hte_supervisor".
 ### The selected account must be active.
 
 PATCH {{apiUrl}}/htes/{{hteId}}/supervisor
 Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
+
+{
+  "supervisorId": "{{hteSupervisorUserId}}"
+}
+
+### Admin Assign HTE Supervisor
+### The selected profile must have role = "hte_supervisor".
+### The selected account must be active.
+
+PATCH {{apiUrl}}/htes/{{hteId}}/supervisor
+Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
@@ -327,6 +359,7 @@ Authorization: Bearer {{coordinatorToken}}
 ### data = array
 ### Each student belongs to this HTE.
 
+### Coordinator Gets Students Assigned To HTE
 GET {{apiUrl}}/htes/{{hteId}}/students
 Authorization: Bearer {{coordinatorToken}}
 
@@ -390,9 +423,18 @@ Authorization: Bearer {{hteSupervisorToken}}
 # HTE DEACTIVATE
 ###############################################################
 
-### FR-04 - Deactivate HTE
+### FR-04 - Admin Deactivate HTE
 PATCH {{apiUrl}}/htes/{{hteId}}/status
 Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+### FR-04 - Coordinator Deactivate HTE
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{coordinatorToken}}
 Content-Type: application/json
 
 {
@@ -409,7 +451,7 @@ Content-Type: application/json
 # HTE REACTIVATE
 ###############################################################
 
-### FR-04 - Reactivate HTE
+### FR-04 - Admin Reactivate HTE
 PATCH {{apiUrl}}/htes/{{hteId}}/status
 Authorization: Bearer {{adminToken}}
 Content-Type: application/json
@@ -417,6 +459,16 @@ Content-Type: application/json
 {
   "isActive": true
 }
+
+### FR-04 - Coordinator Reactivate HTE
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
+
+{
+  "isActive": true
+}
+
 
 ### Expected:
 ### HTTP 200
@@ -878,4 +930,123 @@ Authorization: Bearer {{hteSupervisorToken}}
 ### Only students belonging to the supervisor's assigned HTE are returned.
 
 
+###############################################################
+# AUTHORIZATION - Forbidden
+###############################################################
 
+### Expected for all requests below:
+### HTTP 403 Forbidden
+
+### Administrator Cannot Access my/students Endpoint
+GET {{apiUrl}}/htes/my/students
+Authorization: Bearer {{adminToken}}
+
+### Coordinator Cannot Access my/students Endpoint
+GET {{apiUrl}}/htes/my/students
+Authorization: Bearer {{coordinatorToken}}
+
+### Faculty Cannot Access my/students Endpoint
+GET {{apiUrl}}/htes/my/students
+Authorization: Bearer {{facultyToken}}
+
+### Students Cannot Access my/students Endpoint
+GET {{apiUrl}}/htes/my/students
+Authorization: Bearer {{studentToken}}
+
+
+
+### Supervisor Cannot List HTE Profiles
+GET {{apiUrl}}/htes
+Authorization: Bearer {{hteSupervisorToken}}
+
+### Faculty Cannot List HTE Profiles
+GET {{apiUrl}}/htes
+Authorization: Bearer {{facultyToken}}
+
+### Students Cannot List HTE Profiles
+GET {{apiUrl}}/htes
+Authorization: Bearer {{studentToken}}
+
+
+
+### Supervisor Cannot Retrieve HTE Profile
+GET {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{hteSupervisorToken}}
+
+### Faculty Cannot Retrieve HTE Profile
+GET {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{facultyToken}}
+
+### Students Cannot Retrieve HTE Profile
+GET {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{studentToken}}
+
+
+
+### Supervisor Cannot Retrieve HTE Students
+GET {{apiUrl}}/htes/{{hteId}}/students
+Authorization: Bearer {{hteSupervisorToken}}
+
+### Faculty Cannot Retrieve HTE Students
+GET {{apiUrl}}/htes/{{hteId}}/students
+Authorization: Bearer {{facultyToken}}
+
+### Students Cannot Retrieve HTE Students
+GET {{apiUrl}}/htes/{{hteId}}/students
+Authorization: Bearer {{studentToken}}
+
+
+
+### Supervisor Cannot Create HTE
+POST {{apiUrl}}/htes
+Authorization: Bearer {{hteSupervisorToken}}
+
+### Faculty Cannot Create HTE
+POST {{apiUrl}}/htes
+Authorization: Bearer {{facultyToken}}
+
+### Students Cannot Create HTE
+POST {{apiUrl}}/htes
+Authorization: Bearer {{studentToken}}
+
+
+
+### Supervisor Cannot Update HTE Profile
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{hteSupervisorToken}}
+
+### Faculty Cannot Update HTE Profile
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{facultyToken}}
+
+### Students Cannot Update HTE Profile
+PATCH {{apiUrl}}/htes/{{hteId}}
+Authorization: Bearer {{studentToken}}
+
+
+
+### Supervisor Cannot Update HTE Status
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{hteSupervisorToken}}
+
+### Faculty Cannot Update HTE Status
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{facultyToken}}
+
+### Students Cannot Update HTE Status
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{studentToken}}
+
+
+
+### Supervisor Cannot Assign HTE Supervisor
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{hteSupervisorToken}}
+
+### Faculty Cannot Assign HTE Supervisor
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{facultyToken}}
+
+### Students Cannot Assign HTE Supervisor
+PATCH {{apiUrl}}/htes/{{hteId}}/status
+Authorization: Bearer {{studentToken}}

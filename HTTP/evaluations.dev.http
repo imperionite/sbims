@@ -36,7 +36,7 @@
 ### Status: completed
 ### Validated Rendered Hours: 150
 
-@internshipId=REPLACE_WITH_STUDENT1_INTERNSHIP_UUID
+@internshipId=bdcd7410-829b-47a7-bee4-bddf76a980c3
 
 
 ###############################################################
@@ -45,11 +45,11 @@
 
 ### Replace after creating the HTE evaluation.
 
-@hteEvaluationId=REPLACE_WITH_HTE_EVALUATION_UUID
+@hteEvaluationId=9d01c5e9-d804-4a4e-b75e-5dc58539c193
 
 ### Replace after creating the Faculty Adviser evaluation.
 
-@facultyEvaluationId=REPLACE_WITH_FACULTY_EVALUATION_UUID
+@facultyEvaluationId=3311383e-f9a6-4e32-be2d-3781b6f38adc
 
 
 ###############################################################
@@ -62,10 +62,10 @@
 ### Evaluation-ready student
 
 @student=studentsbims1@grr.la
-@studentAccessToken=
+@studentAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNThhMmFhYS0zYTI5LTRlYjUtOTczOS1mNWZjYzk5ZWE3ODAiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzkyNTY0LCJpYXQiOjE3OTQzODg5NjQsImVtYWlsIjoic3R1ZGVudHNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmFmYWVsIEpvYXF1aW4iLCJsYXN0X25hbWUiOiJEaW1hbGFudGEiLCJtaWRkbGVfbmFtZSI6IkJvbmRvYyIsInJvbGUiOiJzdHVkZW50Iiwic2VlZF9rZXkiOiJzdHVkZW50LTAxIiwic3VmZml4IjoiSUlJIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQzODg5NjR9XSwic2Vzc2lvbl9pZCI6ImQzMmM3ZTllLWIyYjQtNGIxMy1iODhiLTQ2ZDMyYTcwZTcxYiIsImlzX2Fub255bW91cyI6ZmFsc2V9._mFLDGzHh6Zb4FzAEQlcAJbLuCrxjhaLHVWBypntl4l6M3Rx7fjWuInt_F_vRUwmZng9WTGC1Q9vAlVqzyhFjQ
 
 @faculty=facultysbims1@grr.la
-@facultyAcessToken=
+@facultyAcessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIxOTRmZjUyMi01MGJmLTRjMGMtYTMwYy05NTk2NjAyM2MwOTgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzkyNTg1LCJpYXQiOjE3OTQzODg5ODUsImVtYWlsIjoiZmFjdWx0eXNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiTmF0aGFuaWVsIEFuZHJlcyIsImxhc3RfbmFtZSI6Ik5hY3BpbCIsIm1pZGRsZV9uYW1lIjoiU2FybWllbnRvIiwicm9sZSI6ImZhY3VsdHlfYWR2aXNlciIsInNlZWRfa2V5IjoiZmFjdWx0eS1hZHZpc2VyLTAxIiwic3VmZml4IjoiSnIuIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQzODg5ODV9XSwic2Vzc2lvbl9pZCI6IjlkNjI1MDEzLTgzMGUtNDI4Ni05NTUxLTMyZjhlM2FhYjQwYiIsImlzX2Fub255bW91cyI6ZmFsc2V9.Oizg7RjNwhf_nCVHySQAqyO5a2yduZaBfqlAgsNww9-XfDUT1BE42K6XZ8tRx4fTO4owe4Hy0E6Q1ZreJ3f61Q
 
 ### HTE Supervisor assigned to Student 1
 ###
@@ -73,7 +73,7 @@
 ### If your users seed uses a different email, use that account.
 
 @hteSupervisor=htesbims1@grr.la
-@hteSupervisorAccessToken=
+@hteSupervisorAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJlMjUyMjBmZS1kNDhlLTQ4YmItODQ4NC03NTY0OWViODRhZDgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzk0MzkyNjA5LCJpYXQiOjE3OTQzODkwMDksImVtYWlsIjoiaHRlc2JpbXMyQGdyci5sYSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcnN0X25hbWUiOiJQYXRyaWNpYSBBbm5lIiwibGFzdF9uYW1lIjoiRG9taW5ndWV6IiwibWlkZGxlX25hbWUiOiJSYW1pcmV6Iiwicm9sZSI6Imh0ZV9zdXBlcnZpc29yIiwic2VlZF9rZXkiOiJodGUtc3VwZXJ2aXNvci0wMiIsInN1ZmZpeCI6bnVsbH0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTQzODkwMDl9XSwic2Vzc2lvbl9pZCI6IjU0NTBjNDc2LTM0MTktNGJiMC1iNmFkLThiNmYzMTE1MWJhYiIsImlzX2Fub255bW91cyI6ZmFsc2V9.zxRXo2caJ31swwuXS5JurFfHwOAgTEOu9r9wZKMF16J_VhLBS6rjzs04LIie5uxeh6Cqh59Cn42tye01JQW08g
 
 
 ###############################################################
@@ -997,3 +997,53 @@ Content-Type: application/json
 ### Expected: 401 Unauthorized
 
 POST {{apiUrl}}/evaluations/{{hteEvaluationId}}/submit
+
+###############################################################
+# RESOURCE-LEVEL TESTS
+###############################################################
+
+### Faculty Adviser attempts to retrieve evaluations for a student not assigned to them.
+GET {{apiUrl}}/evaluations/internship/{{internshipId}}
+Authorization: Bearer {{facultyAcessToken}}
+
+### Expected:
+### HTTP 403
+
+### Faculty Adviser attempts to retrieve a specific evaluation for a student not assigned to them.
+GET {{apiUrl}}/evaluations/{{facultyEvaluationId}}
+Authorization: Bearer {{facultyAcessToken}}
+
+### Expected:
+### HTTP 403
+
+
+
+### HTE Supervisor attempts to retrieve evaluations for a student not assigned to them.
+GET {{apiUrl}}/evaluations/internship/{{internshipId}}
+Authorization: Bearer {{hteSupervisorAccessToken}}
+
+### Expected:
+### HTTP 403
+
+### HTE Supervisor attempts to retrieve a specific evaluation for a student not assigned to them.
+GET {{apiUrl}}/evaluations/{{hteEvaluationId}}
+Authorization: Bearer {{hteSupervisorAccessToken}}
+
+### Expected:
+### HTTP 403
+
+
+
+### Student attempts to retrieve evaluations belonging to another student.
+GET {{apiUrl}}/evaluations/internship/{{internshipId}}
+Authorization: Bearer {{studentAccessToken}}
+
+### Expected:
+### HTTP 403
+
+### Student attempts to retrieve a specific evaluation belonging to another student.
+GET {{apiUrl}}/evaluations/{{hteEvaluationId}}
+Authorization: Bearer {{studentAccessToken}}
+
+### Expected:
+### HTTP 403
